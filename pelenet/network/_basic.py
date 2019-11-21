@@ -1,0 +1,191 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import sparse
+
+import nxsdk.api.n2a as nx
+
+class BasicNetwork():
+
+    """
+    @desc: Initiates the abstract network
+    """
+    def __init__(self):
+        # Instanciate nx net object
+        self.nxNet = nx.NxNet()
+
+        # Set seed
+        if self.p.seed is not None:
+            np.random.seed(self.p.seed)
+
+        # Define prototypes
+        self.neuronCompProto = nx.CompartmentPrototype(compartmentVoltageDecay=20, refractoryDelay=2)  # compartment prototype (default neuron)
+        self.exConnProto = nx.ConnectionPrototype(signMode=nx.SYNAPSE_SIGN_MODE.EXCITATORY, numTagBits=0, numDelayBits=0, numWeightBits=8)  # excitatory connection prototype
+        self.inConnProto = nx.ConnectionPrototype(signMode=nx.SYNAPSE_SIGN_MODE.INHIBITORY, numTagBits=0, numDelayBits=0, numWeightBits=8)  # inhibitory connection prototype
+        self.mixedConnProto = nx.ConnectionPrototype(signMode=nx.SYNAPSE_SIGN_MODE.MIXED)  # mixed connection prototype
+
+    """
+    @desc: Run the nx net network
+    """
+    def run(self):
+        self.nxNet.run(self.p.totalSteps)
+        self.nxNet.disconnect()
+
+    """
+    @desc: Get random values from a distribution
+    """
+    def drawWeights(self, size, distribution):
+        weights = None
+
+        if distribution == 'lognormal':
+            hyp = 1.0
+            m = np.log(0.12) + hyp  # Default: np.log(0.2)+1.0; according to Teramae, Tsubo & Fukai (2012)
+            s = hyp  # Default: 1.0; according to Teramae, Tsubo & Fukai (2012)
+            # Draw weight from lognormal distribution
+            weights = (np.random.lognormal(m, s, size)*(255/20.)).astype(int)
+        elif distribution == 'normal':
+            m = 10  # mean
+            s = 5  # standard deviation
+            weights = np.random.normal(m, s, size).astype(int)
+
+        return weights
+    
+    """
+    @desc: Draw whole weight matrix with given dimensions
+           for every mask value which equals 1
+    """
+    def drawSparseWeightMatrix(self, mask, distribution='lognormal'):
+        # Get indices and index pointer from mask
+        indices = mask.indices
+        indptr = mask.indptr
+
+        # Get number of synapses
+        numSynapses = np.sum(len(indices))
+        # Draw weights
+        weights = self.drawWeights(numSynapses, distribution)
+
+        # Get indices of values were weight is greater than 255
+        idxNewValues = np.where(weights > 255)[0]
+        # Redraw values as long as all values are below 255
+        while len(idxNewValues) > 0:
+            # Draw new values
+            newValues = np.random.rand(len(idxNewValues))
+            # Replace previous values with new values
+            np.put(weights, idxNewValues, newValues)
+            # Get indices of values greater 255 again
+            idxNewValues = np.where(weights > 255)[0]
+
+        # Build sparse weight matrix and return
+        return sparse.csr_matrix((weights, indices, indptr), shape=np.shape(mask))
+    
+    """
+    @desc: Draw weight matrix for reservoir network
+    """
+    def drawAndSetSparseReservoirWeightMatrix(self, *args):
+        we = drawSparseWeightMatrix(*args)
+
+        # Define and store sub matrices for weights
+        nEx = self.p.reservoirExSize
+        nAll = nEx + self.p.reservoirInSize
+        self.initialWeights.exex = we[0:nEx, 0:nEx]
+        self.initialWeights.inin = -1 * we[nEx:nAll, nEx:nAll]  # change sign of weights
+        self.initialWeights.inex = -1 * we[0:nEx, nEx:nAll]  # change sign of weights
+        self.initialWeights.exin = we[nEx:nAll, 0:nEx]
+
+    """
+    @desc: Create mask that determines the connections to establish
+    """
+    def drawSparseMaskMatrix(self, dens, nSource, nDestination, avoidSelf=False):
+        # For creating sparse csr matrix, rows must be greater than cols
+        if (nSource > nDestination):
+            nRows = nSource
+            nCols = nDestination
+        else:
+            nRows = nDestination
+            nCols = nSource
+
+        indices = []  # column indices
+        indptr = [0]  # index pointer, start with 0
+        prevRowSum = 0
+
+        # Iterate over rows
+        for i in range(nRows):
+            if avoidSelf:
+                # Randomly draw a row
+                row = np.random.choice([0, 1], size=(nCols-1,), p=[1-dens, dens])
+                # Insert zero value at diagonal (if avoidSelf = True)
+                row = np.insert(row, i, 0)
+            else:
+                # Randomly draw a row
+                row = np.random.choice([0, 1], size=(nCols,), p=[1-dens, dens])
+            
+            # Get indices where row entries are 1
+            rowIdx = np.where(row)[0]
+            indices.extend([rowIdx])
+            
+            # Get cumulative sum of ones in row
+            rowSum = prevRowSum + np.sum(row)
+            indptr.extend([rowSum])
+            
+            # Store current value of row sum for next iteration
+            prevRowSum = rowSum
+
+        # Flatten indices
+        indices = [x for y in indices for x in y]
+        # Create data: ones with length of indices
+        data = np.ones(len(indices)).astype(int)
+
+        # Build and return sparse mask matrix
+        return sparse.csr_matrix((data, indices, indptr), shape=(nRows, nCols))
+    
+    """
+    @desc: Draw mask matrix for reservoir network
+    """
+    def drawAndSetSparseReservoirMaskMatrix(self, *args):
+        ma = drawSparseMaskMatrix(*args)
+
+        # Define and store sub matrices for masks
+        nEx = self.p.reservoirExSize
+        nAll = nEx + self.p.reservoirInSize
+        self.initialMasks.exex = ma[0:nEx, 0:nEx]
+        self.initialMasks.inin = ma[nEx:nAll, nEx:nAll]
+        self.initialMasks.inex = ma[0:nEx, nEx:nAll]
+        self.initialMasks.exin = ma[nEx:nAll, 0:nEx]
+
+    """
+    TODO: Shift to utils/weights.py
+    @desc: Apply mask to weight matrix in order to calculate spectral radius
+    """
+    def getMaskedWeights(self, weights, mask):
+        # Apply mask to weights
+        maskedWeights = np.ma.array(weights, mask=np.logical_not(mask.toarray()))
+        # Set all masked values to zero and divide result by 255 to get weights
+        # between 0 and 1, since nxSDK is using weights between 0 and 255
+        return maskedWeights.filled(0)
+
+    """
+    TODO: Shift to utils/weights.py
+    @desc: Get weight matrix from weight probe
+    """
+    def getWeightMatrixFromProbe(self, probeIndex=-1):
+        n = self.p.reservoirExSize
+        weightMatrix = np.zeros((n,n))
+
+        # Get reservoir mask
+        ws = self.initialMasks.exex
+        
+        # Initialize matrix index
+        matrixIndex = 0
+
+        # Loop through matrix
+        for i in range(n):
+            for j in range(n):
+                # If mask value is zero, set matrix value to zero
+                if ws[i,j] == 0:
+                    weightMatrix[i,j] = 0
+                # If mask value is one, set matrix value to probe value
+                else:
+                    weightMatrix[i,j] = self.reservoirConnProbe[matrixIndex][0].data[probeIndex]
+                    matrixIndex += 1
+
+        # Return weight matrix from probe
+        return weightMatrix

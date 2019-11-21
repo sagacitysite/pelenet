@@ -1,0 +1,10 @@
+# Specific files
+/.ipynb_checkpoints
+
+# All files with ending
+*.pyc
+*.log
+
+# All folders with name
+**/__pycache__
+**/datalog

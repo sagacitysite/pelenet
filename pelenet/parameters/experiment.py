@@ -1,0 +1,86 @@
+"""
+@desc: Include parameters of the experiment
+"""
+def includeExperiment(self):
+
+    # Optimization
+    self.optimizeParameters = 'reservoirExSize'  # Parameter to optimize (later extend to a list)
+
+    # Experiment
+    self.seed = 4  # Seed of the simulation, 'None' is random (no seed)
+    self.totalSteps = 2000 #None  # Number of simulation steps, if 'None', value is derived
+    self.trainingIterations = 20  # number of training trials
+    self.testingIterations = 10  # number of testing trials
+    self.testingRelaxation = 5 #10  # Number of iterations for relaxation
+
+    # Ansitotropic
+    self.connectionProb = 0.05 #0.05  # percentage of established connections (range 0.05 - 0.1), FIXME bring together with "self.reservoirDens"
+    self.anisoStdE = 12  # space constant, std of gaussian for excitatory neurons
+    self.anisoStdI = 9  # space constant, std of gaussian for inhibitory neurons (range 9 - 11)
+    self.anisoShift = 1  # FIXME meaning unclear
+    self.anisoPerlinScale = 4 #8 # 4-12  # perlin noise scale, high value => dense valleys, low value => broad valleys
+
+    # Neuron
+    self.refractoryDelay = 2  # refractory period for a neuron
+
+    # OLS Regression Smoothing
+    self.smoothingWd = 3  # number of neurons to the left and right which are influenced
+    self.smoothingVar = 7  # variance of the Gaussian kernel
+
+    # Plasticity
+    self.isLearningRule = False  # defines if learning rule is active or not (true/false)
+    self.learningImpulse = 5  # impulse for learning rule for x1 and y1
+    self.learningTimeConstant = 10 #10  # time constant for learning rule for x1 and y1
+    #self.learningRule = '2^-2*x1*y0 - 2^-2*y1*x0'  # applied learning rule
+    #self.learningRule = '2^-2*x1*y0 - 2^-2*y1*x0'  # applied learning rule
+    #self.learningRule = '2^-2*x1*y0 - 2^-2*y1*x0 + 2^-1*x0*y0 - 2^-3*y0*y0*w'  # applied learning rule
+    self.learningEpoch = 4  # learning epoch for learnin rule
+    self.homeostasisStatus = False # defines if homesostatic plasticity is active or not
+
+    # Network size and connections
+    self.reservoirExSize = 3600 #200 #3600  # size of the excitatory network
+    self.reservoirInSize = None  # size of the inhibitory network
+    self.reservoirInExRatio = 1./4.  # number excitatory/inhibitory neurons ratio
+    self.reservoirDens = None  # connection density of the network
+    self.numConnectionsPerNeuron = 50 #45 #100  # average number of connections per neuron
+    self.weightExCoefficient = 8 #16 #8 #4  # coefficient for excitatory anisotropic weight
+    self.weightInCoefficient = 32 #64 #28 sieht gut aus!! #32 #22  # coefficient for inhibitory anisotropic weight, Perlin scale 4: 25-30 ok, 25-28 good
+
+    # Trace input
+    self.traceClusters = 3  # number of trace clusters
+    self.traceGens = 50  # number of trace generators per input cluster
+    self.traceSteps = 20 #50 #20  # number of steps the trace input should drive the network
+    self.traceDens = 0.2  # percent of connections to reservoir from input
+    self.traceSpikeProb = 0.2  # probability of spike for the generator
+    #self.traceMaxWeight = 255  # maximum weight a trace connection can have
+    self.traceClusterShare = 0.1  # percentage of excitatory neurons a cluster should be connected with
+    self.traceClusterSize = None  # the number of neurons a trace cluster has
+    self.stepsPerIteration = None  # overall steps for whole trace sequence
+
+    # Constant input
+    self.constGens = 50 #10  # number of constant signal generators
+    self.constDens = 0.1 #0.2  # percent of connections to reservoir from input
+    self.constSpikeProb = 0.2  # probability of spike for the generator
+    self.constSizeShare = 0.1  # share of neurons for the constant input in relation to excitatory network size
+    self.constSize = None  # number of neurons for the constant input
+
+    # Cue input
+    self.cueGens = 50 #50 #10  # number of cue generators
+    self.cueSteps = 100 #200 #100  # number of steps the cue should drive the network, if None, cue is background activity over all steps
+    self.cueRelaxation = 0  # time to wait for relaxation of the network activity after cue
+    self.cueDens = 0.2 # 0.1  # percent of connections to reservoir from input
+    self.cueSpikeProb = 0.1  # probability of spike for the generator
+    self.cueMaxWeight = 100  # maximum weight a cue connection can have
+    self.cuePatchNeurons = 4  # number of neurons for the cue input (needs to be root squarable)
+
+    # Noise
+    self.noiseNeuronsShare = 0.1 # share of noise neurons in relation to excitatory neurons
+    self.noiseNeurons = None  # number of noise neurons (calculated if None)
+    self.noiseSpikeprob = 0.05  # in average, every 1/x th time step a noise neuron fires
+    self.noiseDens = 0.05 # 0.005 # connectivity between noise neurons and reservoir
+    self.noiseMaxWeight = 10 #2  # maximum weight a noise connection can have
+
+    # Probes
+    self.isExSpikeProbe = True  # activate/deactivate spike probes for excitatory neurons
+    self.isInSpikeProbe = False  # activate/deactivate spike probes for inhibitory neurons
+    self.weightProbe = False  # read weights at the end of the simulation

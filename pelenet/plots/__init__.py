@@ -18,14 +18,16 @@ class Plot():
     # Functions to evaluate spikes
     from .spikes import (
         reservoirSpikeTrain, reservoirRates, noiseSpikes, pca,
-        autocorrelation, crosscorrelation, spikesMissmatch, ffSpikeCounts
+        autocorrelation, crosscorrelation, spikesMissmatch, ffSpikeCounts,
+        meanTopologyActivity
     )
     # Functions to evaluate weights
     from .weights import (
         initialExWeightDistribution, trainedExWeightDistribution,
-        initialExWeightMatrix, trainedExWeightMatrix, weightsSortedBySupport
+        initialExWeightMatrix, trainedExWeightMatrix, weightsSortedBySupport,
+        cueWeightMean
     )
     # Other functions
     from .misc import (
-        preSynapticTrace
+        preSynapticTrace, landscape
     )

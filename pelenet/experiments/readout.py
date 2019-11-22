@@ -228,7 +228,7 @@ class Experiment():
             paramsArray = []
             for iteration in range(self.p.testingIterations - 1,self.p.testingIterations):  # only last cluster used for estimation
             #for iteration in range(self.p.testingRelaxation, self.p.testingIterations):
-                xc = self.utils.getSmoothSpikes(clusters[iteration]) if smoothing else clusters[iteration]
+                xc = self.utils.getFilteredSpikes(clusters[iteration]) if smoothing else clusters[iteration]
                 model = sm.OLS(y, xc)
                 paramsArray.append(model.fit().params)
                 #paramsArray.append(model.fit_regularized().params)
@@ -238,7 +238,7 @@ class Experiment():
 
             # Estimate target function
             estIdx = self.p.testingIterations - 1  # index of cluster to estimate on
-            xe = self.utils.getSmoothSpikes(clusters[estIdx]) if smoothing else clusters[estIdx]
+            xe = self.utils.getFilteredSpikes(clusters[estIdx]) if smoothing else clusters[estIdx]
             estimate = np.dot(xe, paramsMean)
             estimateAll.append(estimate)
 

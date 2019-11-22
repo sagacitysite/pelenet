@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.linalg as la
+from statsmodels.tsa.api import SimpleExpSmoothing, Holt
 
 """
 @desc: From activity probe, calculate spike patterns
@@ -21,7 +22,7 @@ def getSpikesFromActivity(self, activityProbes):
     return spikeTrain
 
 """
-@desc: Calculate correlation between spike trains of two neurons
+@desc: Calculate cross correlation between spike trains of two neurons
 """
 def cor(self, t1, t2):
     # Calculate standard devaition of each spike train
@@ -35,9 +36,22 @@ def cor(self, t1, t2):
         return 0
 
 """
-@desc: Smoothing spike train
+@desc: Filter spike train
+@pars: spikeTrain: has N rows (number of neurons) and T columns (number of time steps)
+       filter: filter method as string, can be: 'single exponential', 'double exponential' or 'gaussian' (symmetric)
 """
-def getSmoothSpikes(self, spikesTrain):
+def getFilteredSpikes(self, spikes, filter="single exponential"):
+    if (filter == 'single exponential'):
+        return self.getSingleExponentialFilteredSpikes(spikes)
+    if (filter == 'double exponential'):
+        return self.getHoltDoubleExponentialFilteredSpikes(spikes)
+    if (filter == 'gaussian'):
+        return self.getGaussianFilteredSpikes(spikes)
+
+"""
+@desc: Get symmetric gaussian filtered spikes
+"""
+def getGaussianFilteredSpikes(self, spikes):
     # Define some variables
     wd = self.p.smoothingWd  # width of smoothing, number of influenced neurons to the left and right
     var = self.p.smoothingVar  # variance of the Gaussian kernel
@@ -47,12 +61,11 @@ def getSmoothSpikes(self, spikesTrain):
     kernel = np.exp(-(1/(2*var))*lin**2)
 
     # Prepare spike window
-    spikeWindow = np.concatenate((spikesTrain[-wd:,:], spikesTrain, spikesTrain[:wd,:]))
+    spikeWindow = np.concatenate((spikes[-wd:,:], spikes, spikes[:wd,:]))
 
     # Prepare smoothed array
     nSteps, nNeurons = spikeWindow.shape
     smoothed = np.zeros((nSteps, nNeurons))
-
     
     # Add smoothing to every spike
     for n in range(nNeurons):
@@ -64,3 +77,39 @@ def getSmoothSpikes(self, spikesTrain):
 
     # Return smoothed activity
     return smoothed[wd:-wd,:]
+
+"""
+@desc: Get single exponential filtered spikes
+"""
+def getSingleExponentialFilteredSpikes(self, spikes, smoothing_level=0.1):
+    # Get dimensions
+    N, T = np.shape(spikes)
+
+    filteredSpikes = []
+    # Iterate over all neurons
+    for i in range(N):
+        # Fit values
+        fit = SimpleExpSmoothing(spikes[i,:]).fit(smoothing_level=smoothing_level)
+        # Append filtered values for current neuron
+        filteredSpikes.append(fit.fittedvalues)
+
+    # Transform to numpy array and return
+    return np.array(filteredSpikes)
+
+"""
+@desc: Get holt double exponential filtered spikes
+"""
+def getHoltDoubleExponentialFilteredSpikes(self, spikes, smoothing_level=0.1, smoothing_slope=0.1):
+    # Get dimensions
+    N, T = np.shape(spikes)
+
+    filteredSpikes = []
+    # Iterate over all neurons
+    for i in range(N):
+        # Fit values, if smoothing_slope = 0, result equals single exponential solution
+        fit = Holt(spikes[i,:]).fit(smoothing_level=smoothing_level, smoothing_slope=smoothing_slope)
+        # Append filtered values for current neuron
+        filteredSpikes.append(fit.fittedvalues)
+
+    # Transform to numpy array and return
+    return np.array(filteredSpikes)

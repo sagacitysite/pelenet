@@ -1,5 +1,59 @@
 import numpy as np
 import scipy.linalg as la
+from scipy.stats.stats import pearsonr
+import statsmodels.api as sm
+from types import SimpleNamespace
+
+from lib.helper.exceptions import ArgumentNotValid
+
+"""
+@desc: Trains ordinary least square model, includes filtering and regularization
+@pars: trainSpikes: has dimensions N (number of neurons) x T (number of time steps per trial) x B (number of trials)
+       testSpikes: has dimensions N (number of neurons) x T (number of time steps per trial)
+       targetFunction: has dimensions T (number of time steps per trial)
+       filter: filter method as string, can be: 'single exponential', 'double exponential' or 'gaussian' (symmetric)
+"""
+def trainOLS(self, trainSpikes, testSpikes, targetFunction, filter='single exponential'):
+
+    # Preprocess if B i does not exist
+    if (len(np.shape(trainSpikes)) == 2):
+        trainSpikes = trainSpikes[:,:,np.newaxis]
+
+    # Get shapes (N: num neurons, T: num time steps, B: num trials)
+    N, T, B = np.shape(trainSpikes)
+    Nt, Tt = np.shape(testSpikes)
+
+    # Some checks
+    if (len(targetFunction) != T):
+        raise ArgumentNotValid('Length of target function and length of train spikes is not equal.')
+    if (len(targetFunction) != Tt):
+        raise ArgumentNotValid('Length of target function and length of test spikes is not equal.')
+    if (Nt != N or Tt != T):
+        raise ArgumentNotValid('Number of neurons or number of time steps in train and test spikes is not equal.')
+
+    # Get filtered spike trains for train and test spikes
+    x = self.getFilteredSpikes(trainSpikes.reshape(N, T*B), filter)
+    xe = self.getFilteredSpikes(testSpikes, filter)
+
+    # Get target function for all trials
+    y = np.tile(targetFunction, B)
+
+    # Train the parameters
+    model = sm.OLS(y, x.T)
+    params = model.fit().params
+    #params = model.fit_regularized().params  # https://www.statsmodels.org/stable/generated/statsmodels.regression.linear_model.OLS.fit_regularized.html
+
+    # Estimate target function for test spike train
+    ye = np.dot(xe.T, params)
+
+    # Calculate performance
+    mse = np.mean(np.square(y - ye))  # MSE error
+    cor = pearsonr(y, ye)[0]  # Pearson correlaton coefficient
+
+    # Join performance measures
+    performance = SimpleNamespace(**{ 'mse': mse, 'cor': cor })
+
+    return params, ye, performance
 
 """
 @desc: Caluclates PCA out of given data

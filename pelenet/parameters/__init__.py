@@ -1,12 +1,7 @@
 import numpy as np
 from tabulate import tabulate
 
-"""
-@desc: Define custom error for parameter validility problems
-"""
-class ParamaterNotValid(Exception):
-   """Raised when a parameter is not valid"""
-   pass
+from lib.helper.exceptions import ParamaterNotValid
 
 """
 @desc: Contains all parameters and claculates derived values

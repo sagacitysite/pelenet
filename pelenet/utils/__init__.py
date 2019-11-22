@@ -8,19 +8,6 @@ import logging
 @Singleton
 class Utils():
 
-    # Store instance of Plot class
-    #_instance = None
-
-    """
-    @desc: Construct new object, but only if instance does not already exists
-    """
-    #def __new__(cls, *args, **kwargs):
-    #    # Check if instance does already exists, if not, create an instance and store it
-    #    if not cls._instance:
-    #        cls._instance = object.__new__(cls, *args, **kwargs)
-    #    # Return instance, either just created or from memory
-    #    return cls._instance
-
     """
     @desc: Initiates plot object, gets relation to another object for getting the data
     """
@@ -40,7 +27,8 @@ class Utils():
     """
     # Functions to evaluate spikes
     from .spikes import (
-        getSpikesFromActivity, cor, getSmoothSpikes
+        getSpikesFromActivity, cor, getFilteredSpikes,
+        getGaussianFilteredSpikes, getSingleExponentialFilteredSpikes, getHoltDoubleExponentialFilteredSpikes
     )
     # Functions to evaluate weights
     from .weights import (
@@ -48,5 +36,5 @@ class Utils():
     )
     # Other functions
     from .misc import (
-        pca
+        trainOLS, pca
     )

@@ -217,3 +217,22 @@ def ffSpikeCounts(spikes, neuronIdx, windowSize = 50):
     plt.title('Fano factors for test run')
     plt.savefig(self.plotDir + 'spikes_fanofactors.png')
     p = plt.show()
+
+"""
+@desc: Plots the mean activity in the topology
+"""
+def meanTopologyActivity(self):
+    # Define some variables
+    topsize = int(np.sqrt(self.p.reservoirExSize))
+
+    # Get topology of spikes and mean over time
+    topoSpikes = self.obj.exSpikeTrains.reshape(-1, topsize, topsize)
+    topoSpikesMean = np.mean(topoSpikes, axis=0)
+
+    # Plot mean activity
+    plt.figure(figsize=(6, 6))
+    plt.title('Topological mean activity (Perlin scale: '+ str(self.p.anisoPerlinScale) + ')')
+    #st_mean[st_mean < 0.06] = 0
+    plt.imshow(topoSpikesMean)
+    plt.savefig(self.plotDir + 'spikes_topology_activity_mean.png')
+    p = plt.show()

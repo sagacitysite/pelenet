@@ -11,6 +11,14 @@ def computeDerived(self):
     if self.reservoirInSize is None:
         self.reservoirInSize = int(self.reservoirInExRatio * self.reservoirExSize)
 
+    self.totalIterations = self.trainingIterations + self.testingIterations
+
+    # If totalSteps is not set (None), calculate it with cue, cue relaxation and movement trajectory steps
+    if self.totalSteps is None:
+        self.stopStart = self.cueSteps + self.cueRelaxation + self.movementSteps
+        self.trialSteps = self.cueSteps + self.cueRelaxation + self.movementSteps + self.stopSteps + self.stopRelaxation
+        self.totalSteps = self.trialSteps * self.totalIterations
+
     # If cueSteps is not set (None), define cue steps as background activity
     if self.cueSteps is None:
         self.cueSteps = self.totalSteps

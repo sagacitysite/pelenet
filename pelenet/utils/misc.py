@@ -32,7 +32,7 @@ def trainOLS(self, trainSpikes, testSpikes, targetFunction, filter='single expon
         raise ArgumentNotValid('Number of neurons or number of time steps in train and test spikes is not equal.')
 
     # Get filtered spike trains for train and test spikes
-    x = self.getFilteredSpikes(trainSpikes.reshape(N, T*B), filter)
+    x = np.array([self.getFilteredSpikes(trainSpikes[:,:,i], filter) for i in range(B)]).reshape(N, T*B)
     xe = self.getFilteredSpikes(testSpikes, filter)
 
     # Get target function for all trials
@@ -47,8 +47,8 @@ def trainOLS(self, trainSpikes, testSpikes, targetFunction, filter='single expon
     ye = np.dot(xe.T, params)
 
     # Calculate performance
-    mse = np.mean(np.square(y - ye))  # MSE error
-    cor = pearsonr(y, ye)[0]  # Pearson correlaton coefficient
+    mse = np.mean(np.square(targetFunction - ye))  # MSE error
+    cor = pearsonr(targetFunction, ye)[0]  # Pearson correlaton coefficient
 
     # Join performance measures
     performance = SimpleNamespace(**{ 'mse': mse, 'cor': cor })

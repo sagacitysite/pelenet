@@ -18,7 +18,7 @@ class BasicNetwork():
             np.random.seed(self.p.seed)
 
         # Define prototypes
-        self.neuronCompProto = nx.CompartmentPrototype(compartmentVoltageDecay=20, refractoryDelay=2)  # compartment prototype (default neuron)
+        #self.neuronCompProto = nx.CompartmentPrototype(compartmentVoltageDecay=20, refractoryDelay=2)  # compartment prototype (default neuron)
         self.exConnProto = nx.ConnectionPrototype(signMode=nx.SYNAPSE_SIGN_MODE.EXCITATORY, numTagBits=0, numDelayBits=0, numWeightBits=8)  # excitatory connection prototype
         self.inConnProto = nx.ConnectionPrototype(signMode=nx.SYNAPSE_SIGN_MODE.INHIBITORY, numTagBits=0, numDelayBits=0, numWeightBits=8)  # inhibitory connection prototype
         self.mixedConnProto = nx.ConnectionPrototype(signMode=nx.SYNAPSE_SIGN_MODE.MIXED)  # mixed connection prototype

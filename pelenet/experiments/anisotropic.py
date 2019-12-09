@@ -24,7 +24,7 @@ from ..network.reservoir.reservoir import ReservoirNetwork
 @desc: Class for running an experiment, usually contains performing
        several networks (e.g. for training and testing)
 """
-class Experiment():
+class AnisotropicExperiment():
 
     """
     @desc: Initiates the experiment
@@ -35,7 +35,6 @@ class Experiment():
         self.p = Parameters()  # Parameters
 
         self.net = None
-        self.trainSpikes = None
 
         # Instantiate system singleton and add datalog object
         self.system = System.instance()
@@ -62,6 +61,9 @@ class Experiment():
 
         # Add cue
         self.net.addCueGenerator()
+
+        # Add stop signal
+        self.net.addStopGenerator()
 
         # Add background noise
         #self.net.addNoiseGenerator()
@@ -90,9 +92,9 @@ class Experiment():
     @desc: Saves network in numpy file
     """
     # FIXME Does not work
-    def save(self):
+    #def save(self):
         # Saves whole experiment
-        np.save(self.system.datalog.dir+'data/experiment.npy', self)
+        #np.save(self.system.datalog.dir+'data/experiment.npy', self)
 
     """
     @desc: Draw mask and weights

@@ -1,3 +1,5 @@
+from ..system import System
+
 """
 @desc: Class for plotting and visualisation of network and experiment data
 """
@@ -7,10 +9,13 @@ class Plot():
     @desc: Initiates plot object, gets relation to another object for getting the data
     """
     def __init__(self, rel):
+        # Get system instance
+        system = System.instance()
+
         # Store related object
         self.obj = rel
         self.p = rel.p
-        self.plotDir = rel.system.datalog.dir + 'plots/'
+        self.plotDir = system.datalog.dir + 'plots/'
 
     """
     @note: Import functions from files

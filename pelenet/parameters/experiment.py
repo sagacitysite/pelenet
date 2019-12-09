@@ -7,11 +7,12 @@ def includeExperiment(self):
     self.optimizeParameters = 'reservoirExSize'  # Parameter to optimize (later extend to a list)
 
     # Experiment
-    self.seed = 4  # Seed of the simulation, 'None' is random (no seed)
-    self.totalSteps = 2000 #None  # Number of simulation steps, if 'None', value is derived
-    self.trainingIterations = 20  # number of training trials
-    self.testingIterations = 10  # number of testing trials
-    self.testingRelaxation = 5 #10  # Number of iterations for relaxation
+    self.seed = 2  # Seed of the simulation, 'None' is random (no seed)
+    self.totalSteps = None #2000  # Number of simulation steps, if 'None', value is derived
+    self.trainingIterations = 10  # number of training trials
+    self.testingIterations = 1  # number of testing trials
+    self.totalIterations = None  # number of training trials + testing trials
+    self.movementSteps = 200  # Number of steps for movement
 
     # Ansitotropic
     self.connectionProb = 0.05 #0.05  # percentage of established connections (range 0.05 - 0.1), FIXME bring together with "self.reservoirDens"
@@ -21,9 +22,12 @@ def includeExperiment(self):
     self.anisoPerlinScale = 4 #8 # 4-12  # perlin noise scale, high value => dense valleys, low value => broad valleys
 
     # Neuron
+    self.compartmentVoltageDecay = 200 #20  # voltage decay
+    #self.compartmentVoltageTimeConstant = 
     self.refractoryDelay = 2  # refractory period for a neuron
 
-    # OLS Regression Smoothing
+    # Readout training
+    self.flipProb = 0.001  # percentage of neuron flips in every trial
     self.smoothingWd = 3  # number of neurons to the left and right which are influenced
     self.smoothingVar = 7  # variance of the Gaussian kernel
 
@@ -66,12 +70,19 @@ def includeExperiment(self):
 
     # Cue input
     self.cueGens = 50 #50 #10  # number of cue generators
-    self.cueSteps = 100 #200 #100  # number of steps the cue should drive the network, if None, cue is background activity over all steps
-    self.cueRelaxation = 0  # time to wait for relaxation of the network activity after cue
+    self.cueSteps = 50 #200 #100  # number of steps the cue should drive the network, if None, cue is background activity over all steps
+    self.cueRelaxation = 50  # time to wait for relaxation of the network activity after cue
     self.cueDens = 0.2 # 0.1  # percent of connections to reservoir from input
     self.cueSpikeProb = 0.1  # probability of spike for the generator
-    self.cueMaxWeight = 100  # maximum weight a cue connection can have
-    self.cuePatchNeurons = 4  # number of neurons for the cue input (needs to be root squarable)
+    self.cueMaxWeight = 200 #100  # maximum weight a cue connection can have
+    self.cuePatchNeurons = 64  # number of neurons for the cue input (needs to be root squarable)
+
+    # Stop input
+    self.stopStart = None  # point in time where the stop signal should start
+    self.stopGens = 20  # number of stop generators
+    self.stopSteps = 1  # number of time steps the stop generator should be active
+    self.stopRelaxation = 399  # number time steps to relax after the stop signal 
+    self.stopSpikeProb = 0.5  # probability of spike for the generator
 
     # Noise
     self.noiseNeuronsShare = 0.1 # share of noise neurons in relation to excitatory neurons
@@ -84,3 +95,5 @@ def includeExperiment(self):
     self.isExSpikeProbe = True  # activate/deactivate spike probes for excitatory neurons
     self.isInSpikeProbe = False  # activate/deactivate spike probes for inhibitory neurons
     self.weightProbe = False  # read weights at the end of the simulation
+    self.isExVoltageProbe = False  # activate/deactivate voltage probes for excitatory neurons
+    self.isInVoltageProbe = False  # activate/deactivate voltage probes for inhibitory neurons

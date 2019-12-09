@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 from scipy import sparse
 from types import SimpleNamespace
 import logging
+import itertools
 
 # Importing own modules
-from ...system import System
 from ...utils import Utils
 from ...plots import Plot
 from ...parameters import Parameters
@@ -50,8 +50,8 @@ class ReservoirNetwork(BasicNetwork):
         # Probes
         self.exSpikeProbes = []
         self.inSpikeProbes = []
-        self.exActivityProbes = []
-        self.inActivityProbes = []
+        self.exVoltageProbes = []
+        self.inVoltageProbes = []
         self.weightProbes = []
 
         # Spikes
@@ -71,8 +71,7 @@ class ReservoirNetwork(BasicNetwork):
         self.noiseSpikes = None
         self.noiseWeights = None
 
-        # Instantiate system, utils and plot
-        self.system = System.instance()
+        # Instantiate utils and plot
         self.utils = Utils.instance()
         self.plot = Plot(self)
 
@@ -94,15 +93,8 @@ class ReservoirNetwork(BasicNetwork):
     @desc: Build default network structure
     """
     def build(self):
-        # Call common build method
-        self.buildCommon()
-
-    """
-    @desc: Build network structure, which is common for all reservoir networks
-    """
-    def buildCommon(self):
         # Add probes
-        self.addProbes()  # add probes
+        self.addProbes()
 
         # Add spike receiver
         #self.
@@ -217,11 +209,66 @@ class ReservoirNetwork(BasicNetwork):
         return (spikeTimes + start)
 
     """
+    @desc: Adds a very strong inhibitory input to kill all network activity at a given time step
+    """
+    def addStopGenerator(self,):
+        sg = self.nxNet.createSpikeGenProcess(numPorts=self.p.stopGens)
+
+        for i in range(self.p.stopGens):
+            # Generate spikes and add them to spike generator
+            stopSpikesInd = np.where(np.random.rand(self.p.cueSteps) < self.p.stopSpikeProb)[0] + self.p.stopStart
+            sg.addSpikes(spikeInputPortNodeIds=i, spikeTimes=stopSpikesInd.tolist())
+        
+        # Define mask
+        stopMask = np.ones((self.p.reservoirExSize, self.p.stopGens))
+
+        # Define weights
+        stopWeights = -1*np.ones((self.p.reservoirExSize, self.p.stopGens))*255
+
+        for i in range(len(self.exReservoirChunks)):
+            fr, to = i*self.p.neuronsPerCore, (i+1)*self.p.neuronsPerCore
+            ma = stopMask[fr:to, :]
+            we = stopWeights[fr:to, :]
+            sg.connect(self.exReservoirChunks[i], prototype=self.inConnProto, connectionMask=ma, weight=we)
+        
+        # Log that stop generator was added
+        logging.info('Stop generator was added to the network')
+
+    """
+    @desc: Adds a very strong inhibitory input to kill all network activity at a given time step
+    """
+    def addRepeatedStopGenerator(self,):
+        sg = self.nxNet.createSpikeGenProcess(numPorts=self.p.stopGens)
+
+        for i in range(self.p.stopGens):
+            # Generate spikes 
+            spikes = (np.random.rand(self.p.cueSteps) < self.p.stopSpikeProb)
+            # Get indices from spikes
+            stopSpikesInd = [ np.where(spikes)[0] + self.p.stopStart + self.p.trialSteps*j for j in range(self.p.totalIterations) ]
+            # Add spikes indices to spike generator
+            sg.addSpikes(spikeInputPortNodeIds=i, spikeTimes=list(itertools.chain(*stopSpikesInd)))
+        
+        # Define mask
+        stopMask = np.ones((self.p.reservoirExSize, self.p.stopGens))
+
+        # Define weights
+        stopWeights = -1*np.ones((self.p.reservoirExSize, self.p.stopGens))*255
+
+        for i in range(len(self.exReservoirChunks)):
+            fr, to = i*self.p.neuronsPerCore, (i+1)*self.p.neuronsPerCore
+            ma = stopMask[fr:to, :]
+            we = stopWeights[fr:to, :]
+            sg.connect(self.exReservoirChunks[i], prototype=self.inConnProto, connectionMask=ma, weight=we)
+
+        # Log that stop generator was added
+        logging.info('Stop generator was added to the network')
+
+    """
     @desc: Create input spiking generator to add a cue signal,
            the input is connected to the reservoir network,
            an excitatory connection prototype is used
     """
-    def addCueGenerator(self):
+    def addCueGenerator(self, inputSpikes = None):
         # Create spike generator
         sg = self.nxNet.createSpikeGenProcess(numPorts=self.p.cueGens)
 
@@ -229,17 +276,79 @@ class ReservoirNetwork(BasicNetwork):
         for i in range(self.p.cueGens):
             # Generate spikes and add them to spike generator
             cueSpikesInd = None
-            if len(self.cueSpikes) == 0:  # If train, generate spikes
+            # If input spikes are not given
+            if inputSpikes is None:
                 cueSpikesInd = self.generateInputSignal(self.p.cueSteps, prob=self.p.cueSpikeProb) #self.generateSinSignal(self.p.cueSteps)
                 # Store cue input in object
                 cueSpikes.append(cueSpikesInd)
+            # If input spikes are given
             else:
-                cueSpikesInd = self.cueSpikes[i]
+                cueSpikesInd = inputSpikes[i]
             
             sg.addSpikes(spikeInputPortNodeIds=i, spikeTimes=cueSpikesInd.tolist())
 
         if len(self.cueSpikes) == 0:
             self.cueSpikes = np.array(cueSpikes)  # If train, store generated spikes
+
+        # Define mask
+        cueMask = self.drawSparseMaskMatrix(self.p.cueDens, self.p.reservoirExSize, self.p.cueGens)
+
+        cueSize = int(np.sqrt(self.p.cuePatchNeurons))
+        exNeuronsTopSize = int(np.sqrt(self.p.reservoirExSize))
+
+        #cueMask = np.zeros((cueSize, cueSize))
+        #cueMask[self.p.cueSize:, :] = 0  # set all mas values behind last neuron of cue input to zero
+
+        # Set all values zero which are not part of the patch
+        shift = 20
+        topology = np.ones((exNeuronsTopSize,exNeuronsTopSize))
+        topology[shift:shift+cueSize,shift:shift+cueSize] = 0
+        #topology[0,0] = 1
+        idc = np.where(topology.flatten())[0]
+        cueMask[idc,:] = 0
+
+        # Define weights
+        cueWeights = self.p.cueMaxWeight*np.random.rand(self.p.reservoirExSize, self.p.cueGens)
+
+        # Connect generator to the reservoir network
+        for i in range(len(self.exReservoirChunks)):
+            fr, to = i*self.p.neuronsPerCore, (i+1)*self.p.neuronsPerCore
+            ma = cueMask[fr:to, :]
+            we = cueWeights[fr:to, :]
+            sg.connect(self.exReservoirChunks[i], prototype=self.exConnProto, connectionMask=ma, weight=we)
+        
+        self.cueWeights = self.getMaskedWeights(cueWeights, cueMask)
+
+        # Log that cue generator was added
+        logging.info('Cue generator was added to the network')
+
+    """
+    @desc: Create input spiking generator to add a cue signal,
+           the input is connected to the reservoir network,
+           an excitatory connection prototype is used
+    """
+    def addRepeatedCueGenerator(self):
+        # Create spike generator
+        sg = self.nxNet.createSpikeGenProcess(numPorts=self.p.cueGens)
+
+        for i in range(self.p.cueGens):
+            # Generate spikes for spike current generator
+            spikes = (np.random.rand(self.p.cueSteps) < self.p.cueSpikeProb)
+            # Get indices from spikes
+            cueSpikesInd = []
+            for j in range(self.p.totalIterations):
+                # Draw neurons to flip with probability flipProb
+                flips = (np.random.rand(self.p.cueSteps) < self.p.flipProb)
+                # Apply flips to cue input
+                noisedSpikes = np.logical_xor(spikes, flips)
+                # Transform to event indices
+                noisedIndices = np.where(noisedSpikes)[0] + self.p.trialSteps*j
+                cueSpikesInd.append(noisedIndices)
+
+            self.cueSpikes.append(list(itertools.chain(*cueSpikesInd)))
+                
+            # Add spikes indices to current spike generator
+            sg.addSpikes(spikeInputPortNodeIds=i, spikeTimes=list(itertools.chain(*cueSpikesInd)))
 
         # Define mask
         cueMask = self.drawSparseMaskMatrix(self.p.cueDens, self.p.reservoirExSize, self.p.cueGens)
@@ -373,13 +482,14 @@ class ReservoirNetwork(BasicNetwork):
     """
     def addProbes(self):
         # Add activity probe for excitatory network
-        #for net in self.exReservoirChunks:
-        #    #self.exSpikeTrains.append(net.probe([nx.ProbeParameter.SPIKE])[0])
-        #    self.exActivityProbes.append(net.probe([nx.ProbeParameter.SOMA_STATE_ACTIVITY])[0])
+        if self.p.isExVoltageProbe:
+            for net in self.exReservoirChunks:
+                self.exVoltageProbes.append(net.probe([nx.ProbeParameter.COMPARTMENT_VOLTAGE ])[0])
 
         # Add activity probe for inhibitory network
-        #for net in self.inReservoirChunks:
-        #    self.inActivityProbes.append(net.probe([nx.ProbeParameter.SOMA_STATE_ACTIVITY])[0])
+        if self.p.isInVoltageProbe:
+            for net in self.inReservoirChunks:
+                self.inVoltageProbes.append(net.probe([nx.ProbeParameter.COMPARTMENT_VOLTAGE ])[0])
         
         # Probe weights
         if self.p.weightProbe:
@@ -441,7 +551,8 @@ class ReservoirNetwork(BasicNetwork):
         for i in range(nAllCores):
             if i < nExCores:
                 # Excitatory compartment prototype
-                exCompProto = nx.CompartmentPrototype(compartmentVoltageDecay=20, refractoryDelay=self.p.refractoryDelay, logicalCoreId=i,
+                exCompProto = nx.CompartmentPrototype(compartmentVoltageDecay=self.p.compartmentVoltageDecay,
+                                                      refractoryDelay=self.p.refractoryDelay, logicalCoreId=i,
                                                       enableSpikeBackprop=isBackprop, enableSpikeBackpropFromSelf=isBackprop)#,
                                                       #enableHomeostasis=1, minActivity=0, maxActivity=127,
                                                       #homeostasisGain=0, activityImpulse=1, activityTimeConstant=1000000)
@@ -451,7 +562,8 @@ class ReservoirNetwork(BasicNetwork):
                 self.exReservoirChunks.append(self.nxNet.createCompartmentGroup(size=size, prototype=exCompProto))
             elif i >= nExCores:
                 # Inhibitory compartment prototype
-                inCompProto = nx.CompartmentPrototype(compartmentVoltageDecay=20, refractoryDelay=self.p.refractoryDelay, logicalCoreId=i)#,
+                inCompProto = nx.CompartmentPrototype(compartmentVoltageDecay=self.p.compartmentVoltageDecay,
+                                                      refractoryDelay=self.p.refractoryDelay, logicalCoreId=i)#,
                                                       #enableHomeostasis=1, minActivity=0, maxActivity=127,
                                                       #homeostasisGain=0, activityImpulse=1, activityTimeConstant=1000000)
                 # Calculate size of compartment: if last core has remainder, use remainder as size
@@ -460,7 +572,7 @@ class ReservoirNetwork(BasicNetwork):
                 self.inReservoirChunks.append(self.nxNet.createCompartmentGroup(size=size, prototype=inCompProto))
 
         # Interconnect excitatory and inhibitory network chunks
-        self.connectNetworkChunks(fromChunks=self.exReservoirChunks, toChunks=self.exReservoirChunks, mask=self.initialMasks.exex, weights=self.initialWeights.exex, store=True, prototype=exConnProto)
+        self.connectNetworkChunks(fromChunks=self.exReservoirChunks, toChunks=self.exReservoirChunks, mask=self.initialMasks.exex, weights=self.initialWeights.exex, prototype=exConnProto) #store=True, prototype=exConnProto)
         self.connectNetworkChunks(fromChunks=self.inReservoirChunks, toChunks=self.inReservoirChunks, mask=self.initialMasks.inin, weights=self.initialWeights.inin, prototype=self.inConnProto)
         self.connectNetworkChunks(fromChunks=self.exReservoirChunks, toChunks=self.inReservoirChunks, mask=self.initialMasks.exin, weights=self.initialWeights.exin, prototype=self.exConnProto)
         self.connectNetworkChunks(fromChunks=self.inReservoirChunks, toChunks=self.exReservoirChunks, mask=self.initialMasks.inex, weights=self.initialWeights.inex, prototype=self.inConnProto)

@@ -52,6 +52,8 @@ class ReservoirNetwork(BasicNetwork):
         self.inSpikeProbes = []
         self.exVoltageProbes = []
         self.inVoltageProbes = []
+        self.exCurrentProbes = []
+        self.inCurrentProbes = []
         self.weightProbes = []
 
         # Spikes
@@ -244,7 +246,7 @@ class ReservoirNetwork(BasicNetwork):
             # Generate spikes 
             spikes = (np.random.rand(self.p.cueSteps) < self.p.stopSpikeProb)
             # Get indices from spikes
-            stopSpikesInd = [ np.where(spikes)[0] + self.p.stopStart + self.p.trialSteps*j for j in range(self.p.totalIterations) ]
+            stopSpikesInd = [ np.where(spikes)[0] + self.p.stopStart + self.p.trialSteps*j for j in range(self.p.trials) ]
             # Add spikes indices to spike generator
             sg.addSpikes(spikeInputPortNodeIds=i, spikeTimes=list(itertools.chain(*stopSpikesInd)))
         
@@ -336,7 +338,7 @@ class ReservoirNetwork(BasicNetwork):
             spikes = (np.random.rand(self.p.cueSteps) < self.p.cueSpikeProb)
             # Get indices from spikes
             cueSpikesInd = []
-            for j in range(self.p.totalIterations):
+            for j in range(self.p.trials):
                 # Draw neurons to flip with probability flipProb
                 flips = (np.random.rand(self.p.cueSteps) < self.p.flipProb)
                 # Apply flips to cue input
@@ -481,15 +483,25 @@ class ReservoirNetwork(BasicNetwork):
     @desc: Add probing
     """
     def addProbes(self):
-        # Add activity probe for excitatory network
+        # Add voltage probe for excitatory network
         if self.p.isExVoltageProbe:
-            for net in self.exReservoirChunks:
+            for idx, net in enumerate(self.exReservoirChunks):
                 self.exVoltageProbes.append(net.probe([nx.ProbeParameter.COMPARTMENT_VOLTAGE ])[0])
 
-        # Add activity probe for inhibitory network
+        # Add voltage probe for inhibitory network
         if self.p.isInVoltageProbe:
-            for net in self.inReservoirChunks:
+            for idx, net in enumerate(self.inReservoirChunks):
                 self.inVoltageProbes.append(net.probe([nx.ProbeParameter.COMPARTMENT_VOLTAGE ])[0])
+
+        # Add current probe for excitatory network
+        if self.p.isExCurrentProbe:
+            for idx, net in enumerate(self.exReservoirChunks):
+                self.exCurrentProbes.append(net.probe([nx.ProbeParameter.COMPARTMENT_CURRENT ])[0])
+
+        # Add current probe for inhibitory network
+        if self.p.isInCurrentProbe:
+            for idx, net in enumerate(self.inReservoirChunks):
+                self.inCurrentProbes.append(net.probe([nx.ProbeParameter.COMPARTMENT_CURRENT ])[0])
         
         # Probe weights
         if self.p.weightProbe:

@@ -9,16 +9,14 @@ def includeExperiment(self):
     # Experiment
     self.seed = 2  # Seed of the simulation, 'None' is random (no seed)
     self.totalSteps = None #2000  # Number of simulation steps, if 'None', value is derived
-    self.trainingIterations = 10  # number of training trials
-    self.testingIterations = 1  # number of testing trials
-    self.totalIterations = None  # number of training trials + testing trials
+    self.trials = 10  # number of trials
     self.movementSteps = 200  # Number of steps for movement
 
     # Ansitotropic
     self.connectionProb = 0.05 #0.05  # percentage of established connections (range 0.05 - 0.1), FIXME bring together with "self.reservoirDens"
     self.anisoStdE = 12  # space constant, std of gaussian for excitatory neurons
     self.anisoStdI = 9  # space constant, std of gaussian for inhibitory neurons (range 9 - 11)
-    self.anisoShift = 1  # FIXME meaning unclear
+    self.anisoShift = 1  # intensity of the shift of the connectivity distribution for a neuron
     self.anisoPerlinScale = 4 #8 # 4-12  # perlin noise scale, high value => dense valleys, low value => broad valleys
 
     # Neuron
@@ -27,7 +25,7 @@ def includeExperiment(self):
     self.refractoryDelay = 2  # refractory period for a neuron
 
     # Readout training
-    self.flipProb = 0.001  # percentage of neuron flips in every trial
+    self.flipProb = 0.005  # percentage of neuron flips in every trial
     self.smoothingWd = 3  # number of neurons to the left and right which are influenced
     self.smoothingVar = 7  # variance of the Gaussian kernel
 
@@ -42,13 +40,13 @@ def includeExperiment(self):
     self.homeostasisStatus = False # defines if homesostatic plasticity is active or not
 
     # Network size and connections
-    self.reservoirExSize = 3600 #200 #3600  # size of the excitatory network
+    self.reservoirExSize = 3600  # size of the excitatory network
     self.reservoirInSize = None  # size of the inhibitory network
     self.reservoirInExRatio = 1./4.  # number excitatory/inhibitory neurons ratio
     self.reservoirDens = None  # connection density of the network
     self.numConnectionsPerNeuron = 50 #45 #100  # average number of connections per neuron
-    self.weightExCoefficient = 8 #16 #8 #4  # coefficient for excitatory anisotropic weight
-    self.weightInCoefficient = 32 #64 #28 sieht gut aus!! #32 #22  # coefficient for inhibitory anisotropic weight, Perlin scale 4: 25-30 ok, 25-28 good
+    self.weightExCoefficient = 8 #8 #16 #8 #4  # coefficient for excitatory anisotropic weight
+    self.weightInCoefficient = 28 #32 #64 #28 sieht gut aus!! #32 #22  # coefficient for inhibitory anisotropic weight, Perlin scale 4: 25-30 ok, 25-28 good
 
     # Trace input
     self.traceClusters = 3  # number of trace clusters
@@ -70,12 +68,12 @@ def includeExperiment(self):
 
     # Cue input
     self.cueGens = 50 #50 #10  # number of cue generators
-    self.cueSteps = 50 #200 #100  # number of steps the cue should drive the network, if None, cue is background activity over all steps
-    self.cueRelaxation = 50  # time to wait for relaxation of the network activity after cue
+    self.cueSteps = 2 #200 #100  # number of steps the cue should drive the network, if None, cue is background activity over all steps
+    self.cueRelaxation = 23  # time to wait for relaxation of the network activity after cue
     self.cueDens = 0.2 # 0.1  # percent of connections to reservoir from input
     self.cueSpikeProb = 0.1  # probability of spike for the generator
     self.cueMaxWeight = 200 #100  # maximum weight a cue connection can have
-    self.cuePatchNeurons = 64  # number of neurons for the cue input (needs to be root squarable)
+    self.cuePatchNeurons = 49  # number of neurons for the cue input (needs to be root squarable)
 
     # Stop input
     self.stopStart = None  # point in time where the stop signal should start
@@ -97,3 +95,5 @@ def includeExperiment(self):
     self.weightProbe = False  # read weights at the end of the simulation
     self.isExVoltageProbe = False  # activate/deactivate voltage probes for excitatory neurons
     self.isInVoltageProbe = False  # activate/deactivate voltage probes for inhibitory neurons
+    self.isExCurrentProbe = False  # activate/deactivate current probes for excitatory neurons
+    self.isInCurrentProbe = False  # activate/deactivate current probes for inhibitory neurons

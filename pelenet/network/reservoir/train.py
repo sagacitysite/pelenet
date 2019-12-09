@@ -21,7 +21,7 @@ class TrainNet(ReservoirNetwork):
     def build(self):
         # Enable learning and set total steps
         self.p.isLearningRule = True
-        self.p.totalSteps = self.p.offset + self.p.stepsPerIteration*self.p.trainingIterations
+        self.p.totalSteps = self.p.offset + self.p.stepsPerIteration*self.p.trials
 
         # Connect network
         self.addReservoirNetworkDistributed()

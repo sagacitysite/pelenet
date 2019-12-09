@@ -11,13 +11,11 @@ def computeDerived(self):
     if self.reservoirInSize is None:
         self.reservoirInSize = int(self.reservoirInExRatio * self.reservoirExSize)
 
-    self.totalIterations = self.trainingIterations + self.testingIterations
-
     # If totalSteps is not set (None), calculate it with cue, cue relaxation and movement trajectory steps
     if self.totalSteps is None:
         self.stopStart = self.cueSteps + self.cueRelaxation + self.movementSteps
         self.trialSteps = self.cueSteps + self.cueRelaxation + self.movementSteps + self.stopSteps + self.stopRelaxation
-        self.totalSteps = self.trialSteps * self.totalIterations
+        self.totalSteps = self.trialSteps * self.trials
 
     # If cueSteps is not set (None), define cue steps as background activity
     if self.cueSteps is None:
@@ -34,7 +32,6 @@ def computeDerived(self):
     self.reservoirSize = self.reservoirInSize + self.reservoirExSize
     self.reservoirDens = self.numConnectionsPerNeuron / (self.reservoirExSize + self.reservoirInSize)
     self.stepsPerIteration = self.traceClusters * self.traceSteps
-    #self.cueSteps = self.traceSteps #stepsPerIteration*trainingIterations
     self.traceClusterSize = int(self.traceClusterShare * self.reservoirExSize)
 
     # If cueSize is not set (None), size equals size of all trace clusters together or whole ex network

@@ -17,7 +17,7 @@ class TestNet(ReservoirNetwork):
     def build(self, reservoirMasks, reservoirWeights):
         # Disable learning
         self.p.isLearningRule = False
-        self.p.totalSteps = self.p.stepsPerIteration*self.p.testingIterations
+        self.p.totalSteps = self.p.stepsPerIteration*self.p.trials
 
         # Get mask and weights from trained network
         self.initialMasks = reservoirMasks

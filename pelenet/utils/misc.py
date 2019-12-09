@@ -8,19 +8,20 @@ from lib.helper.exceptions import ArgumentNotValid
 
 """
 @desc: Trains ordinary least square model, includes filtering and regularization
-@pars: trainSpikes: has dimensions N (number of neurons) x T (number of time steps per trial) x B (number of trials)
+@pars: trainSpikes: has dimensions B (number of trials) x N (number of neurons) x T (number of time steps per trial)
        testSpikes: has dimensions N (number of neurons) x T (number of time steps per trial)
        targetFunction: has dimensions T (number of time steps per trial)
-       filter: filter method as string, can be: 'single exponential', 'double exponential' or 'gaussian' (symmetric)
+       filter: filter method as string, can be: None, 'single exponential', 'double exponential', 'gaussian' (symmetric) or 'bins'
+       binSize: if filter 'bins' is used, sets the bin size
 """
-def trainOLS(self, trainSpikes, testSpikes, targetFunction, filter='single exponential'):
+def trainOLS(self, trainSpikes, testSpikes, targetFunction, filter='single exponential', binSize=10):
 
-    # Preprocess if B i does not exist
+    # Preprocess if B axis does not exist
     if (len(np.shape(trainSpikes)) == 2):
-        trainSpikes = trainSpikes[:,:,np.newaxis]
+        trainSpikes = trainSpikes[np.newaxis,...]
 
-    # Get shapes (N: num neurons, T: num time steps, B: num trials)
-    N, T, B = np.shape(trainSpikes)
+    # Get shapes (N: num neurons, T: num time steps per trial, B: num trials)
+    B, N, T = np.shape(trainSpikes)
     Nt, Tt = np.shape(testSpikes)
 
     # Some checks
@@ -32,8 +33,28 @@ def trainOLS(self, trainSpikes, testSpikes, targetFunction, filter='single expon
         raise ArgumentNotValid('Number of neurons or number of time steps in train and test spikes is not equal.')
 
     # Get filtered spike trains for train and test spikes
-    x = np.array([self.getFilteredSpikes(trainSpikes[:,:,i], filter) for i in range(B)]).reshape(N, T*B)
-    xe = self.getFilteredSpikes(testSpikes, filter)
+    x, xe = None, None
+    # If not filter is chosen, apply it to raw data
+    if filter is None:
+        x = np.hstack(tuple( trainSpikes[i,:,:] for i in range(B) )) #trainSpikes.reshape(N, T*B)
+        xe = testSpikes
+    # If filter is bins, bin it with binSize
+    elif filter == 'bins':
+        data = np.hstack(tuple( trainSpikes[i,:,:] for i in range(B) ))
+        #data = trainSpikes.reshape(N, T*B)
+
+        #x = np.array([np.mean(data[:,i*binSize:(i+1)*binSize], axis=1) for i in range(0,T*B,binSize)]).T
+        x = np.array([np.mean(data[:,i:i+binSize], axis=1) for i in range(0,T*B,binSize)]).T
+
+        #xe = np.array([np.mean(testSpikes[:,i*binSize:(i+1)*binSize], axis=1) for i in range(0,Tt,binSize)]).T
+        xe = np.array([np.mean(testSpikes[:,i:i+binSize], axis=1) for i in range(0,Tt,binSize)]).T
+
+        # In case of bins, also target function need to be compressed
+        targetFunction = np.array([np.mean(targetFunction[i:i+binSize]) for i in range(0,T,binSize)])
+    # If any other filter is chosen, apply it
+    else:
+        x = np.array([self.getFilteredSpikes(trainSpikes[i,...], filter) for i in range(B)]).reshape(N, T*B)
+        xe = self.getFilteredSpikes(testSpikes, filter)
 
     # Get target function for all trials
     y = np.tile(targetFunction, B)

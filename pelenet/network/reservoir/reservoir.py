@@ -302,8 +302,8 @@ class ReservoirNetwork(BasicNetwork):
         #cueMask[self.p.cueSize:, :] = 0  # set all mas values behind last neuron of cue input to zero
 
         # Set all values zero which are not part of the patch
-        shift = 20
         topology = np.ones((exNeuronsTopSize,exNeuronsTopSize))
+        shift = self.p.cuePatchNeuronsShift
         topology[shift:shift+cueSize,shift:shift+cueSize] = 0
         #topology[0,0] = 1
         idc = np.where(topology.flatten())[0]
@@ -344,7 +344,7 @@ class ReservoirNetwork(BasicNetwork):
                 # Apply flips to cue input
                 noisedSpikes = np.logical_xor(spikes, flips)
                 # Transform to event indices
-                noisedIndices = np.where(noisedSpikes)[0] + self.p.trialSteps*j
+                noisedIndices = np.where(noisedSpikes)[0] + self.p.trialSteps*j + 20  # TODO temoraryly added something
                 cueSpikesInd.append(noisedIndices)
 
             self.cueSpikes.append(list(itertools.chain(*cueSpikesInd)))
@@ -362,7 +362,7 @@ class ReservoirNetwork(BasicNetwork):
         #cueMask[self.p.cueSize:, :] = 0  # set all mas values behind last neuron of cue input to zero
 
         # Set all values zero which are not part of the patch
-        shift = 0
+        shift = self.p.cuePatchNeuronsShift
         topology = np.ones((exNeuronsTopSize,exNeuronsTopSize))
         topology[shift:shift+cueSize,shift:shift+cueSize] = 0
         #topology[0,0] = 1

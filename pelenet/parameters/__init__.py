@@ -62,3 +62,8 @@ class Parameters():
         # Check if size of cue input is smaller than network site
         if self.cuePatchNeurons > self.reservoirSize:
             raise ParamaterNotValid('Cue size is too large, cannot be larger than network size.')
+
+        # Check if number of neurons per core is properly chosen
+        if int(self.reservoirExSize/self.neuronsPerCore) > self.numCores*self.numCoresPerChip:
+            raise ParameterNotValid('Number of cores exceeded, increase number of neurons per core.')
+

@@ -51,7 +51,7 @@ class ReadoutExperiment(AnisotropicExperiment):
         self.net.addRepeatedCueGenerator()
 
         # Add stop generator
-        self.net.addRepeatedStopGenerator()
+        #self.net.addRepeatedStopGenerator()
 
         # Add background noise
         #self.net.addNoiseGenerator()

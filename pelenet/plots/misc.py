@@ -53,7 +53,7 @@ def landscape(self):
     # Show vectors
     ax.quiver(xx, yy, ldx, -ldy, headwidth=2, color="white")  # note: -dy flips quiver to match imshow
     # Define some attributes of the plot and show
-    title = 'Quiver Plot (Perlin scale: '+ str(self.p.anisoPerlinScale) +')'
+    title = 'Perlin scale: '+ str(self.p.anisoPerlinScale)
     ax.set(aspect=1, title=title)
     # Save and show
     plt.savefig(self.plotDir + 'landscape.png')

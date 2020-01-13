@@ -1,3 +1,5 @@
+import numpy as np
+
 """
 @desc: Some values are derived and need to be computed
 @note:  - This function is necessary, since it needs to be called
@@ -24,6 +26,13 @@ def computeDerived(self):
     # If noiseNeurons is not set (None), calculate it with given share
     if self.noiseNeurons is None:
         self.noiseNeurons = int(self.noiseNeuronsShare * self.reservoirExSize)
+
+    self.topologySize = int(np.sqrt(self.reservoirExSize))
+
+    # Derived output values
+    self.numOutClusters = int(self.reservoirExSize / np.square(self.partitioningClusterSize))
+    self.numOutputNeurons = 2 * self.numOutClusters
+    self.numOutDimSize = int(np.sqrt(self.numOutClusters))
 
     # Set datalog path for the current experiment, depending on the current time
     self.expLogPath

@@ -45,16 +45,23 @@ class ReservoirNetwork(BasicNetwork):
         # NxSDK compartment group chunks
         self.exReservoirChunks = []
         self.inReservoirChunks = []
+        self.outputLayerChunks = []
         self.connectionChunks = []
 
         # Probes
         self.exSpikeProbes = []
         self.inSpikeProbes = []
+        self.outSpikeProbes = []
         self.exVoltageProbes = []
         self.inVoltageProbes = []
+        self.outVoltageProbes = []
         self.exCurrentProbes = []
         self.inCurrentProbes = []
         self.weightProbes = []
+
+        # Output
+        self.outputMask = None
+        self.outputWeights = None
 
         # Spikes
         self.exSpikeTrains = []
@@ -129,6 +136,46 @@ class ReservoirNetwork(BasicNetwork):
 
         # Log that post processing has finished
         logging.info('Post processing succesfully completed')
+
+    """
+    @desc: Get weights for synapses between reservoir and output neurons
+    """
+    def drawOutputMaskAndWeights(self):
+
+        # TODO
+        # * Test speed with output neuron probes
+
+        # Define some helper variables
+        cs = self.p.partitioningClusterSize  # Size of output clusters
+
+        # Define empty mask
+        mask = np.zeros((self.p.reservoirExSize, self.p.numOutputNeurons)).astype(int)
+
+        # Get indices of network topology
+        topologyIndices = np.arange(self.p.reservoirExSize).reshape((self.p.topologySize, self.p.topologySize))
+
+        # Get indices of shifted network topology
+        topologyIndicesRolled = np.roll(topologyIndices, int(cs/2), axis=(0,1))
+
+        k = 0  # k counts number of output cluster
+        for i in range(self.p.numOutDimSize):
+            # Define from and to variables for index i
+            ifr, ito = i*cs, (i+1)*cs
+            for j in range(self.p.numOutDimSize):
+                # Define from and to variables for index j
+                jfr, jto = j*cs, (j+1)*cs
+                # Get topology indices and set connect neurons between output cluster and output neuron
+                mask[topologyIndices[ifr:ito,jfr:jto], k] = 1
+                # Overlapping outout neurons
+                mask[topologyIndicesRolled[ifr:ito,jfr:jto], k+1] = 1
+                # Increase by 2
+                k += 2
+        
+        # Store mask
+        self.outputMask = sparse.csr_matrix(mask.T)
+
+        # Define weights
+        self.outputWeights = self.outputMask * self.p.outputWeightValue
 
     """
     @desc: Adds a generator which produces random spikes and
@@ -493,6 +540,11 @@ class ReservoirNetwork(BasicNetwork):
             for idx, net in enumerate(self.inReservoirChunks):
                 self.inVoltageProbes.append(net.probe([nx.ProbeParameter.COMPARTMENT_VOLTAGE ])[0])
 
+        # Add voltage probe for output neurons
+        if self.p.isOutVoltageProbe:
+            for idx, net in enumerate(self.outputLayerChunks):
+                self.outVoltageProbes.append(net.probe([nx.ProbeParameter.COMPARTMENT_VOLTAGE ])[0])
+
         # Add current probe for excitatory network
         if self.p.isExCurrentProbe:
             for idx, net in enumerate(self.exReservoirChunks):
@@ -526,6 +578,11 @@ class ReservoirNetwork(BasicNetwork):
             for net in self.inReservoirChunks:
                 self.inSpikeProbes.append(net.probe([nx.ProbeParameter.SPIKE])[0])#, probeConditions=[probeCond])[0])
 
+        # Add spike probe for output neurons
+        if self.p.isOutSpikeProbe:
+            for net in self.outputLayerChunks:
+                self.outSpikeProbes.append(net.probe([nx.ProbeParameter.SPIKE])[0])
+
         # Log that probes were added to network
         logging.info('Probes added to Loihi network')
 
@@ -536,12 +593,15 @@ class ReservoirNetwork(BasicNetwork):
         # Predefine some helper variables
         nEx = self.p.reservoirExSize
         nIn = self.p.reservoirInSize
+        nOut = self.p.numOutputNeurons
 
         nExCores = int(np.ceil(nEx / self.p.neuronsPerCore))
-        nLastExCore = nEx % self.p.neuronsPerCore
+        nLastExCore = nEx % self.p.neuronsPerCore  # number of excitatory neurons in last core
         nInCores = int(np.ceil(nIn / self.p.neuronsPerCore))
-        nLastInCore = nIn % self.p.neuronsPerCore
-        nAllCores = nExCores + nInCores
+        nLastInCore = nIn % self.p.neuronsPerCore  # number of inhibitory neurons in last core
+        nOutCores = int(np.ceil(nOut / self.p.neuronsPerCore))
+        nLastOutCore = nOut % self.p.neuronsPerCore  # number of ouput neurons in last core
+        nAllCores = nExCores + nInCores + nOutCores
 
         exConnProto = None
         # Create learning rule
@@ -565,29 +625,36 @@ class ReservoirNetwork(BasicNetwork):
                 # Excitatory compartment prototype
                 exCompProto = nx.CompartmentPrototype(compartmentVoltageDecay=self.p.compartmentVoltageDecay,
                                                       refractoryDelay=self.p.refractoryDelay, logicalCoreId=i,
-                                                      enableSpikeBackprop=isBackprop, enableSpikeBackpropFromSelf=isBackprop)#,
-                                                      #enableHomeostasis=1, minActivity=0, maxActivity=127,
-                                                      #homeostasisGain=0, activityImpulse=1, activityTimeConstant=1000000)
+                                                      enableSpikeBackprop=isBackprop, enableSpikeBackpropFromSelf=isBackprop)
                 # Calculate size of compartment: if last core has remainder, use remainder as size
                 size = nLastExCore if (i == (nExCores-1) and nLastExCore > 0) else self.p.neuronsPerCore
                 # Excitatory compartment group
                 self.exReservoirChunks.append(self.nxNet.createCompartmentGroup(size=size, prototype=exCompProto))
-            elif i >= nExCores:
+            elif i >= nExCores and i < nExCores+nInCores:
                 # Inhibitory compartment prototype
                 inCompProto = nx.CompartmentPrototype(compartmentVoltageDecay=self.p.compartmentVoltageDecay,
-                                                      refractoryDelay=self.p.refractoryDelay, logicalCoreId=i)#,
-                                                      #enableHomeostasis=1, minActivity=0, maxActivity=127,
-                                                      #homeostasisGain=0, activityImpulse=1, activityTimeConstant=1000000)
+                                                      refractoryDelay=self.p.refractoryDelay, logicalCoreId=i)
                 # Calculate size of compartment: if last core has remainder, use remainder as size
-                size = nLastInCore if (i == (nAllCores-1) and nLastInCore > 0) else self.p.neuronsPerCore
+                size = nLastInCore if (i == (nExCores+nInCores-1) and nLastInCore > 0) else self.p.neuronsPerCore
                 # Inhibitory compartment prototype
                 self.inReservoirChunks.append(self.nxNet.createCompartmentGroup(size=size, prototype=inCompProto))
+            elif i >= nExCores+nInCores:
+                # Output compartment prototype
+                outCompProto = nx.CompartmentPrototype(compartmentVoltageDecay=self.p.compartmentVoltageDecay,
+                                                       refractoryDelay=self.p.refractoryDelay, logicalCoreId=i)
+                # Calculate size of compartment: if last core has remainder, use remainder as size
+                size = nLastOutCore if (i == (nAllCores-1) and nLastOutCore > 0) else self.p.neuronsPerCore
+                # Inhibitory compartment prototype
+                self.outputLayerChunks.append(self.nxNet.createCompartmentGroup(size=size, prototype=outCompProto))
 
         # Interconnect excitatory and inhibitory network chunks
         self.connectNetworkChunks(fromChunks=self.exReservoirChunks, toChunks=self.exReservoirChunks, mask=self.initialMasks.exex, weights=self.initialWeights.exex, prototype=exConnProto) #store=True, prototype=exConnProto)
         self.connectNetworkChunks(fromChunks=self.inReservoirChunks, toChunks=self.inReservoirChunks, mask=self.initialMasks.inin, weights=self.initialWeights.inin, prototype=self.inConnProto)
         self.connectNetworkChunks(fromChunks=self.exReservoirChunks, toChunks=self.inReservoirChunks, mask=self.initialMasks.exin, weights=self.initialWeights.exin, prototype=self.exConnProto)
         self.connectNetworkChunks(fromChunks=self.inReservoirChunks, toChunks=self.exReservoirChunks, mask=self.initialMasks.inex, weights=self.initialWeights.inex, prototype=self.inConnProto)
+
+        # Connect excitatory neurons to output layer
+        self.connectNetworkChunks(fromChunks=self.exReservoirChunks, toChunks=self.outputLayerChunks, mask=self.outputMask, weights=self.outputWeights, prototype=self.exConnProto)
 
         # Log that all cores are interconnected
         logging.info('All cores are sucessfully interconnected')

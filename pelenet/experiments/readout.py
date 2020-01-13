@@ -44,6 +44,9 @@ class ReadoutExperiment(AnisotropicExperiment):
         # Draw anisotropic mask and weights
         self.drawMaskAndWeights()
 
+        # Draw output weights
+        self.net.drawOutputMaskAndWeights()
+
         # Connect network
         self.net.addReservoirNetworkDistributed()
 

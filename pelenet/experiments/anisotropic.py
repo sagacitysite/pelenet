@@ -63,7 +63,7 @@ class AnisotropicExperiment():
         self.net.addCueGenerator()
 
         # Add stop signal
-        self.net.addStopGenerator()
+        #self.net.addStopGenerator()
 
         # Add background noise
         #self.net.addNoiseGenerator()

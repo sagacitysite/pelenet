@@ -63,6 +63,9 @@ void reset(runState *RunState) {
 
         nx_flush_core(nx_nth_coreid(i));
     }
+
+    // Flush spikes
+    //SPIKE_COUNT[RunState->time_step][0x20] = 0;
 }
 
 

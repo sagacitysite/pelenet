@@ -31,6 +31,7 @@ def includeExperiment(self):
 
     # Output layer
     self.partitioningClusterSize = 10  # size of clusters connected to an output neuron
+    self.outputWeightValue = 8  # weight for output neurons
 
     # Plasticity
     self.isLearningRule = False  # defines if learning rule is active or not (true/false)
@@ -96,8 +97,10 @@ def includeExperiment(self):
     # Probes
     self.isExSpikeProbe = True  # activate/deactivate spike probes for excitatory neurons
     self.isInSpikeProbe = False  # activate/deactivate spike probes for inhibitory neurons
+    self.isOutSpikeProbe = True  # activate/deactivate spike probes for output neurons
     self.weightProbe = False  # read weights at the end of the simulation
     self.isExVoltageProbe = True  # activate/deactivate voltage probes for excitatory neurons
     self.isInVoltageProbe = True  # activate/deactivate voltage probes for inhibitory neurons
+    self.isOutVoltageProbe = True  # activate/deactivate voltage probes for output neurons
     self.isExCurrentProbe = False  # activate/deactivate current probes for excitatory neurons
     self.isInCurrentProbe = False  # activate/deactivate current probes for inhibitory neurons

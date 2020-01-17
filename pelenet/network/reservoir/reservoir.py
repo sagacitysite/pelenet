@@ -260,7 +260,7 @@ class ReservoirNetwork(BasicNetwork):
     """
     @desc: Adds a very strong inhibitory input to kill all network activity at a given time step
     """
-    def addStopGenerator(self,):
+    def addStopGenerator(self):
         sg = self.nxNet.createSpikeGenProcess(numPorts=self.p.stopGens)
 
         for i in range(self.p.stopGens):
@@ -391,7 +391,7 @@ class ReservoirNetwork(BasicNetwork):
                 # Apply flips to cue input
                 noisedSpikes = np.logical_xor(spikes, flips)
                 # Transform to event indices
-                noisedIndices = np.where(noisedSpikes)[0] + self.p.trialSteps*j + 20  # TODO temoraryly added something
+                noisedIndices = np.where(noisedSpikes)[0] + self.p.trialSteps*j + self.p.breakSteps*(j+1)  # TODO temoraryly added something
                 cueSpikesInd.append(noisedIndices)
 
             self.cueSpikes.append(list(itertools.chain(*cueSpikesInd)))

@@ -83,8 +83,8 @@ def includeExperiment(self):
     # Stop input
     self.stopStart = None  # point in time where the stop signal should start
     self.stopGens = 20  # number of stop generators
-    self.stopSteps = 1  # number of time steps the stop generator should be active
-    self.stopRelaxation = 399  # number time steps to relax after the stop signal 
+    self.stopSteps = 10  # number of time steps the stop generator should be active
+    self.stopRelaxation = 10  # number time steps to relax after the stop signal 
     self.stopSpikeProb = 0.5  # probability of spike for the generator
 
     # Noise

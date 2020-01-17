@@ -16,8 +16,10 @@ def computeDerived(self):
     # If totalSteps is not set (None), calculate it with cue, cue relaxation and movement trajectory steps
     if self.totalSteps is None:
         #self.stopStart = self.cueSteps + self.cueRelaxation + self.movementSteps
-        self.trialSteps = self.cueSteps + self.cueRelaxation + self.movementSteps #+ self.stopSteps + self.stopRelaxation
-        self.totalSteps = self.trialSteps * self.trials
+        self.trialSteps = self.cueSteps + self.cueRelaxation + self.movementSteps
+        self.breakSteps = self.stopSteps + self.stopRelaxation
+        self.totalTrialSteps = self.trialSteps + self.breakSteps
+        self.totalSteps = self.totalTrialSteps * self.trials
 
     # If cueSteps is not set (None), define cue steps as background activity
     if self.cueSteps is None:

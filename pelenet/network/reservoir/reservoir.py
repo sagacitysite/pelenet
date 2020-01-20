@@ -102,8 +102,9 @@ class ReservoirNetwork(BasicNetwork):
     @desc: Build default network structure
     """
     def build(self):
+        pass
         # Add probes
-        self.addProbes()
+        #self.addProbes()
 
         # Add spike receiver
         #self.
@@ -654,7 +655,7 @@ class ReservoirNetwork(BasicNetwork):
         self.connectNetworkChunks(fromChunks=self.inReservoirChunks, toChunks=self.exReservoirChunks, mask=self.initialMasks.inex, weights=self.initialWeights.inex, prototype=self.inConnProto)
 
         # Connect excitatory neurons to output layer
-        self.connectNetworkChunks(fromChunks=self.exReservoirChunks, toChunks=self.outputLayerChunks, mask=self.outputMask, weights=self.outputWeights, prototype=self.exConnProto)
+        #self.connectNetworkChunks(fromChunks=self.exReservoirChunks, toChunks=self.outputLayerChunks, mask=self.outputMask, weights=self.outputWeights, prototype=self.exConnProto)
 
         # Log that all cores are interconnected
         logging.info('All cores are sucessfully interconnected')

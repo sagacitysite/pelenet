@@ -80,8 +80,8 @@ class BasicNetwork():
     """
     @desc: Draw weight matrix for reservoir network
     """
-    def drawAndSetSparseReservoirWeightMatrix(self, *args):
-        we = drawSparseWeightMatrix(*args)
+    def drawAndSetSparseReservoirWeightMatrix(self, *args, **kwargs):
+        we = self.drawSparseWeightMatrix(*args, **kwargs)
 
         # Define and store sub matrices for weights
         nEx = self.p.reservoirExSize
@@ -140,8 +140,8 @@ class BasicNetwork():
     """
     @desc: Draw mask matrix for reservoir network
     """
-    def drawAndSetSparseReservoirMaskMatrix(self, *args):
-        ma = drawSparseMaskMatrix(*args)
+    def drawAndSetSparseReservoirMaskMatrix(self, *args, **kwargs):
+        ma = self.drawSparseMaskMatrix(*args, **kwargs)
 
         # Define and store sub matrices for masks
         nEx = self.p.reservoirExSize
@@ -150,6 +150,8 @@ class BasicNetwork():
         self.initialMasks.inin = ma[nEx:nAll, nEx:nAll]
         self.initialMasks.inex = ma[0:nEx, nEx:nAll]
         self.initialMasks.exin = ma[nEx:nAll, 0:nEx]
+
+        return ma
 
     """
     TODO: Shift to utils/weights.py

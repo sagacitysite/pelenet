@@ -15,7 +15,8 @@ extern int enableReset;
 int do_reset(runState *RunState) {
     bool apply = false;
 
-    for(int i=0; i<10; i++) {
+    // Prepare boolean variable, which is true for 10 time steps
+    for(int i=1; i<=10; i++) {
         apply = apply || (RunState->time_step - i) % resetInterval == 0;
     }
 

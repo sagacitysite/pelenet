@@ -8,7 +8,7 @@ def includeExperiment(self):
 
     # Experiment
     self.seed = 2  # Seed of the simulation, 'None' is random (no seed)
-    self.totalSteps = None #2000  # Number of simulation steps, if 'None', value is derived
+    self.totalSteps = 2000 #None  # Number of simulation steps, if 'None', value is derived
     self.trials = 3  # number of trials
     self.movementSteps = 200  # Number of steps for movement
 
@@ -18,6 +18,8 @@ def includeExperiment(self):
     self.anisoStdI = 9  # space constant, std of gaussian for inhibitory neurons (range 9 - 11)
     self.anisoShift = 1  # intensity of the shift of the connectivity distribution for a neuron
     self.anisoPerlinScale = 4 #8 # 4-12  # perlin noise scale, high value => dense valleys, low value => broad valleys
+    self.weightExCoefficient = 16 # 8 #8 #16 #8 #4  # coefficient for excitatory anisotropic weight
+    self.weightInCoefficient = 64 # 28 #32 #64 #28 sieht gut aus!! #32 #22  # coefficient for inhibitory anisotropic weight, Perlin scale 4: 25-30 ok, 25-28 good
 
     # Neuron
     self.compartmentVoltageDecay = 200 #20  # voltage decay
@@ -44,13 +46,11 @@ def includeExperiment(self):
     self.homeostasisStatus = False # defines if homesostatic plasticity is active or not
 
     # Network size and connections
-    self.reservoirExSize = 1600 #3600  # size of the excitatory network
+    self.reservoirExSize = 800 #3600  # size of the excitatory network
     self.reservoirInSize = None  # size of the inhibitory network
     self.reservoirInExRatio = 1./4.  # number excitatory/inhibitory neurons ratio
     self.reservoirDens = None  # connection density of the network
     self.numConnectionsPerNeuron = 50 #45 #100  # average number of connections per neuron
-    self.weightExCoefficient = 16 # 8 #8 #16 #8 #4  # coefficient for excitatory anisotropic weight
-    self.weightInCoefficient = 64 # 28 #32 #64 #28 sieht gut aus!! #32 #22  # coefficient for inhibitory anisotropic weight, Perlin scale 4: 25-30 ok, 25-28 good
 
     # Trace input
     self.traceClusters = 3  # number of trace clusters

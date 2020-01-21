@@ -18,7 +18,7 @@ from ..system.datalog import Datalog
 from ..parameters import Parameters
 from ..utils import Utils
 from ..plots import Plot
-from ..network.reservoir.reservoir import ReservoirNetwork
+from ..network import ReservoirNetwork
 
 """
 @desc: Class for running an experiment, usually contains performing
@@ -32,7 +32,7 @@ class RewardExperiment():
     def __init__(self):
         self.p = Parameters()  # Parameters
 
-        self.targetFunctions = np.zeros((self.p.traceClusters, self.p.traceSteps))
+        #self.targetFunctions = np.zeros((self.p.traceClusters, self.p.traceSteps))
 
         # Instantiate system singleton and add datalog object
         self.system = System.instance()

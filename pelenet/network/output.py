@@ -37,4 +37,5 @@ def drawOutputMaskAndWeights(self):
 
     # Define weights
     self.outputWeights = self.outputMask * self.p.outputWeightValue
-    
+
+

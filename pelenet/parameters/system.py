@@ -14,9 +14,9 @@ def includeSystem(self):
     self.expLogPath = None  # The explicit path within dataLogPath, which is set when parameter instance is created, it depends on datetime
 
     # Loihi chip
-    self.numCores = 2  # number of cores available in current setting
+    self.numChips = 2  # number of cores available in current setting
     self.numCoresPerChip = 128  # number of cores per chip in current setting
-    self.neuronsPerCore = 20 #55  # numer of neurons distributed to each Loihi core
+    self.neuronsPerCore = 10 #20 #55  # numer of neurons distributed to each Loihi core
     self.bufferFactor = 20  # number of timesteps the buffer should collect spike data from the Loihi cores
 
     # Validity check

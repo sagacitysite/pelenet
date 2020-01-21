@@ -36,7 +36,7 @@ def addReservoirNetworkDistributed(self):
 
     # Define variable to enable/disable spike backprop for learning
     isBackprop = int(self.p.isLearningRule)
-    # Define compartment prototypes and compartmen groups
+    # Define compartment prototypes and compartment groups
     for i in range(nAllCores):
         if i < nExCores:
             # Excitatory compartment prototype

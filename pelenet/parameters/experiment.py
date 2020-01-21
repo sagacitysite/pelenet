@@ -50,7 +50,7 @@ def includeExperiment(self):
     self.reservoirInSize = None  # size of the inhibitory network
     self.reservoirInExRatio = 1./4.  # number excitatory/inhibitory neurons ratio
     self.reservoirDens = None  # connection density of the network
-    self.numConnectionsPerNeuron = 60 #50 #45 #100  # average number of connections per neuron
+    self.numConnectionsPerNeuron = 25 #50 #45 #100  # average number of connections per neuron
 
     # Trace input
     self.traceClusters = 3  # number of trace clusters
@@ -76,7 +76,7 @@ def includeExperiment(self):
     self.cueRelaxation = 20 #23  # time to wait for relaxation of the network activity after cue
     self.cueDens = 0.2 # 0.1  # percent of connections to reservoir from input
     self.cueSpikeProb = 0.1  # probability of spike for the generator
-    self.cueMaxWeight = 200 #100  # maximum weight a cue connection can have
+    self.cueMaxWeight = 100 #200 #100  # maximum weight a cue connection can have
     self.cuePatchNeuronsShift = 0 #20  # shift in x and y direction of cue input
     self.cuePatchNeurons = 25  # number of neurons for the cue input (needs to be root squarable)
 

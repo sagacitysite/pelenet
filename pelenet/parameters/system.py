@@ -16,7 +16,7 @@ def includeSystem(self):
     # Loihi chip
     self.numChips = 2  # number of cores available in current setting
     self.numCoresPerChip = 128  # number of cores per chip in current setting
-    self.neuronsPerCore = 10 #20 #55  # numer of neurons distributed to each Loihi core
+    self.neuronsPerCore = 20 #1024 #10 #20 #55  # numer of neurons distributed to each Loihi core
     self.bufferFactor = 20  # number of timesteps the buffer should collect spike data from the Loihi cores
 
     # Validity check

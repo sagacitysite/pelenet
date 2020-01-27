@@ -18,7 +18,7 @@ from ..system.datalog import Datalog
 from ..parameters import Parameters
 from ..utils import Utils
 from ..plots import Plot
-from ..network.reservoir.reservoir import ReservoirNetwork
+from ..network import ReservoirNetwork
 
 """
 @desc: Class for running an experiment, usually contains performing

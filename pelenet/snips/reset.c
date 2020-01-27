@@ -3,14 +3,14 @@
 #include "time.h"
 #include "reset.h"
 
-static int numNeuronsPerCore = 1024;
+static int numNeuronsPerCore = 20;
 
 int tImgStart = 0;
 int tImgEnd = 0;
 
-extern int numCores;
-extern int resetInterval;
-extern int enableReset;
+extern int numCores = 128;
+extern int resetInterval = 400;
+extern int enableReset = 1;
 
 int do_reset(runState *RunState) {
     bool apply = false;

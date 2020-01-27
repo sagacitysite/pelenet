@@ -57,13 +57,13 @@ class RewardExperiment():
         self.net.addReservoirNetworkDistributed()
 
         # Add cue
-        self.net.addCueGenerator()
+        #self.net.addCueGenerator()
 
         # Add output neuron
         #self.net.addOutputRewardStructure()
 
         # Build the network structure
-        self.net.build()
+        #self.net.build()
     
     """
     @desc: Draw mask and weights

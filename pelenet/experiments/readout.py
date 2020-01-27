@@ -8,7 +8,7 @@ import gc
 from .anisotropic import AnisotropicExperiment
 
 # Own modules
-from ..network.reservoir.reservoir import ReservoirNetwork
+from ..network import ReservoirNetwork
 
 """
 @desc: Class for running an experiment, usually contains performing

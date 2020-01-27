@@ -8,7 +8,7 @@ def includeExperiment(self):
 
     # Experiment
     self.seed = 2  # Seed of the simulation, 'None' is random (no seed)
-    self.totalSteps = 1000 #None  # Number of simulation steps, if 'None', value is derived
+    self.totalSteps = None #1000 #None  # Number of simulation steps, if 'None', value is derived
     self.trials = 3  # number of trials
     self.movementSteps = 200  # Number of steps for movement
 
@@ -46,11 +46,11 @@ def includeExperiment(self):
     self.homeostasisStatus = False # defines if homesostatic plasticity is active or not
 
     # Network size and connections
-    self.reservoirExSize = 400 #3600  # size of the excitatory network
+    self.reservoirExSize = 3600 #50 #400 #3600  # size of the excitatory network
     self.reservoirInSize = None  # size of the inhibitory network
     self.reservoirInExRatio = 1./4.  # number excitatory/inhibitory neurons ratio
     self.reservoirDens = None  # connection density of the network
-    self.numConnectionsPerNeuron = 25 #50 #45 #100  # average number of connections per neuron
+    self.numConnectionsPerNeuron = 45 #50 #45 #100  # average number of connections per neuron
 
     # Trace input
     self.traceClusters = 3  # number of trace clusters
@@ -84,7 +84,7 @@ def includeExperiment(self):
     self.stopStart = None  # point in time where the stop signal should start
     self.stopGens = 20  # number of stop generators
     self.stopSteps = 10  # number of time steps the stop generator should be active
-    self.stopRelaxation = 10  # number time steps to relax after the stop signal 
+    self.stopRelaxation = 150  # number time steps to relax after the stop signal 
     self.stopSpikeProb = 0.5  # probability of spike for the generator
 
     # Noise
@@ -99,8 +99,8 @@ def includeExperiment(self):
     self.isInSpikeProbe = False  # activate/deactivate spike probes for inhibitory neurons
     self.isOutSpikeProbe = False  # activate/deactivate spike probes for output neurons
     self.weightProbe = False  # read weights at the end of the simulation
-    self.isExVoltageProbe = False  # activate/deactivate voltage probes for excitatory neurons
-    self.isInVoltageProbe = False  # activate/deactivate voltage probes for inhibitory neurons
+    self.isExVoltageProbe = True  # activate/deactivate voltage probes for excitatory neurons
+    self.isInVoltageProbe = True  # activate/deactivate voltage probes for inhibitory neurons
     self.isOutVoltageProbe = False  # activate/deactivate voltage probes for output neurons
     self.isExCurrentProbe = False  # activate/deactivate current probes for excitatory neurons
     self.isInCurrentProbe = False  # activate/deactivate current probes for inhibitory neurons

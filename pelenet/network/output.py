@@ -1,3 +1,6 @@
+import numpy as np
+from scipy import sparse
+
 """
 @desc: Get weights for synapses between reservoir and output neurons
 """

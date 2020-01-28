@@ -1,13 +1,15 @@
+# Loihi modules
+import nxsdk.api.n2a as nx
+from nxsdk.graph.processes.phase_enums import Phase
+
 # Official modules
 import numpy as np
 import logging
 from copy import deepcopy
-import gc
+import os
 
-# Importing anisotropic network
+# Pelenet modules
 from .anisotropic import AnisotropicExperiment
-
-# Own modules
 from ..network import ReservoirNetwork
 
 """
@@ -25,13 +27,101 @@ class ReadoutExperiment(AnisotropicExperiment):
 
         # Define some further variables
         self.targetFunction = self.getTargetFunction()
-
+    
     """
     @desc: Run whole experiment
     """
     def run(self):
-        # Run network
-        self.net.run()
+        # Compile network
+        compiler = nx.N2Compiler()
+        board = compiler.compile(self.net.nxNet)
+        logging.info('Network successfully compiled')
+
+        # Add snips
+        resetInitSnips = self.addSnips(board)
+        logging.info('SNIPs added to chips')
+
+        # Create channels for transfering initial values for the reset SNIP
+        resetInitChannels = self.createAndConnectInitChannels(board, resetInitSnips)
+        logging.info('Channels added')
+        
+        # Start board
+        board.start()
+        logging.info('Board successfully started')
+
+        # Write initial data to channels
+        for i in range(self.p.numChips):
+            resetInitChannels[i].write(3, [
+                self.p.neuronsPerCore,  # number of neurons per core
+                self.p.totalTrialSteps,  # reset interval
+                self.p.stopSteps  # number of steps to clear voltages/currents
+            ])
+        logging.info('Initial values transfered to SNIPs via channel')
+
+        # Run and disconnect board
+        board.run(self.p.totalSteps)
+        board.disconnect()
+
+        # Perform postprocessing
+        self.net.postProcessing()
+
+    """
+    @desc: Add SNIPs to the chips of the system
+
+    TODO: Only add SNIPs to used chips, not to all available chips on the system
+    """
+    def addSnips(self, board):
+        snipDir = os.path.abspath(os.path.join('pelenet', 'snips'))
+        print(snipDir)
+        print(self.p.snipsPath)
+
+        # Add one SNIPs to every chip
+        resetInitSnips = []
+        for i in range(self.p.numChips):
+            # SNIP for initializing some values for the reset SNIP
+            resetInitSnips.append(board.createSnip(
+                name='init'+str(i),
+                cFilePath=self.p.snipsPath + "/reset_init.c",
+                includeDir=self.p.snipsPath,
+                funcName='initialize_reset',
+                phase=Phase.EMBEDDED_INIT,
+                lmtId=0,
+                chipId=i))
+
+        # SNIPs for resetting the voltages and currents
+        resetSnips = []
+        for i in range(self.p.numChips):
+            # Add one SNIP for every chip
+            board.createSnip(
+                name='reset'+str(i),
+                cFilePath=self.p.snipsPath + "/reset.c",
+                includeDir=self.p.snipsPath,
+                guardName='do_reset',
+                funcName='reset',
+                phase=Phase.EMBEDDED_MGMT,
+                lmtId=0,
+                chipId=i)
+
+        return resetInitSnips
+
+    """
+    @desc: Create and connect channels for initializing values for the reset SNIPs
+    """
+    def createAndConnectInitChannels(self, board, resetInitSnips):
+        resetInitChannels = []
+        # Add one channel to every chip
+        for i in range(self.p.numChips):
+            # Create channel for init data with buffer size of 3
+            initResetChannel = board.createChannel(bytes('initreset'+str(i), 'utf-8'), "int", 3)
+            
+            # Connect channel to init snip
+            initResetChannel.connect(None, resetInitSnips[i])
+
+            # Add channel to list
+            resetInitChannels.append(initResetChannel)
+
+        return resetInitChannels
+
 
     """
     @desc: Build all networks
@@ -45,7 +135,7 @@ class ReadoutExperiment(AnisotropicExperiment):
         self.drawMaskAndWeights()
 
         # Draw output weights
-        self.net.drawOutputMaskAndWeights()
+        #self.net.drawOutputMaskAndWeights()
 
         # Connect network
         self.net.addReservoirNetworkDistributed()

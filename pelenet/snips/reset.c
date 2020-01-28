@@ -3,24 +3,22 @@
 #include "time.h"
 #include "reset.h"
 
-static int numNeuronsPerCore = 20;
+static int numCores = 128;
 
-int tImgStart = 0;
-int tImgEnd = 0;
-
-extern int numCores = 128;
-extern int resetInterval = 400;
-extern int enableReset = 1;
+extern int neuronsPerCore;
+extern int resetInterval;
+extern int stopSteps;
 
 int do_reset(runState *RunState) {
     bool apply = false;
 
     // Prepare boolean variable, which is true for 10 time steps
-    for(int i=1; i<=10; i++) {
+    for(int i = 1; i <= stopSteps; i++) {
         apply = apply || (RunState->time_step - i) % resetInterval == 0;
     }
 
-    if (enableReset && (RunState->time_step == 1 || apply)) {
+
+    if (RunState->time_step == 1 || apply) {
         return 1;
     } else {
         return 0;
@@ -30,11 +28,13 @@ int do_reset(runState *RunState) {
 void reset(runState *RunState) {
 
     CxState cxs = (CxState) {.U=0, .V=0};
-    for(int i=0; i<numCores; i++) {
+
+    // Iterate over all cores
+    for(int i = 0; i < numCores; i++) {
         NeuronCore* nc = NEURON_PTR(nx_nth_coreid(i));
         // Sets all 1024 registers on the neurocore
-        nx_fast_init64(nc->cx_state, numNeuronsPerCore, *(uint64_t*)&cxs);
-        //nx_fast_init64(nc->cx_state, numNeuronsPerCore, 0);
+        nx_fast_init64(nc->cx_state, neuronsPerCore, *(uint64_t*)&cxs);
+        //nx_fast_init64(nc->cx_state, neuronsPerCore, 0);
 
         nx_flush_core(nx_nth_coreid(i));
     }

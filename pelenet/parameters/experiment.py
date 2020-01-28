@@ -9,7 +9,7 @@ def includeExperiment(self):
     # Experiment
     self.seed = 2  # Seed of the simulation, 'None' is random (no seed)
     self.totalSteps = None #1000 #None  # Number of simulation steps, if 'None', value is derived
-    self.trials = 3  # number of trials
+    self.trials = 10  # number of trials
     self.movementSteps = 200  # Number of steps for movement
 
     # Ansitotropic
@@ -27,7 +27,7 @@ def includeExperiment(self):
     self.refractoryDelay = 2  # refractory period for a neuron
 
     # Readout training
-    self.flipProb = 0 #0.05  # percentage of neuron flips in every trial
+    self.flipProb = 0.01 #0.05  # percentage of neuron flips in every trial
     self.smoothingWd = 3  # number of neurons to the left and right which are influenced
     self.smoothingVar = 7  # variance of the Gaussian kernel
 
@@ -99,8 +99,8 @@ def includeExperiment(self):
     self.isInSpikeProbe = False  # activate/deactivate spike probes for inhibitory neurons
     self.isOutSpikeProbe = False  # activate/deactivate spike probes for output neurons
     self.weightProbe = False  # read weights at the end of the simulation
-    self.isExVoltageProbe = True  # activate/deactivate voltage probes for excitatory neurons
-    self.isInVoltageProbe = True  # activate/deactivate voltage probes for inhibitory neurons
+    self.isExVoltageProbe = False  # activate/deactivate voltage probes for excitatory neurons
+    self.isInVoltageProbe = False  # activate/deactivate voltage probes for inhibitory neurons
     self.isOutVoltageProbe = False  # activate/deactivate voltage probes for output neurons
     self.isExCurrentProbe = False  # activate/deactivate current probes for excitatory neurons
     self.isInCurrentProbe = False  # activate/deactivate current probes for inhibitory neurons

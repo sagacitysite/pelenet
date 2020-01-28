@@ -8,11 +8,6 @@ def run(self):
     # Post processing of probes
     self.postProcessing()
 
-    #if self.log:
-    #    self.plot.reservoirSpikeTrain()  # Plot spike train of reservoir network
-    #    self.plot.reservoirRates()  # Plot avergae rates of reservoir network
-    #    self.plot.noiseSpikes()  # Plot spikes of noise neurons
-
 """
 @desc: Build default network structure
 """

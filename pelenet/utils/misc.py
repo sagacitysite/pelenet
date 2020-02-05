@@ -82,7 +82,7 @@ def trainOLS(self, trainSpikes, testSpikes, targetFunction, filter='single expon
 @return: data transformed in 2 dims/columns + regenerated original data
 @link: https://stackoverflow.com/a/13224592/2692283
 """
-def pca(data, dims_rescaled_data=2):
+def pca(self, data, dims_rescaled_data=2):
     m, n = data.shape
     # mean center the data
     data -= data.mean(axis=0)

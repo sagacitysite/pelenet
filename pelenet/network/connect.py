@@ -42,7 +42,8 @@ def addReservoirNetworkDistributed(self):
             # Excitatory compartment prototype
             exCompProto = nx.CompartmentPrototype(compartmentVoltageDecay=self.p.compartmentVoltageDecay,
                                                     refractoryDelay=self.p.refractoryDelay, logicalCoreId=i,
-                                                    enableSpikeBackprop=isBackprop, enableSpikeBackpropFromSelf=isBackprop)
+                                                    enableSpikeBackprop=isBackprop, enableSpikeBackpropFromSelf=isBackprop,
+                                                    functionalState=nx.COMPARTMENT_FUNCTIONAL_STATE.IDLE)
             # Calculate size of compartment: if last core has remainder, use remainder as size
             size = nLastExCore if (i == (nExCores-1) and nLastExCore > 0) else self.p.neuronsPerCore
             # Excitatory compartment group
@@ -50,7 +51,8 @@ def addReservoirNetworkDistributed(self):
         elif i >= nExCores and i < nExCores+nInCores:
             # Inhibitory compartment prototype
             inCompProto = nx.CompartmentPrototype(compartmentVoltageDecay=self.p.compartmentVoltageDecay,
-                                                    refractoryDelay=self.p.refractoryDelay, logicalCoreId=i)
+                                                    refractoryDelay=self.p.refractoryDelay, logicalCoreId=i,
+                                                    functionalState=nx.COMPARTMENT_FUNCTIONAL_STATE.IDLE)
             # Calculate size of compartment: if last core has remainder, use remainder as size
             size = nLastInCore if (i == (nExCores+nInCores-1) and nLastInCore > 0) else self.p.neuronsPerCore
             # Inhibitory compartment prototype
@@ -58,7 +60,8 @@ def addReservoirNetworkDistributed(self):
         elif i >= nExCores+nInCores:
             # Output compartment prototype
             outCompProto = nx.CompartmentPrototype(compartmentVoltageDecay=self.p.compartmentVoltageDecay,
-                                                    refractoryDelay=self.p.refractoryDelay, logicalCoreId=i)
+                                                    refractoryDelay=self.p.refractoryDelay, logicalCoreId=i,
+                                                    functionalState=nx.COMPARTMENT_FUNCTIONAL_STATE.IDLE)
             # Calculate size of compartment: if last core has remainder, use remainder as size
             size = nLastOutCore if (i == (nAllCores-1) and nLastOutCore > 0) else self.p.neuronsPerCore
             # Inhibitory compartment prototype

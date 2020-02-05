@@ -71,10 +71,6 @@ class ReadoutExperiment(AnisotropicExperiment):
     TODO: Only add SNIPs to used chips, not to all available chips on the system
     """
     def addSnips(self, board):
-        snipDir = os.path.abspath(os.path.join('pelenet', 'snips'))
-        print(snipDir)
-        print(self.p.snipsPath)
-
         # Add one SNIPs to every chip
         resetInitSnips = []
         for i in range(self.p.numChips):
@@ -141,7 +137,7 @@ class ReadoutExperiment(AnisotropicExperiment):
         self.net.addReservoirNetworkDistributed()
 
         # Add cue
-        self.net.addRepeatedCueGenerator()
+        self.net.addRepeatedInputGenerator()
 
         # Add stop generator
         #self.net.addRepeatedStopGenerator()
@@ -158,8 +154,11 @@ class ReadoutExperiment(AnisotropicExperiment):
             clusterIndex: index of cluster the function is defined for
             type: 'sin', 'revsin', 'lin'
     """
-    def getTargetFunction(self, type = 'sin'):
-        nTs = self.p.movementSteps
+    def getTargetFunction(self, type = 'sin', steps = None):
+        if steps is None:
+            nTs = self.p.movementSteps
+        else:
+            nTs = steps
 
         # Define function values
         if type == 'sin': return 0.5+0.5*np.sin((np.pi/(0.5*nTs))*np.arange(nTs))

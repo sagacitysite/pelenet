@@ -137,7 +137,7 @@ def crosscorrelation(spikes):
 """
 @desc: Plot first 2 dimensions of PCA
 """
-def pca(spikes):
+def pca(self, spikes):
     # Perform PCA
     res = self.obj.utils.pca(spikes.T.astype(float))
 

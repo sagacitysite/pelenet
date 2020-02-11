@@ -9,17 +9,17 @@ def includeExperiment(self):
     # Experiment
     self.seed = 2  # Seed of the simulation, 'None' is random (no seed)
     self.totalSteps = None #1000 #None  # Number of simulation steps, if 'None', value is derived
-    self.trials = 10  # number of trials
+    self.trials = 25  # number of trials
     self.movementSteps = 200  # Number of steps for movement
 
     # Ansitotropic
-    self.connectionProb = 0.04 #0.05  # percentage of established connections (range 0.05 - 0.1), FIXME bring together with "self.reservoirDens"
+    self.connectionProb = 0.05 #0.04 #0.05  # percentage of established connections (range 0.05 - 0.1), FIXME bring together with "self.reservoirDens"
     self.anisoStdE = 12 #6 #10 #12  # space constant, std of gaussian for excitatory neurons
     self.anisoStdI = 9 #4.5 #8 #9  # space constant, std of gaussian for inhibitory neurons (range 9 - 11)
     self.anisoShift = 1  # intensity of the shift of the connectivity distribution for a neuron
     self.anisoPerlinScale = 4 #8 # 4-12  # perlin noise scale, high value => dense valleys, low value => broad valleys
-    self.weightExCoefficient = 16 #8 #16 # 8 #8 #16 #8 #4  # coefficient for excitatory anisotropic weight
-    self.weightInCoefficient = 64 #32 #64 # 28 #32 #64 #28 sieht gut aus!! #32 #22  # coefficient for inhibitory anisotropic weight, Perlin scale 4: 25-30 ok, 25-28 good
+    self.weightExCoefficient = 12 #16 #8 #16 # 8 #8 #16 #8 #4  # coefficient for excitatory anisotropic weight
+    self.weightInCoefficient = 48 #64 #32 #64 # 28 #32 #64 #28 sieht gut aus!! #32 #22  # coefficient for inhibitory anisotropic weight, Perlin scale 4: 25-30 ok, 25-28 good
 
     # Neuron
     self.compartmentVoltageDecay = 200 #20  # voltage decay
@@ -27,7 +27,7 @@ def includeExperiment(self):
     self.refractoryDelay = 2  # refractory period for a neuron
 
     # Readout training
-    self.flipProb = 0.05 #0.05  # percentage of neuron flips in every trial
+    #self.flipProb = 0.05 #0.05  # percentage of neuron flips in every trial
     self.smoothingWd = 3  # number of neurons to the left and right which are influenced
     self.smoothingVar = 7  # variance of the Gaussian kernel
 
@@ -72,14 +72,14 @@ def includeExperiment(self):
 
     # Cue input
     #self.cueGens = 50 #50 #10  # number of cue generators
-    self.cueSteps = 2 #5 #2 #200 #100  # number of steps the cue should drive the network, if None, cue is background activity over all steps
-    self.cueRelaxation = 18 #23  # time to wait for relaxation of the network activity after cue
+    self.cueSteps = 1 #5 #2 #200 #100  # number of steps the cue should drive the network, if None, cue is background activity over all steps
+    self.cueRelaxation = 0 #23  # time to wait for relaxation of the network activity after cue
     #self.cueDens = 0.2 # 0.1  # percent of connections to reservoir from input
-    self.cueSpikeProb = 0.5  # probability of spike for the generator, needs to be 0.5 if flips are applied (to remain equal input strength)
-    self.cueMaxWeight = 128 #200 #100  # maximum weight a cue connection can have
+    #self.cueSpikeProb = 0.5  # probability of spike for the generator, needs to be 0.5 if flips are applied (to remain equal input strength)
+    self.cueMaxWeight = 255 #200 #100  # maximum weight a cue connection can have
     self.cuePatchNeuronsShift = 0 #20  # shift in x and y direction of cue input
-    self.cuePatchNeurons = 16  # number of neurons for the cue input (needs to be root squarable)
-    self.cueGensPerNeuron = 8  # number of generators per input neuron
+    self.cuePatchNeurons = 25  # number of neurons for the cue input (needs to be root squarable)
+    self.cueGensPerNeuron = 16  # number of generators per input neuron
 
     # Stop input
     self.stopStart = None  # point in time where the stop signal should start
@@ -96,9 +96,9 @@ def includeExperiment(self):
     self.noiseMaxWeight = 10 #2  # maximum weight a noise connection can have
 
     # Probes
-    self.isExSpikeProbe = True  # activate/deactivate spike probes for excitatory neurons
+    self.isExSpikeProbe = False  # activate/deactivate spike probes for excitatory neurons
     self.isInSpikeProbe = False  # activate/deactivate spike probes for inhibitory neurons
-    self.isOutSpikeProbe = False  # activate/deactivate spike probes for output neurons
+    self.isOutSpikeProbe = True  # activate/deactivate spike probes for output neurons
     self.weightProbe = False  # read weights at the end of the simulation
     self.isExVoltageProbe = False  # activate/deactivate voltage probes for excitatory neurons
     self.isInVoltageProbe = False  # activate/deactivate voltage probes for inhibitory neurons

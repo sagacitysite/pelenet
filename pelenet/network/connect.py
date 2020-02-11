@@ -74,7 +74,7 @@ def addReservoirNetworkDistributed(self):
     connectNetworkChunks(self, fromChunks=self.inReservoirChunks, toChunks=self.exReservoirChunks, mask=self.initialMasks.inex, weights=self.initialWeights.inex, prototype=self.inConnProto)
 
     # Connect excitatory neurons to output layer
-    #connectNetworkChunks(self, fromChunks=self.exReservoirChunks, toChunks=self.outputLayerChunks, mask=self.outputMask, weights=self.outputWeights, prototype=self.exConnProto)
+    connectNetworkChunks(self, fromChunks=self.exReservoirChunks, toChunks=self.outputLayerChunks, mask=self.outputMask, weights=self.outputWeights, prototype=self.exConnProto)
 
     # Log that all cores are interconnected
     logging.info('All cores are sucessfully interconnected')

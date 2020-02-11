@@ -24,6 +24,13 @@ def postProcessing(self):
             spks.append(self.inSpikeProbes[i].data)
         self.inSpikeTrains = np.reshape(spks, (self.p.reservoirInSize, self.p.totalSteps))
 
+    # Combine spike probes from all chunks together for inhibitory neurons
+    if self.p.isOutSpikeProbe:
+        spks = []
+        for i in range(len(self.outSpikeProbes)):
+            spks.append(self.outSpikeProbes[i].data)
+        self.outSpikeTrains = np.reshape(spks, (self.p.numOutputNeurons, self.p.totalSteps))
+
     # Recombine all weights from probe chunks together to a matrix again
     if self.p.weightProbe:
         self.trainedWeightsExex = self.utils.recombineExWeightMatrix(self.initialWeights.exex, self.weightProbes)

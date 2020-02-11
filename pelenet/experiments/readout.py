@@ -131,7 +131,7 @@ class ReadoutExperiment(AnisotropicExperiment):
         self.drawMaskAndWeights()
 
         # Draw output weights
-        #self.net.drawOutputMaskAndWeights()
+        self.net.drawOutputMaskAndWeights()
 
         # Connect network
         self.net.addReservoirNetworkDistributed()

@@ -170,24 +170,24 @@ def addRepeatedInputGenerator(self):
     # Create spike generator
     sg = self.nxNet.createSpikeGenProcess(numPorts=cueGens)
 
-    for i in range(cueGens):
-        # Generate spikes for spike current generator
-        spikes = 1(np.random.rand(self.p.cueSteps) < self.p.cueSpikeProb)
-        # Get indices from spikes
-        cueSpikesInd = []
-        for j in range(self.p.trials):
-            # Draw neurons to flip with probability flipProb
-            flips = (np.random.rand(self.p.cueSteps) < self.p.flipProb)
-            # Apply flips to cue input
-            noisedSpikes = np.logical_xor(spikes, flips)
-            # Transform to event indices
-            noisedIndices = np.where(noisedSpikes)[0] + self.p.trialSteps*j + self.p.breakSteps*(j+1)
-            cueSpikesInd.append(noisedIndices)
-
-        self.cueSpikes.append(list(itertools.chain(*cueSpikesInd)))
+    # Initialize counter
+    cnt = 0
+    for i in range(self.p.cuePatchNeurons):
+        for j in range(self.p.cueGensPerNeuron):
+            spikeTimes = []
+            for k in range(self.p.trials):
+                # Add spike times only when i != k
+                if (i != k):
+                    spks = np.arange(self.p.cueSteps) + self.p.trialSteps*k + self.p.breakSteps*(k+1)
+                    spikeTimes.append(spks)
             
-        # Add spikes indices to current spike generator
-        sg.addSpikes(spikeInputPortNodeIds=i, spikeTimes=list(itertools.chain(*cueSpikesInd)))
+            # Add spikes indices to current spike generator
+            sg.addSpikes(spikeInputPortNodeIds=cnt, spikeTimes=list(itertools.chain(*spikeTimes)))
+            # Increase counter
+            cnt += 1
+
+            # Add spike indices to cueSpikes array
+            self.cueSpikes.append(list(itertools.chain(*spikeTimes)))
 
     cueSize = int(np.sqrt(self.p.cuePatchNeurons))
     exNeuronsTopSize = int(np.sqrt(self.p.reservoirExSize))
@@ -196,11 +196,17 @@ def addRepeatedInputGenerator(self):
     #cueMask[self.p.cueSize:, :] = 0  # set all mas values behind last neuron of cue input to zero
 
     # Set all values zero which are not part of the patch
-    shift = self.p.cuePatchNeuronsShift
+    #shiftX = 0 #self.p.cuePatchNeuronsShift
+    #shiftY = 0 #self.p.cuePatchNeuronsShift
+    shiftX = 44
+    shiftY = 24
     topology = np.zeros((exNeuronsTopSize,exNeuronsTopSize))
-    topology[shift:shift+cueSize,shift:shift+cueSize] = 1
+    topology[shiftY:shiftY+cueSize,shiftX:shiftX+cueSize] = 1
     #topology[0,0] = 1
     idc = np.where(topology.flatten())[0]
+
+    # In every trial remove another 
+    #self.idc = idc
 
     cueMask = np.zeros((self.p.reservoirExSize, cueGens))
 
@@ -208,9 +214,8 @@ def addRepeatedInputGenerator(self):
         fr, to = i*self.p.cueGensPerNeuron, (i+1)*self.p.cueGensPerNeuron
         cueMask[idx,fr:to] = 1
 
-    #cueMask[idc,:] = 0
-
-
+    #for idx in idc:
+    #    cueMask[idx,:cueGens] = 1
 
     # Define weights
     self.cueWeights = cueMask*self.p.cueMaxWeight

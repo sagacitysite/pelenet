@@ -61,8 +61,8 @@ def trainOLS(self, trainSpikes, testSpikes, targetFunction, filter=None, binSize
 
     # Train the parameters
     model = sm.OLS(y, x.T)
-    #params = model.fit().params
-    params = model.fit_regularized(alpha=alpha, L1_wt=l1w).params
+    params = model.fit().params
+    #params = model.fit_regularized(alpha=alpha, L1_wt=l1w).params
     # alpha=0.2, L1_wt=0.001
 
     # Estimate target function for test spike train

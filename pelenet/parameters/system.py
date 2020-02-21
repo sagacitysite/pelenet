@@ -7,6 +7,17 @@ from nxsdk.logutils.nxlogging import LoggingLevel
 """
 def includeSystem(self):
 
+    # Plot styles
+    self.pltColor = '#000000'
+    self.pltLegendSize = 12
+    self.pltFontFamily = 'CMU Serif'
+    self.pltFontSize = 14
+    self.pltFileType = 'svg'  # png, svg, jpg, pdf
+    self.pltAxesGrid = True
+    self.pltLegendFancybox = True
+    self.pltLegendFramealpha = 0.75
+    self.pltPatchLinewidth = 0
+
     # Data log
     self.loihiLoggingLevel = LoggingLevel.INFO
     self.systemLoggingLevel = logging.INFO

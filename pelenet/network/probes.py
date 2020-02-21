@@ -15,21 +15,28 @@ def postProcessing(self):
         spks = []
         for i in range(len(self.exSpikeProbes)):
             spks.append(self.exSpikeProbes[i].data)
-        self.exSpikeTrains = np.reshape(spks, (self.p.reservoirExSize, self.p.totalSteps))
+        self.exSpikeTrains = np.vstack(spks) #np.reshape(spks, (self.p.reservoirExSize, self.p.totalSteps))
 
     # Combine spike probes from all chunks together for inhibitory neurons
     if self.p.isInSpikeProbe:
         spks = []
         for i in range(len(self.inSpikeProbes)):
             spks.append(self.inSpikeProbes[i].data)
-        self.inSpikeTrains = np.reshape(spks, (self.p.reservoirInSize, self.p.totalSteps))
+        self.inSpikeTrains = np.vstack(spks) #np.reshape(spks, (self.p.reservoirInSize, self.p.totalSteps))
 
     # Combine spike probes from all chunks together for inhibitory neurons
     if self.p.isOutSpikeProbe:
         spks = []
         for i in range(len(self.outSpikeProbes)):
             spks.append(self.outSpikeProbes[i].data)
-        self.outSpikeTrains = np.reshape(spks, (self.p.numOutputNeurons, self.p.totalSteps))
+        self.outSpikeTrains = np.vstack(spks)
+
+    # Combine spike probes from all chunks together for inhibitory neurons
+    if self.p.isOutVoltageProbe:
+        spks = []
+        for i in range(len(self.outVoltageProbes)):
+            spks.append(self.outVoltageProbes[i].data)
+        self.outVoltageTrains = np.vstack(spks)
 
     # Recombine all weights from probe chunks together to a matrix again
     if self.p.weightProbe:

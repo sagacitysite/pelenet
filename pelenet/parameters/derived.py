@@ -9,6 +9,9 @@ import numpy as np
           use system variables
 """
 def computeDerived(self):
+    
+    self.cuePatchNeurons = np.square(self.cuePatchSize)
+
     # If reservoirInSize is not set (None), calculate it with given ex/in ratio
     if self.reservoirInSize is None:
         self.reservoirInSize = int(self.reservoirInExRatio * self.reservoirExSize)

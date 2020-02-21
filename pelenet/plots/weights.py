@@ -25,7 +25,7 @@ def weightDistribution(self, weights, yscale):
     plt.ylabel('#')
     plt.title('Spectral radius: ' + str(maxeigval_round) + ', Mean weight: ' + str(meanweight))
     plt.yscale(yscale)
-    plt.savefig(self.plotDir + 'weights_distribution.png')
+    plt.savefig(self.plotDir + 'weights_distribution.' + self.p.pltFileType)
     p = plt.hist(wsf[np.nonzero(wsf)], bins=np.arange(np.max(wsf)))
 
 """
@@ -55,7 +55,7 @@ def weightMatrix(self, sparseMatrix):
     plt.figure(figsize=(6, 6))
     plt.imshow(denseMatrix, vmin=0, vmax=max_weight, interpolation=None)
     plt.title('Initial weights')
-    plt.savefig(self.plotDir + 'weights_matrix.png')
+    plt.savefig(self.plotDir + 'weights_matrix.' + self.p.pltFileType)
     p = plt.colorbar()
 
 """
@@ -96,7 +96,7 @@ def weightsSortedBySupport(self, mask):
     plt.imshow(sorted_matrix, interpolation=None, vmin=0, vmax=20)
     plt.title('Sorted weights')
     plt.colorbar()
-    plt.savefig(self.plotDir + 'weights_support.png')
+    plt.savefig(self.plotDir + 'weights_support.' + self.p.pltFileType)
     p = plt.show()
 
 """
@@ -111,5 +111,5 @@ def cueWeightMean(self):
     # Reshape to topology
     wgt = inputWeightMean.reshape((topsize,topsize))
     # Show and save result
-    plt.savefig(self.plotDir + 'weights_cue_mean.png')
+    plt.savefig(self.plotDir + 'weights_cue_mean.' + self.p.pltFileType)
     p = plt.imshow(wgt)

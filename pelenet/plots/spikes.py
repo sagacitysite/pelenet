@@ -7,13 +7,13 @@ import warnings
 @desc: Plot spike train of neurons in reservoir
 """
 def reservoirSpikeTrain(self, fr=0, to=None):
-    # Spikes from activites
+    # Get spikes
     exSpikes = self.obj.exSpikeTrains if self.p.isExSpikeProbe else None
     inSpikes = 2*self.obj.inSpikeTrains if self.p.isInSpikeProbe else None  # multiply by 2 to enable a different color in imshow
 
     # If no spike probe is in use and we can stop here
     if (not self.p.isExSpikeProbe) and (not self.p.isInSpikeProbe):
-        warnings.warn("No spikes were probed, spike trains cannot be shown.")
+        warnings.warn("No excitatory or inhibitory spikes were probed, spike trains cannot be shown.")
         return
 
     # Combine ex and in spikes
@@ -32,21 +32,39 @@ def reservoirSpikeTrain(self, fr=0, to=None):
     cmap = colors.ListedColormap(['white', 'red', 'blue'])
 
     # Plot spike train
-    #events = [np.where(inExp.net.exSpikeTrains[i,:])[0] for i in range(3600)]
-    #plt.figure(figsize=(16, 10))
-    #plt.title('Reservoir spikes')
-    #plt.xlabel('Time')
-    #plt.ylabel('# neuron')
-    #plt.eventplot(events, color='red')
-    #p = plt.show()
-
-    # Plot spike train
     plt.figure(figsize=(16, 10))
     plt.imshow(chosenSpikes, cmap=cmap, vmin=0, vmax=2, aspect='auto')
     plt.title('Reservoir spikes')
     plt.xlabel('Time')
     plt.ylabel('# neuron')
-    plt.savefig(self.plotDir + 'spikes_raster.png')
+    plt.savefig(self.plotDir + 'spikes_raster.' + self.p.pltFileType)
+    p = plt.show()
+
+"""
+@desc: Plot spike train of output neurons
+"""
+def outputSpikeTrain(self, fr=0, to=None):
+    # Get spikes
+    outSpikes = self.obj.outSpikeTrains if self.p.isOutSpikeProbe else None
+
+    # If no spike probe is in use and we can stop here
+    if (not self.p.isOutSpikeProbe):
+        warnings.warn("No output spikes were probed, spike trains cannot be shown.")
+        return
+    
+    # Choose spikes ("zoom" in time)
+    chosenSpikes = outSpikes[:, fr:to]
+
+    # Define colors
+    cmap = colors.ListedColormap(['white', 'green'])
+
+    # Plot spike train
+    plt.figure(figsize=(16, 4))
+    plt.imshow(chosenSpikes, cmap=cmap, aspect='auto')
+    plt.title('Output spikes')
+    plt.xlabel('Time')
+    plt.ylabel('# neuron')
+    plt.savefig(self.plotDir + 'spikes_output_raster.' + self.p.pltFileType)
     p = plt.show()
 
 """
@@ -84,7 +102,7 @@ def reservoirRates(self):
     if meanRateEx is not None:
         plt.plot(np.arange(self.p.totalSteps), meanRateEx, alpha=0.75, color='r', label='Excitatory neurons')
     plt.legend()
-    plt.savefig(self.plotDir + 'spikes_rates.png')
+    plt.savefig(self.plotDir + 'spikes_rates.' + self.p.pltFileType)
     p = plt.show()
 
 """
@@ -93,7 +111,7 @@ def reservoirRates(self):
 def noiseSpikes(self):
     plt.figure(figsize=(16, 4))
     plt.title('Noise spikes')
-    plt.savefig(self.plotDir + 'spikes_noise.png')
+    plt.savefig(self.plotDir + 'spikes_noise.' + self.p.pltFileType)
     p = plt.imshow(self.obj.noiseSpikes, cmap='Greys', aspect='auto')
 
 """
@@ -107,7 +125,7 @@ def autocorrelation(spikes, numNeuronsToShow=3):
         plt.title('Autocorrelation')
         plt.xlabel('$\Delta t$')
         plt.ylabel('ACF')
-        plt.savefig(self.plotDir + 'spikes_autocorrelation.png')
+        plt.savefig(self.plotDir + 'spikes_autocorrelation.' + self.p.pltFileType)
         p = plt.show()
 
 """
@@ -131,7 +149,7 @@ def crosscorrelation(spikes):
     plt.imshow(crosscor)
     plt.title('Crosscorrelation')
     plt.colorbar()
-    plt.savefig(self.plotDir + 'spikes_crosscorrelation.png')
+    plt.savefig(self.plotDir + 'spikes_crosscorrelation.' + self.p.pltFileType)
     p = plt.show()
 
 """
@@ -176,7 +194,7 @@ def spikesMissmatch(self, trainSpikes, testSpikes, windowSize = 20):
     plt.ylim((-0.05,0.55))
     for i in range(self.p.trainingTrials):
         plt.plot(np.arange(0, T, windowSize), spikeMissmatches[i,:])
-    plt.savefig(self.plotDir + 'spikes_missmatch.png')
+    plt.savefig(self.plotDir + 'spikes_missmatch.' + self.p.pltFileType)
     p = plt.show()
 
 """
@@ -215,7 +233,7 @@ def ffSpikeCounts(spikes, neuronIdx, windowSize = 50):
     plt.ylim((0,1))
     plt.legend()
     plt.title('Fano factors for test run')
-    plt.savefig(self.plotDir + 'spikes_fanofactors.png')
+    plt.savefig(self.plotDir + 'spikes_fanofactors.' + self.p.pltFileType)
     p = plt.show()
 
 """
@@ -234,5 +252,5 @@ def meanTopologyActivity(self):
     plt.title('Topological mean activity (Perlin scale: '+ str(self.p.anisoPerlinScale) + ')')
     #st_mean[st_mean < 0.06] = 0
     plt.imshow(topoSpikesMean)
-    plt.savefig(self.plotDir + 'spikes_topology_activity_mean.png')
+    plt.savefig(self.plotDir + 'spikes_topology_activity_mean.' + self.p.pltFileType)
     p = plt.show()

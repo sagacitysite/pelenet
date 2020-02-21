@@ -10,7 +10,7 @@ def addReservoirNetworkDistributed(self):
     # Predefine some helper variables
     nEx = self.p.reservoirExSize
     nIn = self.p.reservoirInSize
-    nOut = self.p.numOutputNeurons
+    nOut = self.p.numOutputNeurons #self.p.numOutClusters #self.p.numOutputNeurons
 
     nExCores = int(np.ceil(nEx / self.p.neuronsPerCore))
     nLastExCore = nEx % self.p.neuronsPerCore  # number of excitatory neurons in last core

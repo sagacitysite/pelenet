@@ -123,7 +123,7 @@ class AnisotropicExperiment():
         stdE = self.p.anisoStdE
         stdI = self.p.anisoStdI
         
-        # ?
+        # Directions
         move = cl.move(nrowE)
 
         # Generate landscape
@@ -142,6 +142,10 @@ class AnisotropicExperiment():
             source = idx, nrowE, ncolE, nrowE, ncolE, int(p * npopE), stdE
             targets, delay = lcrn.lcrn_gauss_targets(*source)
             if landscape[idx] != 0:  # asymmetry
+                #if np.random.rand() <= self.p.percShift:  # for perc_shift < 1, some are not shifted
+                #    targets = (targets + self.p.anisoShift * move[landscape[idx] % len(move)]) % npopE
+                #else:
+                #    not_shifted.append(idx)
                 targets = (targets + self.p.anisoShift * move[landscape[idx] % len(move)]) % npopE
             targets = targets[targets != idx]
             

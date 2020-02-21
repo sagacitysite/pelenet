@@ -56,5 +56,5 @@ def landscape(self):
     title = 'Perlin scale: '+ str(self.p.anisoPerlinScale)
     ax.set(aspect=1, title=title)
     # Save and show
-    plt.savefig(self.plotDir + 'landscape.png')
+    plt.savefig(self.plotDir + 'landscape.' + self.p.pltFileType)
     p = plt.show()

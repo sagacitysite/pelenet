@@ -165,29 +165,39 @@ def addRepeatedCueGenerator(self):
         an excitatory connection prototype is used
 """
 def addRepeatedInputGenerator(self):
-    cueGens = self.p.cueGensPerNeuron*self.p.cuePatchNeurons
+    cueGens = int(self.p.cueGensPerNeuron*self.p.cuePatchNeurons)
 
     # Create spike generator
     sg = self.nxNet.createSpikeGenProcess(numPorts=cueGens)
 
+    combinations = np.array(list(itertools.combinations(np.arange(self.p.cuePatchNeurons), self.p.cueMissingNeurons)))
+
     # Initialize counter
     cnt = 0
+    # Iterate over patch neurons
     for i in range(self.p.cuePatchNeurons):
-        for j in range(self.p.cueGensPerNeuron):
-            spikeTimes = []
-            for k in range(self.p.trials):
-                # Add spike times only when i != k
-                if (i != k):
-                    spks = np.arange(self.p.cueSteps) + self.p.trialSteps*k + self.p.breakSteps*(k+1)
-                    spikeTimes.append(spks)
+        
+        spikeTimes = []
+        # Iterate over trials
+        for k in range(self.p.trials):
+            # Add spike times only when i != k
+            apply = np.all([combinations[k, m] != i for m in range(self.p.cueMissingNeurons)])
+
+            if (apply):
+                spks = np.arange(self.p.cueSteps) + self.p.trialSteps*k + self.p.breakSteps*(k+1)
+                spikeTimes.append(spks)
+
+        spikeTimes = list(itertools.chain(*spikeTimes))
             
+        # Iterate over generators
+        for j in range(self.p.cueGensPerNeuron):
             # Add spikes indices to current spike generator
-            sg.addSpikes(spikeInputPortNodeIds=cnt, spikeTimes=list(itertools.chain(*spikeTimes)))
+            sg.addSpikes(spikeInputPortNodeIds=cnt, spikeTimes=spikeTimes)
             # Increase counter
             cnt += 1
 
-            # Add spike indices to cueSpikes array
-            self.cueSpikes.append(list(itertools.chain(*spikeTimes)))
+        # Add spike indices to cueSpikes array
+        self.cueSpikes.append(spikeTimes)
 
     cueSize = int(np.sqrt(self.p.cuePatchNeurons))
     exNeuronsTopSize = int(np.sqrt(self.p.reservoirExSize))

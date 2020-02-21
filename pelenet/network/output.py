@@ -14,6 +14,7 @@ def drawOutputMaskAndWeights(self):
 
     # Define empty mask
     mask = np.zeros((self.p.reservoirExSize, self.p.numOutputNeurons)).astype(int)
+    #mask = np.zeros((self.p.reservoirExSize, self.p.numOutClusters)).astype(int)
 
     # Get indices of network topology
     topologyIndices = np.arange(self.p.reservoirExSize).reshape((self.p.topologySize, self.p.topologySize))
@@ -30,10 +31,11 @@ def drawOutputMaskAndWeights(self):
             jfr, jto = j*cs, (j+1)*cs
             # Get topology indices and set connect neurons between output cluster and output neuron
             mask[topologyIndices[ifr:ito,jfr:jto], k] = 1
-            # Overlapping outout neurons
+            # Overlapping output neurons
             mask[topologyIndicesRolled[ifr:ito,jfr:jto], k+1] = 1
             # Increase by 2
             k += 2
+            #k += 1
     
     # Store mask
     self.outputMask = sparse.csr_matrix(mask.T)

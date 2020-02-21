@@ -70,6 +70,10 @@ class ReservoirNetwork():
         # Spikes
         self.exSpikeTrains = []
         self.inSpikeTrains = []
+        self.outSpikeTrains = []
+
+        # Voltages
+        self.outVoltageTrains = []
 
         # Trace input
         self.traceSpikes = []

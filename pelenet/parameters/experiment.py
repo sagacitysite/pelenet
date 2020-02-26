@@ -10,7 +10,7 @@ def includeExperiment(self):
     self.seed = 2  # Seed of the simulation, 'None' is random (no seed)
     self.totalSteps = None #1000 #None  # Number of simulation steps, if 'None', value is derived
     self.trials = 25  # number of trials
-    self.movementSteps = 100  # Number of steps for movement
+    self.movementSteps = 1000  # Number of steps for movement
 
     # Ansitotropic
     self.connectionProb = 0.05 #0.04 #0.05  # percentage of established connections (range 0.05 - 0.1), FIXME bring together with "self.reservoirDens"

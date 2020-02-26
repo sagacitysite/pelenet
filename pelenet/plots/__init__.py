@@ -28,10 +28,10 @@ class Plot():
         rcParams['axes.edgecolor'] = self.p.pltColor
         rcParams['xtick.color'] = self.p.pltColor
         rcParams['ytick.color'] = self.p.pltColor
-        #rcParams['axes.grid'] = True
-        #rcParams['grid.linestyle'] = ':'
-        #rcParams['grid.linewidth'] = 0.5
-        #rcParams['grid.color'] = self.p.pltColor
+        rcParams['axes.grid'] = True
+        rcParams['grid.linestyle'] = ':'
+        rcParams['grid.linewidth'] = 0.5
+        rcParams['grid.color'] = self.p.pltColor
         rcParams['legend.fancybox'] = self.p.pltLegendFancybox
         rcParams['legend.framealpha'] = self.p.pltLegendFramealpha
         rcParams['patch.linewidth'] = self.p.pltPatchLinewidth

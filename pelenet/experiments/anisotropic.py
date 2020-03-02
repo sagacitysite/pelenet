@@ -44,23 +44,36 @@ class AnisotropicExperiment():
         # Instantiate utils and plot
         self.utils = Utils.instance()
         self.plot = Plot(self)
+
+    """
+    @desc: Overwrite parameters for this experiment
+    """
+    def updateParameters(self):
+        # Ansitotropic
+        self.p.anisoStdE = 12 #6 #10 #12  # space constant, std of gaussian for excitatory neurons
+        self.p.anisoStdI = 9 #4.5 #8 #9  # space constant, std of gaussian for inhibitory neurons (range 9 - 11)
+        self.p.anisoShift = 1  # intensity of the shift of the connectivity distribution for a neuron
+        #self.p.percShift = 1 #0.8  # percentage of shift (default 1)
+        self.p.anisoPerlinScale = 4 #8 # 4-12  # perlin noise scale, high value => dense valleys, low value => broad valleys
+        self.p.weightExCoefficient = 12 #16 #8 #16 # 8 #8 #16 #8 #4  # coefficient for excitatory anisotropic weight
+        self.p.weightInCoefficient = 48 #64 #32 #64 # 28 #32 #64 #28 sieht gut aus!! #32 #22  # coefficient for inhibitory anisotropic weight, Perlin scale 4: 25-30 ok, 25-28 good
     
     """
     @desc: Build network
     """
     def build(self):
         # Instanciate innate network
-        self.net = ReservoirNetwork(self.p)
-        self.net.landscape = None
+        #self.net = ReservoirNetwork(self.p)
+        #self.net.landscape = None
 
         # Draw anisotropic mask and weights
-        self.drawMaskAndWeights()
+        #self.drawMaskAndWeights()
 
         # Connect network
-        self.net.addReservoirNetworkDistributed()
+        #self.net.addReservoirNetworkDistributed()
 
         # Add cue
-        self.net.addCueGenerator()
+        #self.net.addCueGenerator()
 
         # Add stop signal
         #self.net.addStopGenerator()
@@ -69,7 +82,8 @@ class AnisotropicExperiment():
         #self.net.addNoiseGenerator()
 
         # Build the network structure
-        self.net.build()
+        #self.net.build()
+        pass
 
     """
     @desc: Summary of some plots about the network
@@ -119,7 +133,7 @@ class AnisotropicExperiment():
         nrowI, ncolI = int(np.sqrt(npopI)), int(np.sqrt(npopI)) #60, 60
 
         # Predefine some parameter shorthands
-        p = self.p.connectionProb
+        p = self.p.reservoirConnProb
         stdE = self.p.anisoStdE
         stdI = self.p.anisoStdI
         

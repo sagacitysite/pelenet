@@ -81,9 +81,8 @@ class ReservoirNetwork():
         self.traceWeights = []
 
         # Cue input
-        self.cueSpikes = []
-        self.cue = None
-        self.cueWeights = None
+        self.patchSpikes = []
+        self.patchWeights = None
 
         # Noise input spikes
         self.noiseSpikes = None
@@ -92,16 +91,32 @@ class ReservoirNetwork():
         # Instantiate utils and plot
         self.utils = Utils.instance()
         self.plot = Plot(self)
+    
+    """
+    @desc: Run the network
+    """
+    def run(self):
+        self.nxNet.run(self.p.totalSteps)
+        self.nxNet.disconnect()
+
+        # Post processing of probes
+        self.postProcessing()
+
+    """
+    @desc: Build default network structure
+    """
+    def build(self):
+        # Add probes
+        self.addProbes()
 
     """
     @note: Import functions from files
     """
     from .connect import addReservoirNetworkDistributed
-    from .input import addCueGenerator, addRepeatedInputGenerator, addTraceGenerator
+    from .input import addRepeatedPatchGenerator, addTraceGenerator
     from .noise import addNoiseGenerator, addConstantGenerator
     from .output import drawOutputMaskAndWeights
     from .probes import addProbes, postProcessing
-    from .reservoir import run, build, addStopGenerator, addRepeatedStopGenerator
     from .weights import (
         drawAndSetSparseReservoirWeightMatrix, drawSparseWeightMatrix,
         drawAndSetSparseReservoirMaskMatrix, drawSparseMaskMatrix,

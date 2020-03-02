@@ -25,8 +25,48 @@ class ReadoutExperiment(AnisotropicExperiment):
         # Init super object
         super().__init__()
 
+        # Overwrite parameters for this experiment
+        self.updateParameters()
+
         # Define some further variables
         self.targetFunction = self.getTargetFunction()
+
+    """
+    @desc: Overwrite parameters for this experiment
+    """
+    def updateParameters(self):
+        # Update patameters from parent
+        super().updateParameters()
+
+        # Experiment
+        self.p.trials = 25
+        self.p.stepsPerTrial = 100
+    
+    """
+    @desc: Build all networks
+    """
+    def build(self):
+        # Instanciate innate network
+        self.net = ReservoirNetwork(self.p)
+        self.net.landscape = None
+
+        # Draw anisotropic mask and weights
+        self.drawMaskAndWeights()
+
+        # Draw output weights
+        self.net.drawOutputMaskAndWeights()
+
+        # Connect network
+        self.net.addReservoirNetworkDistributed()
+
+        # Add cue
+        self.net.addRepeatedPatchGenerator()
+
+        # Add background noise
+        #self.net.addNoiseGenerator()
+
+        # Build the network structure
+        self.net.build()
     
     """
     @desc: Run whole experiment
@@ -118,36 +158,6 @@ class ReadoutExperiment(AnisotropicExperiment):
 
         return resetInitChannels
 
-
-    """
-    @desc: Build all networks
-    """
-    def build(self):
-        # Instanciate innate network
-        self.net = ReservoirNetwork(self.p)
-        self.net.landscape = None
-
-        # Draw anisotropic mask and weights
-        self.drawMaskAndWeights()
-
-        # Draw output weights
-        self.net.drawOutputMaskAndWeights()
-
-        # Connect network
-        self.net.addReservoirNetworkDistributed()
-
-        # Add cue
-        self.net.addRepeatedInputGenerator()
-
-        # Add stop generator
-        #self.net.addRepeatedStopGenerator()
-
-        # Add background noise
-        #self.net.addNoiseGenerator()
-
-        # Build the network structure
-        self.net.build()
-
     """
     @desc: Define function to learn as ouput
     @params:
@@ -156,7 +166,7 @@ class ReadoutExperiment(AnisotropicExperiment):
     """
     def getTargetFunction(self, type = 'sin', steps = None):
         if steps is None:
-            nTs = self.p.movementSteps
+            nTs = self.p.stepsPerTrial
         else:
             nTs = steps
 

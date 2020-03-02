@@ -40,204 +40,204 @@ def generateInputSignal(length, prob=0.1, start=0):
     # Shift sin signal by 'start' and return spikes
     return (spikeTimes + start)
 
-"""
-@desc: Create input spiking generator to add a cue signal,
-        the input is connected to the reservoir network,
-        an excitatory connection prototype is used
-"""
-def addCueGenerator(self, inputSpikes = None):
-    # Create spike generator
-    sg = self.nxNet.createSpikeGenProcess(numPorts=self.p.cueGens)
+# """
+# @desc: Create input spiking generator to add a cue signal,
+#         the input is connected to the reservoir network,
+#         an excitatory connection prototype is used
+# """
+# def addCueGenerator(self, inputSpikes = None):
+#     # Create spike generator
+#     sg = self.nxNet.createSpikeGenProcess(numPorts=self.p.cueGens)
 
-    cueSpikes = []
-    for i in range(self.p.cueGens):
-        # Generate spikes and add them to spike generator
-        cueSpikesInd = None
-        # If input spikes are not given
-        if inputSpikes is None:
-            cueSpikesInd = generateInputSignal(self.p.cueSteps, prob=self.p.cueSpikeProb) #generateSinSignal(self.p.cueSteps)
-            # Store cue input in object
-            cueSpikes.append(cueSpikesInd)
-        # If input spikes are given
-        else:
-            cueSpikesInd = inputSpikes[i]
+#     cueSpikes = []
+#     for i in range(self.p.cueGens):
+#         # Generate spikes and add them to spike generator
+#         cueSpikesInd = None
+#         # If input spikes are not given
+#         if inputSpikes is None:
+#             cueSpikesInd = generateInputSignal(self.p.cueSteps, prob=self.p.cueSpikeProb) #generateSinSignal(self.p.cueSteps)
+#             # Store cue input in object
+#             cueSpikes.append(cueSpikesInd)
+#         # If input spikes are given
+#         else:
+#             cueSpikesInd = inputSpikes[i]
         
-        sg.addSpikes(spikeInputPortNodeIds=i, spikeTimes=cueSpikesInd.tolist())
+#         sg.addSpikes(spikeInputPortNodeIds=i, spikeTimes=cueSpikesInd.tolist())
 
-    if len(self.cueSpikes) == 0:
-        self.cueSpikes = np.array(cueSpikes)  # If train, store generated spikes
+#     if len(self.cueSpikes) == 0:
+#         self.cueSpikes = np.array(cueSpikes)  # If train, store generated spikes
 
-    # Define mask
-    cueMask = self.drawSparseMaskMatrix(self.p.cueDens, self.p.reservoirExSize, self.p.cueGens)
+#     # Define mask
+#     cueMask = self.drawSparseMaskMatrix(self.p.cueDens, self.p.reservoirExSize, self.p.cueGens)
 
-    cueSize = int(np.sqrt(self.p.cuePatchNeurons))
-    exNeuronsTopSize = int(np.sqrt(self.p.reservoirExSize))
+#     cueSize = int(np.sqrt(self.p.cuePatchNeurons))
+#     exNeuronsTopSize = int(np.sqrt(self.p.reservoirExSize))
 
-    #cueMask = np.zeros((cueSize, cueSize))
-    #cueMask[self.p.cueSize:, :] = 0  # set all mas values behind last neuron of cue input to zero
+#     #cueMask = np.zeros((cueSize, cueSize))
+#     #cueMask[self.p.cueSize:, :] = 0  # set all mas values behind last neuron of cue input to zero
 
-    # Set all values zero which are not part of the patch
-    topology = np.ones((exNeuronsTopSize,exNeuronsTopSize))
-    shift = self.p.cuePatchNeuronsShift
-    topology[shift:shift+cueSize,shift:shift+cueSize] = 0
-    #topology[0,0] = 1
-    idc = np.where(topology.flatten())[0]
-    cueMask[idc,:] = 0
+#     # Set all values zero which are not part of the patch
+#     topology = np.ones((exNeuronsTopSize,exNeuronsTopSize))
+#     shift = self.p.cuePatchNeuronsShift
+#     topology[shift:shift+cueSize,shift:shift+cueSize] = 0
+#     #topology[0,0] = 1
+#     idc = np.where(topology.flatten())[0]
+#     cueMask[idc,:] = 0
 
-    # Define weights
-    cueWeights = self.p.cueMaxWeight*np.random.rand(self.p.reservoirExSize, self.p.cueGens)
+#     # Define weights
+#     cueWeights = self.p.cueMaxWeight*np.random.rand(self.p.reservoirExSize, self.p.cueGens)
 
-    # Connect generator to the reservoir network
-    for i in range(len(self.exReservoirChunks)):
-        fr, to = i*self.p.neuronsPerCore, (i+1)*self.p.neuronsPerCore
-        ma = cueMask[fr:to, :]
-        we = cueWeights[fr:to, :]
-        sg.connect(self.exReservoirChunks[i], prototype=self.exConnProto, connectionMask=ma, weight=we)
+#     # Connect generator to the reservoir network
+#     for i in range(len(self.exReservoirChunks)):
+#         fr, to = i*self.p.neuronsPerCore, (i+1)*self.p.neuronsPerCore
+#         ma = cueMask[fr:to, :]
+#         we = cueWeights[fr:to, :]
+#         sg.connect(self.exReservoirChunks[i], prototype=self.exConnProto, connectionMask=ma, weight=we)
     
-    self.cueWeights = self.getMaskedWeights(cueWeights, cueMask)
+#     self.cueWeights = self.getMaskedWeights(cueWeights, cueMask)
 
-    # Log that cue generator was added
-    logging.info('Cue generator was added to the network')
+#     # Log that cue generator was added
+#     logging.info('Cue generator was added to the network')
 
-"""
-@desc: Create input spiking generator to add a cue signal,
-        the input is connected to the reservoir network,
-        an excitatory connection prototype is used
-"""
-def addRepeatedCueGenerator(self):
-    # Create spike generator
-    sg = self.nxNet.createSpikeGenProcess(numPorts=self.p.cueGens)
+# """
+# @desc: Create input spiking generator to add a cue signal,
+#         the input is connected to the reservoir network,
+#         an excitatory connection prototype is used
+# """
+# def addRepeatedCueGenerator(self):
+#     # Create spike generator
+#     sg = self.nxNet.createSpikeGenProcess(numPorts=self.p.cueGens)
 
-    for i in range(self.p.cueGens):
-        # Generate spikes for spike current generator
-        spikes = (np.random.rand(self.p.cueSteps) < self.p.cueSpikeProb)
-        # Get indices from spikes
-        cueSpikesInd = []
-        for j in range(self.p.trials):
-            # Draw neurons to flip with probability flipProb
-            flips = (np.random.rand(self.p.cueSteps) < self.p.flipProb)
-            # Apply flips to cue input
-            noisedSpikes = np.logical_xor(spikes, flips)
-            # Transform to event indices
-            noisedIndices = np.where(noisedSpikes)[0] + self.p.trialSteps*j + self.p.breakSteps*(j+1)
-            cueSpikesInd.append(noisedIndices)
+#     for i in range(self.p.cueGens):
+#         # Generate spikes for spike current generator
+#         spikes = (np.random.rand(self.p.cueSteps) < self.p.cueSpikeProb)
+#         # Get indices from spikes
+#         cueSpikesInd = []
+#         for j in range(self.p.trials):
+#             # Draw neurons to flip with probability flipProb
+#             flips = (np.random.rand(self.p.cueSteps) < self.p.flipProb)
+#             # Apply flips to cue input
+#             noisedSpikes = np.logical_xor(spikes, flips)
+#             # Transform to event indices
+#             noisedIndices = np.where(noisedSpikes)[0] + self.p.trialSteps*j + self.p.breakSteps*(j+1)
+#             cueSpikesInd.append(noisedIndices)
 
-        self.cueSpikes.append(list(itertools.chain(*cueSpikesInd)))
+#         self.cueSpikes.append(list(itertools.chain(*cueSpikesInd)))
             
-        # Add spikes indices to current spike generator
-        sg.addSpikes(spikeInputPortNodeIds=i, spikeTimes=list(itertools.chain(*cueSpikesInd)))
+#         # Add spikes indices to current spike generator
+#         sg.addSpikes(spikeInputPortNodeIds=i, spikeTimes=list(itertools.chain(*cueSpikesInd)))
 
-    # Define mask
-    cueMask = self.drawSparseMaskMatrix(self.p.cueDens, self.p.reservoirExSize, self.p.cueGens)
+#     # Define mask
+#     cueMask = self.drawSparseMaskMatrix(self.p.cueDens, self.p.reservoirExSize, self.p.cueGens)
 
-    cueSize = int(np.sqrt(self.p.cuePatchNeurons))
-    exNeuronsTopSize = int(np.sqrt(self.p.reservoirExSize))
+#     cueSize = int(np.sqrt(self.p.cuePatchNeurons))
+#     exNeuronsTopSize = int(np.sqrt(self.p.reservoirExSize))
 
-    #cueMask = np.zeros((cueSize, cueSize))
-    #cueMask[self.p.cueSize:, :] = 0  # set all mas values behind last neuron of cue input to zero
+#     #cueMask = np.zeros((cueSize, cueSize))
+#     #cueMask[self.p.cueSize:, :] = 0  # set all mas values behind last neuron of cue input to zero
 
-    # Set all values zero which are not part of the patch
-    shift = self.p.cuePatchNeuronsShift
-    topology = np.ones((exNeuronsTopSize,exNeuronsTopSize))
-    topology[shift:shift+cueSize,shift:shift+cueSize] = 0
-    #topology[0,0] = 1
-    idc = np.where(topology.flatten())[0]
-    cueMask[idc,:] = 0
+#     # Set all values zero which are not part of the patch
+#     shift = self.p.cuePatchNeuronsShift
+#     topology = np.ones((exNeuronsTopSize,exNeuronsTopSize))
+#     topology[shift:shift+cueSize,shift:shift+cueSize] = 0
+#     #topology[0,0] = 1
+#     idc = np.where(topology.flatten())[0]
+#     cueMask[idc,:] = 0
 
-    # Define weights
-    cueWeights = self.p.cueMaxWeight*np.random.rand(self.p.reservoirExSize, self.p.cueGens)
+#     # Define weights
+#     cueWeights = self.p.patchMaxWeight*np.random.rand(self.p.reservoirExSize, self.p.cueGens)
 
-    # Connect generator to the reservoir network
-    for i in range(len(self.exReservoirChunks)):
-        fr, to = i*self.p.neuronsPerCore, (i+1)*self.p.neuronsPerCore
-        ma = cueMask[fr:to, :]
-        we = cueWeights[fr:to, :]
-        sg.connect(self.exReservoirChunks[i], prototype=self.exConnProto, connectionMask=ma, weight=we)
+#     # Connect generator to the reservoir network
+#     for i in range(len(self.exReservoirChunks)):
+#         fr, to = i*self.p.neuronsPerCore, (i+1)*self.p.neuronsPerCore
+#         ma = cueMask[fr:to, :]
+#         we = cueWeights[fr:to, :]
+#         sg.connect(self.exReservoirChunks[i], prototype=self.exConnProto, connectionMask=ma, weight=we)
     
-    self.cueWeights = self.getMaskedWeights(cueWeights, cueMask)
+#     self.cueWeights = self.getMaskedWeights(cueWeights, cueMask)
 
-    # Log that cue generator was added
-    logging.info('Cue generator was added to the network')
+#     # Log that cue generator was added
+#     logging.info('Cue generator was added to the network')
 
 """
-@desc: Create input spiking generator to add a cue signal,
+@desc: Create input spiking generator to add a patch signal,
         the input is connected to the reservoir network,
         an excitatory connection prototype is used
 """
-def addRepeatedInputGenerator(self):
-    cueGens = int(self.p.cueGensPerNeuron*self.p.cuePatchNeurons)
+def addRepeatedPatchGenerator(self):
+    patchGens = int(self.p.patchGensPerNeuron*self.p.patchNeurons)
 
     # Create spike generator
-    sg = self.nxNet.createSpikeGenProcess(numPorts=cueGens)
+    sg = self.nxNet.createSpikeGenProcess(numPorts=patchGens)
 
-    combinations = np.array(list(itertools.combinations(np.arange(self.p.cuePatchNeurons), self.p.cueMissingNeurons)))
+    combinations = np.array(list(itertools.combinations(np.arange(self.p.patchNeurons), self.p.patchMissingNeurons)))
 
     # Initialize counter
     cnt = 0
     # Iterate over patch neurons
-    for i in range(self.p.cuePatchNeurons):
+    for i in range(self.p.patchNeurons):
         
         spikeTimes = []
         # Iterate over trials
         for k in range(self.p.trials):
             # Add spike times only when i != k
-            apply = np.all([combinations[k, m] != i for m in range(self.p.cueMissingNeurons)])
+            apply = np.all([combinations[k, m] != i for m in range(self.p.patchMissingNeurons)])
 
             if (apply):
-                spks = np.arange(self.p.cueSteps) + self.p.trialSteps*k + self.p.breakSteps*(k+1)
+                spks = np.arange(self.p.patchSteps) + self.p.trialSteps*k + self.p.breakSteps*(k+1)
                 spikeTimes.append(spks)
 
         spikeTimes = list(itertools.chain(*spikeTimes))
             
         # Iterate over generators
-        for j in range(self.p.cueGensPerNeuron):
+        for j in range(self.p.patchGensPerNeuron):
             # Add spikes indices to current spike generator
             sg.addSpikes(spikeInputPortNodeIds=cnt, spikeTimes=spikeTimes)
             # Increase counter
             cnt += 1
 
-        # Add spike indices to cueSpikes array
-        self.cueSpikes.append(spikeTimes)
+        # Add spike indices to patchSpikes array
+        self.patchSpikes.append(spikeTimes)
 
-    cueSize = int(np.sqrt(self.p.cuePatchNeurons))
+    patchSize = int(np.sqrt(self.p.patchNeurons))
     exNeuronsTopSize = int(np.sqrt(self.p.reservoirExSize))
 
-    #cueMask = np.zeros((cueSize, cueSize))
-    #cueMask[self.p.cueSize:, :] = 0  # set all mas values behind last neuron of cue input to zero
+    #patchMask = np.zeros((patchSize, patchSize))
+    #patchMask[self.p.patchSize:, :] = 0  # set all mas values behind last neuron of patch input to zero
 
     # Set all values zero which are not part of the patch
-    #shiftX = 0 #self.p.cuePatchNeuronsShift
-    #shiftY = 0 #self.p.cuePatchNeuronsShift
+    #shiftX = 0 #self.p.patchNeuronsShiftX
+    #shiftY = 0 #self.p.patchNeuronsShiftY
     shiftX = 44
     shiftY = 24
     topology = np.zeros((exNeuronsTopSize,exNeuronsTopSize))
-    topology[shiftY:shiftY+cueSize,shiftX:shiftX+cueSize] = 1
+    topology[shiftY:shiftY+patchSize,shiftX:shiftX+patchSize] = 1
     #topology[0,0] = 1
     idc = np.where(topology.flatten())[0]
 
     # In every trial remove another 
     #self.idc = idc
 
-    cueMask = np.zeros((self.p.reservoirExSize, cueGens))
+    patchMask = np.zeros((self.p.reservoirExSize, patchGens))
 
     for i, idx in enumerate(idc):
-        fr, to = i*self.p.cueGensPerNeuron, (i+1)*self.p.cueGensPerNeuron
-        cueMask[idx,fr:to] = 1
+        fr, to = i*self.p.patchGensPerNeuron, (i+1)*self.p.patchGensPerNeuron
+        patchMask[idx,fr:to] = 1
 
     #for idx in idc:
-    #    cueMask[idx,:cueGens] = 1
+    #    patchMask[idx,:patchGens] = 1
 
     # Define weights
-    self.cueWeights = cueMask*self.p.cueMaxWeight
+    self.patchWeights = patchMask*self.p.patchMaxWeight
 
     # Connect generator to the reservoir network
     for i in range(len(self.exReservoirChunks)):
         fr, to = i*self.p.neuronsPerCore, (i+1)*self.p.neuronsPerCore
-        ma = cueMask[fr:to, :]
-        we = self.cueWeights[fr:to, :]
+        ma = patchMask[fr:to, :]
+        we = self.patchWeights[fr:to, :]
         sg.connect(self.exReservoirChunks[i], prototype=self.exConnProto, connectionMask=ma, weight=we)
 
-    # Log that cue generator was added
+    # Log that patch generator was added
     logging.info('Cue generator was added to the network')
 
 """

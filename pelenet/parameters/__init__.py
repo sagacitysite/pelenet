@@ -52,15 +52,15 @@ class Parameters():
     """
     def vadilityCheck(self):
         # If number of connections per neuron is larger than total number of neurons
-        if self.numConnectionsPerNeuron > (self.reservoirExSize + self.reservoirInSize):
+        if self.reservoirConnPerNeuron > (self.reservoirExSize + self.reservoirInSize):
             raise ParamaterNotValid('Number of connections per neuron must be larger than number of neurons in the network.')
 
         # Check if ex neurons are square rootable
-        #if self.numConnectionsPerNeuron > (self.reservoirExSize + self.reservoirInSize):
+        #if self.reservoirConnPerNeuron > (self.reservoirExSize + self.reservoirInSize):
         #    raise ParamaterNotValid('Number of connections per neuron must be larger than number of neurons in the network')
 
-        # Check if size of cue input is smaller than network site
-        if self.cuePatchNeurons > self.reservoirSize:
+        # Check if size of patch input is smaller than network site
+        if self.patchNeurons > self.reservoirSize:
             raise ParamaterNotValid('Cue size is too large, cannot be larger than network size.')
 
         # Check if number of neurons per core is properly chosen

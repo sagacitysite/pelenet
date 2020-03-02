@@ -93,7 +93,7 @@ def addProbes(self):
 
     # Add spike probe for excitatory network
     if self.p.isInSpikeProbe:
-        #probeCond = nx.SpikeProbeCondition(tStart=self.p.cueSteps, dt=5)
+        #probeCond = nx.SpikeProbeCondition(tStart=1, dt=5)
         for net in self.inReservoirChunks:
             self.inSpikeProbes.append(net.probe([nx.ProbeParameter.SPIKE])[0])#, probeConditions=[probeCond])[0])
 

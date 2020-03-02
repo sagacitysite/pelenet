@@ -32,7 +32,8 @@ class AnisotropicExperiment():
     # TODO user decorator for default stuff (like creating instances),
     # maybe some stuff from basicNetwork can be included?
     def __init__(self):
-        self.p = Parameters()  # Parameters
+        # Parameters
+        self.p = Parameters(update = self.updateParameters())
 
         self.net = None
 
@@ -49,14 +50,24 @@ class AnisotropicExperiment():
     @desc: Overwrite parameters for this experiment
     """
     def updateParameters(self):
+        return {
+            'anisoStdE': 12,
+            'anisoStdI': 9,
+            'anisoShift': 1,
+            #'percShift': 1,
+            'anisoPerlinScale': 4,
+            'weightExCoefficient': 12,
+            'weightInCoefficient': 48
+        }
+
         # Ansitotropic
-        self.p.anisoStdE = 12 #6 #10 #12  # space constant, std of gaussian for excitatory neurons
-        self.p.anisoStdI = 9 #4.5 #8 #9  # space constant, std of gaussian for inhibitory neurons (range 9 - 11)
-        self.p.anisoShift = 1  # intensity of the shift of the connectivity distribution for a neuron
-        #self.p.percShift = 1 #0.8  # percentage of shift (default 1)
-        self.p.anisoPerlinScale = 4 #8 # 4-12  # perlin noise scale, high value => dense valleys, low value => broad valleys
-        self.p.weightExCoefficient = 12 #16 #8 #16 # 8 #8 #16 #8 #4  # coefficient for excitatory anisotropic weight
-        self.p.weightInCoefficient = 48 #64 #32 #64 # 28 #32 #64 #28 sieht gut aus!! #32 #22  # coefficient for inhibitory anisotropic weight, Perlin scale 4: 25-30 ok, 25-28 good
+        #self.anisoStdE = 12 #6 #10 #12  # space constant, std of gaussian for excitatory neurons
+        #self.anisoStdI = 9 #4.5 #8 #9  # space constant, std of gaussian for inhibitory neurons (range 9 - 11)
+        #self.anisoShift = 1  # intensity of the shift of the connectivity distribution for a neuron
+        ##self.percShift = 1 #0.8  # percentage of shift (default 1)
+        #self.anisoPerlinScale = 4 #8 # 4-12  # perlin noise scale, high value => dense valleys, low value => broad valleys
+        #self.weightExCoefficient = 12 #16 #8 #16 # 8 #8 #16 #8 #4  # coefficient for excitatory anisotropic weight
+        #self.weightInCoefficient = 48 #64 #32 #64 # 28 #32 #64 #28 sieht gut aus!! #32 #22  # coefficient for inhibitory anisotropic weight, Perlin scale 4: 25-30 ok, 25-28 good
     
     """
     @desc: Build network

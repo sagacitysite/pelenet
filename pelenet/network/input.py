@@ -119,7 +119,7 @@ def generateInputSignal(length, prob=0.1, start=0):
 #             # Apply flips to cue input
 #             noisedSpikes = np.logical_xor(spikes, flips)
 #             # Transform to event indices
-#             noisedIndices = np.where(noisedSpikes)[0] + self.p.trialSteps*j + self.p.breakSteps*(j+1)
+#             noisedIndices = np.where(noisedSpikes)[0] + self.p.trialSteps*j + self.p.resetOffset*(j+1)
 #             cueSpikesInd.append(noisedIndices)
 
 #         self.cueSpikes.append(list(itertools.chain(*cueSpikesInd)))
@@ -184,7 +184,7 @@ def addRepeatedPatchGenerator(self):
             apply = np.all([combinations[k, m] != i for m in range(self.p.patchMissingNeurons)])
 
             if (apply):
-                spks = np.arange(self.p.patchSteps) + self.p.trialSteps*k + self.p.breakSteps*(k+1)
+                spks = np.arange(self.p.inputSteps) + self.p.trialSteps*k + self.p.resetOffset*(k+1)
                 spikeTimes.append(spks)
 
         spikeTimes = list(itertools.chain(*spikeTimes))
@@ -246,7 +246,7 @@ def addRepeatedPatchGenerator(self):
         an excitatory connection prototype is used
 """
 def addTraceGenerator(self, clusterIdx):
-    start = self.p.offset + clusterIdx*self.p.traceSteps
+    start = self.p.inputOffset + clusterIdx*self.p.traceSteps
     # Create spike generator
     sg = self.nxNet.createSpikeGenProcess(numPorts=self.p.traceGens)
 

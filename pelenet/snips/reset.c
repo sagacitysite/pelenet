@@ -7,13 +7,13 @@ static int numCores = 128;
 
 extern int neuronsPerCore;
 extern int resetInterval;
-extern int stopSteps;
+extern int resetSteps;
 
 int do_reset(runState *RunState) {
     bool apply = false;
 
     // Prepare boolean variable, which is true for 10 time steps
-    for(int i = 1; i <= stopSteps; i++) {
+    for(int i = 1; i <= resetSteps; i++) {
         apply = apply || (RunState->time_step - i) % resetInterval == 0;
     }
 
@@ -49,9 +49,9 @@ void reset(runState *RunState) {
     }
 
     // Only reset functional state in last stop step
-    if ((RunState->time_step - stopSteps) % resetInterval == 0) {
+    if ((RunState->time_step - resetSteps) % resetInterval == 0) {
         // Print what we are doing
-        printf("Reset current/voltage from time step %d to %d\n", RunState->time_step-stopSteps, RunState->time_step);
+        printf("Reset current/voltage from time step %d to %d\n", RunState->time_step-resetSteps, RunState->time_step);
         printf("Reset functional state at %d\n", RunState->time_step);
 
         // Set functional state for all cores

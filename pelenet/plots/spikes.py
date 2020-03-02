@@ -90,7 +90,7 @@ def reservoirRates(self):
         meanRate = meanRateIn
 
     # Calculate mean rate for whole simulation, except cue steps
-    totalMeanRate = np.round(np.mean(meanRate[self.p.patchSteps:])*1000)/1000
+    totalMeanRate = np.round(np.mean(meanRate[self.p.inputSteps:])*1000)/1000
 
     # Plot mean rate and show total mean rate in title
     plt.figure(figsize=(16, 4))

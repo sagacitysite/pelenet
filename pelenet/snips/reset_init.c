@@ -6,7 +6,7 @@
 // Values necessary for reset
 int neuronsPerCore;
 int resetInterval;
-int stopSteps;
+int resetSteps;
 
 int channelID;
 
@@ -41,8 +41,8 @@ void initialize_reset(runState *s) {
     // Read values from channel buffer
     readChannel(channelID, &neuronsPerCore, 1);
     readChannel(channelID, &resetInterval, 1);
-    readChannel(channelID, &stopSteps, 1);
+    readChannel(channelID, &resetSteps, 1);
 
     // Log results
-    printf("Transfered values %d, %d, %d \n", neuronsPerCore, resetInterval, stopSteps);
+    printf("Transfered values %d, %d, %d \n", neuronsPerCore, resetInterval, resetSteps);
 }

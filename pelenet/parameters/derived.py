@@ -11,8 +11,10 @@ import numpy as np
 def computeDerived(self):
 
     # Initialize some derived parameters
-    self.totalSteps = None  # Number of simulation steps
-    self.reservoirSize = None  # Total size of reservoir
+    self.totalSteps = None  # number of simulation steps
+    self.reservoirSize = None  # total size of reservoir
+    self.totalTrialSteps = None  # number of total steps per trial
+    self.resetOffset = None  # offset due to reset (reset steps + reset relaxation)
 
     """
     Define some derived parameters
@@ -21,49 +23,48 @@ def computeDerived(self):
     # Set some derived parameters directly
     self.patchNeurons = np.square(self.patchSize)  # Number of patch input neurons
     self.topologySize = int(np.sqrt(self.reservoirExSize))  # Size of one dimension of topology
-
+    self.constSize = int(self.constSizeShare * self.reservoirExSize)
+    
     # Derived output values
     self.numOutClusters = int(self.reservoirExSize / np.square(self.partitioningClusterSize))
     self.numOutputNeurons = 2 * self.numOutClusters
     self.numOutDimSize = int(np.sqrt(self.numOutClusters))
 
-    # 
-    self.stepsPerIteration = self.traceClusters * self.traceSteps
-    self.traceClusterSize = int(self.traceClusterShare * self.reservoirExSize)
-
-    # 
-    self.constSize = int(self.constSizeShare * self.reservoirExSize)
-    self.offset = self.patchSteps + self.patchRelaxation
+    # Set datalog path for the current experiment, depending on the current time
+    #self.expLogPath
 
     """
     Define conditional parameters
     """
 
-    # If reservoirInSize is not set (None), calculate it with given ex/in ratio
+    # Size of inhibitory/excitatory network
     if self.reservoirInSize is None:
         self.reservoirInSize = int(self.reservoirInExRatio * self.reservoirExSize)
-
-    # If totalSteps is not set (None), calculate it with cue, cue relaxation and trial steps
-    if self.totalSteps is None:
-        #self.stopStart = self.patchSteps + self.patchRelaxation + self.stepsPerTrial
-        self.trialSteps = self.patchSteps + self.patchRelaxation + self.stepsPerTrial
-        self.breakSteps = self.stopSteps + self.stopRelaxation
-        self.totalTrialSteps = self.trialSteps + self.breakSteps
-        self.totalSteps = self.totalTrialSteps * self.trials
-
-    # If patchSteps is not set (None), define cue steps as background activity
-    if self.patchSteps is None:
-        self.patchSteps = self.totalSteps
-
-    # If noiseNeurons is not set (None), calculate it with given share
-    if self.noiseNeurons is None:
-        self.noiseNeurons = int(self.noiseNeuronsShare * self.reservoirExSize)    
-
-    # Set datalog path for the current experiment, depending on the current time
-    #self.expLogPath
+    if self.reservoirInExRatio is None:
+        self.reservoirInExRatio = int(self.reservoirExSize / self.reservoirInSize)
 
     # Calculate total size of the network
     self.reservoirSize = self.reservoirInSize + self.reservoirExSize
+
+    # Calculate reset offset if reset is applied
+    if self.isReset:
+        self.resetOffset = self.resetSteps + self.resetRelaxation
+
+    # Calculate steps
+    self.inputOffset = self.inputSteps + self.inputRelaxation
+    self.trialSteps = self.inputOffset + self.stepsPerTrial
+    self.totalTrialSteps = self.trialSteps + self.resetOffset
+    self.totalSteps = self.totalTrialSteps * self.trials
+
+    # If noiseNeurons is not set (None), calculate it with given share
+    if self.noiseNeurons is None:
+        self.noiseNeurons = int(self.noiseNeuronsShare * self.reservoirExSize)
+
+    # Trace input size
+    if self.traceClusterShare is None:
+        self.traceClusterShare = int(self.traceClusterSize / self.reservoirExSize)
+    if self.traceClusterSize is None:
+        self.traceClusterSize = int(self.traceClusterShare * self.reservoirExSize)
 
     # Calculate connectivity
     if self.reservoirConnProb is None:

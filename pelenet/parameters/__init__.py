@@ -16,10 +16,15 @@ class Parameters():
     @desc: Initializes all parameters
     @note: Parameters defined as 'None' are computed values (function computeDerivedParameters below)
     """
-    def __init__(self, includeDerived = True):
+    def __init__(self, includeDerived = True, update = None):
         # Include parameters
         self.includeSystem()
         self.includeExperiment()
+
+        # If parameters are updated, add/update them in list
+        if update is not None:
+            for parameter, value in update.items():
+                setattr(self, parameter, value)
 
         # If derived values shall be included, calculate them
         if includeDerived: self.computeDerived()

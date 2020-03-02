@@ -9,6 +9,11 @@ from copy import deepcopy
 import os
 
 # Pelenet modules
+from ..system import System
+from ..system.datalog import Datalog
+from ..parameters import Parameters
+from ..utils import Utils
+from ..plots import Plot
 from .anisotropic import AnisotropicExperiment
 from ..network import ReservoirNetwork
 
@@ -22,11 +27,19 @@ class ReadoutExperiment(AnisotropicExperiment):
     @desc: Initiates the experiment
     """
     def __init__(self):
-        # Init super object
-        super().__init__()
+        # Parameters
+        self.p = Parameters(update = self.updateParameters())
 
-        # Overwrite parameters for this experiment
-        self.updateParameters()
+        self.net = None
+
+        # Instantiate system singleton and add datalog object
+        self.system = System.instance()
+        datalog = Datalog(self.p)
+        self.system.setDatalog(datalog)
+
+        # Instantiate utils and plot
+        self.utils = Utils.instance()
+        self.plot = Plot(self)
 
         # Define some further variables
         self.targetFunction = self.getTargetFunction()
@@ -36,11 +49,25 @@ class ReadoutExperiment(AnisotropicExperiment):
     """
     def updateParameters(self):
         # Update patameters from parent
-        super().updateParameters()
+        p = super().updateParameters()
 
+        return {
+            # Parameters from parent
+            **p,
+            # Experiment
+            'trials': 25,
+            'stepsPerTrial': 100,
+            # Probes
+            'isExSpikeProbe': True,
+            'isOutSpikeProbe': True
+        }
         # Experiment
-        self.p.trials = 25
-        self.p.stepsPerTrial = 100
+        #self.p.trials = 25
+        #self.p.stepsPerTrial = 100
+
+        # Probes
+        #self.p.isExSpikeProbe = True
+        #self.p.isOutSpikeProbe = True
     
     """
     @desc: Build all networks
@@ -94,7 +121,7 @@ class ReadoutExperiment(AnisotropicExperiment):
             resetInitChannels[i].write(3, [
                 self.p.neuronsPerCore,  # number of neurons per core
                 self.p.totalTrialSteps,  # reset interval
-                self.p.stopSteps  # number of steps to clear voltages/currents
+                self.p.resetSteps  # number of steps to clear voltages/currents
             ])
         logging.info('Initial values transfered to SNIPs via channel')
 

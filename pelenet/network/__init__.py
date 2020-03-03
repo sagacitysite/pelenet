@@ -36,6 +36,9 @@ class ReservoirNetwork():
         """
         Network objects
         """
+        # Cores
+        self.cores = np.arange(self.p.numChips*self.p.numCoresPerChip)
+
         # Weights
         self.initialMasks = SimpleNamespace(**{
             'exex': None, 'inin': None, 'inex': None, 'exin': None
@@ -112,11 +115,12 @@ class ReservoirNetwork():
     """
     @note: Import functions from files
     """
-    from .connect import addReservoirNetworkDistributed
+    from .connect import removeCoreFromList, connectReservoir, connectOutput
     from .input import addRepeatedPatchGenerator, addTraceGenerator
     from .noise import addNoiseGenerator, addConstantGenerator
     from .output import drawOutputMaskAndWeights
     from .probes import addProbes, postProcessing
+    from .snips import addResetSnips, createAndConnectResetInitChannels
     from .weights import (
         drawAndSetSparseReservoirWeightMatrix, drawSparseWeightMatrix,
         drawAndSetSparseReservoirMaskMatrix, drawSparseMaskMatrix,

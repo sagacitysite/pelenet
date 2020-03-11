@@ -68,6 +68,6 @@ def computeDerived(self):
 
     # Calculate connectivity
     if self.reservoirConnProb is None:
-        self.reservoirConnProb = int(self.reservoirConnPerNeuron / self.reservoirSize)
+        self.reservoirConnProb = float(self.reservoirConnPerNeuron / self.reservoirSize)
     if self.reservoirConnPerNeuron is None:
         self.reservoirConnPerNeuron = int(self.reservoirConnProb * self.reservoirSize)

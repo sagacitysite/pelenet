@@ -25,10 +25,11 @@ def includeExperiment(self):
     """
 
     # Neuron
-    self.compartmentVoltageDecay = 150 #100 #200 #20  # voltage decay
-    #self.compartmentVoltageTimeConstant = 
-    #self.compartmentCurrentDecay = 
+    self.compartmentVoltageDecay = 100 #100 #200 #20  # voltage decay
+    #self.compartmentVoltageTimeConstant = 1
+    self.compartmentCurrentDecay = 2000
     #self.compartmentCurrentTimeConstant = 
+    self.thresholdMant = 200
     self.refractoryDelay = 2  # refractory period for a neuron
 
     # Network size and connections
@@ -75,10 +76,10 @@ def includeExperiment(self):
 
     # Trace input
     self.traceClusters = 3  # number of trace clusters
-    self.traceGens = 50  # number of trace generators per input cluster
-    self.traceSteps = 20 #50 #20  # number of steps the trace input should drive the network
-    self.traceDens = 0.2  # percent of connections to reservoir from input
-    self.traceSpikeProb = 0.2  # probability of spike for the generator
+    self.traceGens = 10  # number of trace generators per input cluster
+    self.traceSteps = 30 #50 #20  # number of steps the trace input should drive the network
+    self.traceDens = 0.1  # percent of connections to reservoir from input
+    self.traceSpikeProb = 0.1  # probability of spike for the generator
     #self.traceMaxWeight = 255  # maximum weight a trace connection can have
     self.traceClusterShare = 0.1  # percentage of excitatory neurons a cluster should be connected with
     self.traceClusterSize = None  # the number of neurons a trace cluster has

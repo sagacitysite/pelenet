@@ -54,19 +54,17 @@ class ReadoutExperiment(AnisotropicExperiment):
             # Parameters from parent
             **p,
             # Experiment
-            'trials': 25,
-            'stepsPerTrial': 100,
+            'trials': 1,
+            'stepsPerTrial': 500,
+            # Network
+            'refractoryDelay': 2,
+            'compartmentVoltageDecay': 400, #500,  # Slows down / speeds up
+            'compartmentCurrentDecay': 500, #500,  # Variability (higher values) vs. Stability (lower values)
+            'thresholdMant': 800,  # Increases/decreases firing rate
             # Probes
             'isExSpikeProbe': True,
-            'isOutSpikeProbe': True
+            'isOutSpikeProbe': False
         }
-        # Experiment
-        #self.p.trials = 25
-        #self.p.stepsPerTrial = 100
-
-        # Probes
-        #self.p.isExSpikeProbe = True
-        #self.p.isOutSpikeProbe = True
     
     """
     @desc: Build all networks
@@ -88,7 +86,7 @@ class ReadoutExperiment(AnisotropicExperiment):
         # Connect reservoir to output
         self.net.connectOutput()
 
-        # Add cue
+        # Add patch input
         self.net.addRepeatedPatchGenerator()
 
         # Add background noise

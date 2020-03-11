@@ -24,6 +24,7 @@ class Plot():
     def defineStyle(self):
         rcParams['font.family'] = self.p.pltFontFamily
         rcParams['font.size'] = self.p.pltFontSize
+        rcParams['font.weight'] = 'normal'
         rcParams['text.color'] = self.p.pltColor
         rcParams['axes.edgecolor'] = self.p.pltColor
         rcParams['xtick.color'] = self.p.pltColor

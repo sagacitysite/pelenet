@@ -10,7 +10,7 @@ def includeSystem(self):
     # Plot styles
     self.pltColor = '#000000'
     self.pltLegendSize = 12
-    self.pltFontFamily = 'CMU Serif'
+    self.pltFontFamily = 'CMU Sans Serif'
     self.pltFontSize = 14
     self.pltFileType = 'svg'  # png, svg, jpg, pdf
     self.pltAxesGrid = True

@@ -164,7 +164,7 @@ def generateInputSignal(length, prob=0.1, start=0):
         the input is connected to the reservoir network,
         an excitatory connection prototype is used
 """
-def addRepeatedPatchGenerator(self):
+def addRepeatedPatchGenerator(self, idc=None):
     patchGens = int(self.p.patchGensPerNeuron*self.p.patchNeurons)
 
     # Create spike generator
@@ -199,33 +199,34 @@ def addRepeatedPatchGenerator(self):
         # Add spike indices to patchSpikes array
         self.patchSpikes.append(spikeTimes)
 
-    patchSize = int(np.sqrt(self.p.patchNeurons))
-    exNeuronsTopSize = int(np.sqrt(self.p.reservoirExSize))
+    if idc is None:
+        patchSize = int(np.sqrt(self.p.patchNeurons))
+        exNeuronsTopSize = int(np.sqrt(self.p.reservoirExSize))
 
-    #patchMask = np.zeros((patchSize, patchSize))
-    #patchMask[self.p.patchSize:, :] = 0  # set all mas values behind last neuron of patch input to zero
+        #patchMask = np.zeros((patchSize, patchSize))
+        #patchMask[self.p.patchSize:, :] = 0  # set all mas values behind last neuron of patch input to zero
 
-    # Set all values zero which are not part of the patch
-    #shiftX = 0 #self.p.patchNeuronsShiftX
-    #shiftY = 0 #self.p.patchNeuronsShiftY
-    shiftX = 44
-    shiftY = 24
-    topology = np.zeros((exNeuronsTopSize,exNeuronsTopSize))
-    topology[shiftY:shiftY+patchSize,shiftX:shiftX+patchSize] = 1
-    #topology[0,0] = 1
-    idc = np.where(topology.flatten())[0]
+        # Set all values zero which are not part of the patch
+        #shiftX = 0 #self.p.patchNeuronsShiftX
+        #shiftY = 0 #self.p.patchNeuronsShiftY
+        shiftX = 44
+        shiftY = 24
+        topology = np.zeros((exNeuronsTopSize,exNeuronsTopSize))
+        topology[shiftY:shiftY+patchSize,shiftX:shiftX+patchSize] = 1
+        #topology[0,0] = 1
+        idc = np.where(topology.flatten())[0]
 
-    # In every trial remove another 
-    #self.idc = idc
+        # In every trial remove another 
+        #self.idc = idc
+    
+    # Store patch neurons
+    self.patchNeurons = idc
 
+    # Define mask for connections
     patchMask = np.zeros((self.p.reservoirExSize, patchGens))
-
     for i, idx in enumerate(idc):
         fr, to = i*self.p.patchGensPerNeuron, (i+1)*self.p.patchGensPerNeuron
         patchMask[idx,fr:to] = 1
-
-    #for idx in idc:
-    #    patchMask[idx,:patchGens] = 1
 
     # Define weights
     self.patchWeights = patchMask*self.p.patchMaxWeight
@@ -257,7 +258,7 @@ def addTraceGenerator(self, clusterIdx):
         traceSpikesInd = generateInputSignal(self.p.traceSteps, prob=self.p.traceSpikeProb, start=start)
 
         # Multiply spikes to all training steps
-        spikeRange = range(0, self.p.totalSteps, self.p.stepsPerIteration)
+        spikeRange = range(0, self.p.totalSteps, self.p.totalTrialSteps)
         traceSpikesInds = np.ndarray.flatten(np.array([traceSpikesInd + i for i in spikeRange]))
         
         # Add all spikes to spike generator

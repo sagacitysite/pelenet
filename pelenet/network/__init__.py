@@ -84,6 +84,7 @@ class ReservoirNetwork():
         self.traceWeights = []
 
         # Cue input
+        self.patchNeurons = None
         self.patchSpikes = []
         self.patchWeights = None
 

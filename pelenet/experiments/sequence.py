@@ -5,25 +5,39 @@ import statsmodels.api as sm
 from tabulate import tabulate
 from copy import deepcopy
 
-# Own modules
-from parameters import Parameters
-from utils import Utils
-from plots import Plot
-from network.reservoir.test import TestNet
-from network.reservoir.train import TrainNet
+# Pelenet modules
+from ..system import System
+from ..system.datalog import Datalog
+from ..parameters import Parameters
+from ..utils import Utils
+from ..plots import Plot
+from ..network import ReservoirNetwork
 
 """
 @desc: Class for running an experiment, usually contains performing
        several networks (e.g. for training and testing)
 """
-class Experiment():
+class SequenceExperiment():
 
     """
     @desc: Initiates the experiment
     """
     def __init__(self):
-        self.p = Parameters()  # Parameters
+        # Parameters
+        self.p = Parameters(update = self.updateParameters())
 
+        self.net = None
+
+        # Instantiate system singleton and add datalog object
+        self.system = System.instance()
+        datalog = Datalog(self.p)
+        self.system.setDatalog(datalog)
+
+        # Instantiate utils and plot
+        self.utils = Utils.instance()
+        self.plot = Plot(self)
+
+        # Define some further variables
         self.targetFunctions = np.zeros((self.p.traceClusters, self.p.traceSteps))
         self.estimatedParameters = None
         self.parameterMean = None
@@ -32,11 +46,57 @@ class Experiment():
         self.testSpikes = None
         self.trainSpikes = None
 
-        #self.setTargetFunction()
+    """
+    @desc: Overwrite parameters for this experiment
+    """
+    def updateParameters(self):
+        return {
+            # Experiment
+            'trials': 5,
+            'stepsPerTrial': 90,
+            # Network
+            'reservoirExSize': 2048,
+            'reservoirConnProb': None,
+            'reservoirConnPerNeuron': 45,
+            'isLearningRule': True,
+            'learningRule': '2^-2*x1*y0 - 2^-2*y1*x0 + 2^-4*x1*y1*y0 - 2^-3*y0*w*w',
+            # Probes
+            'isExSpikeProbe': True
+        }
 
-        # Instantiate utils and plot
-        self.utils = Utils()
-        self.plot = Plot(self)
+    """
+    @desc: Build reservoir network with all parts (input, output, noise, etc.)
+    """
+    def build(self):
+        # Instanciate innate network
+        self.net = ReservoirNetwork(self.p)
+
+        # Draw anisotropic mask and weights
+        self.drawMaskAndWeights()
+
+        # Connect ex-in reservoir
+        self.net.connectReservoir()
+
+        # Add cue
+        self.net.addTraceGenerator(0)
+        self.net.addTraceGenerator(1)
+        self.net.addTraceGenerator(2)
+
+        # Add background noise
+        #self.net.addNoiseGenerator()
+
+        # Build the network structure
+        self.net.build()
+
+    """
+    @desc: Draw mask and weights
+    """
+    def drawMaskAndWeights(self):
+        # Draw and store mask matrix
+        mask = self.net.drawAndSetSparseReservoirMaskMatrix(self.p.reservoirConnProb, self.p.reservoirSize, self.p.reservoirSize, avoidSelf=True)
+
+        # Draw and store weight matrix
+        self.net.drawAndSetSparseReservoirWeightMatrix(mask)
 
     """
     @desc: Train sequence

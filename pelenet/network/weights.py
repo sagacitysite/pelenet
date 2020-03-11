@@ -56,7 +56,7 @@ def drawAndSetSparseReservoirWeightMatrix(self, *args, **kwargs):
 
     # Define and store sub matrices for weights
     nEx = self.p.reservoirExSize
-    nAll = nEx + self.p.reservoirInSize
+    nAll = self.p.reservoirSize
     self.initialWeights.exex = we[0:nEx, 0:nEx]
     self.initialWeights.inin = -1 * we[nEx:nAll, nEx:nAll]  # change sign of weights
     self.initialWeights.inex = -1 * we[0:nEx, nEx:nAll]  # change sign of weights
@@ -116,7 +116,7 @@ def drawAndSetSparseReservoirMaskMatrix(self, *args, **kwargs):
 
     # Define and store sub matrices for masks
     nEx = self.p.reservoirExSize
-    nAll = nEx + self.p.reservoirInSize
+    nAll = self.p.reservoirSize
     self.initialMasks.exex = ma[0:nEx, 0:nEx]
     self.initialMasks.inin = ma[nEx:nAll, nEx:nAll]
     self.initialMasks.inex = ma[0:nEx, nEx:nAll]

@@ -14,7 +14,7 @@ from lib.helper.exceptions import ArgumentNotValid
        filter: filter method as string, can be: None, 'single exponential', 'double exponential', 'gaussian' (symmetric) or 'bins'
        binSize: if filter 'bins' is used, sets the bin size
 """
-def trainOLS(self, trainSpikes, testSpikes, targetFunction, filter=None, binSize=10, alpha=1.0, l1w=0.0):
+def trainOLS(self, trainSpikes, testSpikes, targetFunction, filter=None, isIntercept=True, binSize=10, alpha=1.0, l1w=0.0):
 
     # Preprocess if B axis does not exist
     if (len(np.shape(trainSpikes)) == 2):
@@ -59,9 +59,15 @@ def trainOLS(self, trainSpikes, testSpikes, targetFunction, filter=None, binSize
     # Get target function for all trials
     y = np.tile(targetFunction, B)
 
+    # Add intercept
+    if (isIntercept):
+        x = np.insert(x, 0, 1.0, axis=0)
+        xe = np.insert(xe, 0, 1.0, axis=0)
+
     # Train the parameters
     model = sm.OLS(y, x.T)
-    params = model.fit().params
+    #params = model.fit().params
+    params = model.fit_regularized(alpha=0.0, L1_wt=0.0).params
     #params = model.fit_regularized(alpha=alpha, L1_wt=l1w).params
     # alpha=0.2, L1_wt=0.001
 

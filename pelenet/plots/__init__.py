@@ -44,9 +44,9 @@ class Plot():
     """
     # Functions to evaluate spikes
     from .spikes import (
-        reservoirSpikeTrain, outputSpikeTrain, reservoirRates, noiseSpikes, pca,
-        autocorrelation, crosscorrelation, spikesMissmatch, ffSpikeCounts,
-        meanTopologyActivity
+        reservoirSpikeTrain, outputSpikeTrain, reservoirRates, outputRates, 
+        noiseSpikes, pca, autocorrelation, crosscorrelation, spikesMissmatch,
+        ffSpikeCounts, meanTopologyActivity
     )
     # Functions to evaluate weights
     from .weights import (

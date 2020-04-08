@@ -49,10 +49,10 @@ def drawSparseWeightMatrix(self, mask, distribution='lognormal'):
     return sparse.csr_matrix((weights, indices, indptr), shape=np.shape(mask))
 
 """
-@desc: Draw weight matrix for reservoir network
+@desc: Draw random weight matrix for reservoir network
 """
-def drawAndSetSparseReservoirWeightMatrix(self, *args, **kwargs):
-    we = self.drawSparseWeightMatrix(*args, **kwargs)
+def drawAndSetSparseReservoirWeightMatrix(self, mask, *args, **kwargs):
+    we = self.drawSparseWeightMatrix(mask, *args, **kwargs)
 
     # Define and store sub matrices for weights
     nEx = self.p.reservoirExSize
@@ -63,31 +63,34 @@ def drawAndSetSparseReservoirWeightMatrix(self, *args, **kwargs):
     self.initialWeights.exin = we[nEx:nAll, 0:nEx]
 
 """
+@desc: Sets a static weight matrix for reservoir network
+"""
+def setSparseReservoirWeightMatrix(self, mask, *args, **kwargs):
+    # Define and store sub matrices for weights
+    nEx = self.p.reservoirExSize
+    nAll = self.p.reservoirSize
+    self.initialWeights.exex = mask[0:nEx, 0:nEx]*self.p.weightExCoefficient
+    self.initialWeights.inin = -1 * mask[nEx:nAll, nEx:nAll]*self.p.weightInCoefficient  # change sign of weights
+    self.initialWeights.inex = -1 * mask[0:nEx, nEx:nAll]*self.p.weightInCoefficient  # change sign of weights
+    self.initialWeights.exin = mask[nEx:nAll, 0:nEx]*self.p.weightExCoefficient
+
+"""
 @desc: Create mask that determines the connections to establish
 """
-def drawSparseMaskMatrix(self, dens, nSource, nDestination, avoidSelf=False):
-    # For creating sparse csr matrix, rows must be greater than cols
-    if (nSource > nDestination):
-        nRows = nSource
-        nCols = nDestination
-    else:
-        nRows = nDestination
-        nCols = nSource
+def drawSparseMaskMatrix(self):
+    pc = self.p.reservoirConnProb
+    n = self.p.reservoirExSize + self.p.reservoirInSize
 
     indices = []  # column indices
     indptr = [0]  # index pointer, start with 0
     prevRowSum = 0
 
     # Iterate over rows
-    for i in range(nRows):
-        if avoidSelf:
-            # Randomly draw a row
-            row = np.random.choice([0, 1], size=(nCols-1,), p=[1-dens, dens])
-            # Insert zero value at diagonal (if avoidSelf = True)
-            row = np.insert(row, i, 0)
-        else:
-            # Randomly draw a row
-            row = np.random.choice([0, 1], size=(nCols,), p=[1-dens, dens])
+    for i in range(n):
+        # Randomly draw a row
+        row = np.random.choice([0, 1], size=(n-1,), p=[1-pc, pc])
+        # Insert zero value at diagonal
+        row = np.insert(row, i, 0)
         
         # Get indices where row entries are 1
         rowIdx = np.where(row)[0]
@@ -106,7 +109,7 @@ def drawSparseMaskMatrix(self, dens, nSource, nDestination, avoidSelf=False):
     data = np.ones(len(indices)).astype(int)
 
     # Build and return sparse mask matrix
-    return sparse.csr_matrix((data, indices, indptr), shape=(nRows, nCols))
+    return sparse.csr_matrix((data, indices, indptr), shape=(n, n))
 
 """
 @desc: Draw mask matrix for reservoir network

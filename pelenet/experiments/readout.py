@@ -54,16 +54,18 @@ class ReadoutExperiment(AnisotropicExperiment):
             # Parameters from parent
             **p,
             # Experiment
-            'trials': 1,
-            'stepsPerTrial': 500,
+            'trials': 25,
+            'stepsPerTrial': 200, #500,
             # Network
-            'refractoryDelay': 2,
-            'compartmentVoltageDecay': 400, #500,  # Slows down / speeds up
-            'compartmentCurrentDecay': 500, #500,  # Variability (higher values) vs. Stability (lower values)
-            'thresholdMant': 800,  # Increases/decreases firing rate
+            'refractoryDelay': 2, # Sparse activity (high values) vs. dense activity (low values)
+            'compartmentVoltageDecay': 500,  # Slows down / speeds up
+            'compartmentCurrentDecay': 500,  # Variability (higher values) vs. Stability (lower values)
+            'thresholdMant': 1000,  # Slower spread (high values) va. faster spread (low values)
+            # Output
+            'partitioningClusterSize': 6, #10  # size of clusters connected to an output neuron
             # Probes
             'isExSpikeProbe': True,
-            'isOutSpikeProbe': False
+            'isOutSpikeProbe': True
         }
     
     """

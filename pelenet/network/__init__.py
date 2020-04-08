@@ -125,5 +125,5 @@ class ReservoirNetwork():
     from .weights import (
         drawAndSetSparseReservoirWeightMatrix, drawSparseWeightMatrix,
         drawAndSetSparseReservoirMaskMatrix, drawSparseMaskMatrix,
-        getMaskedWeights, getWeightMatrixFromProbe
+        setSparseReservoirWeightMatrix, getMaskedWeights, getWeightMatrixFromProbe
     )

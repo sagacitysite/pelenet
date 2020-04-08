@@ -1,5 +1,6 @@
 import numpy as np
 from matplotlib import colors
+import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 
 """
@@ -19,6 +20,8 @@ def landscape(self):
     #  4  3  2
     #  5  x  1
     #  6  7  8
+
+    
 
     # relative directions dx/dy
     #  (-1,1)  (0,1)  (1,1)
@@ -44,17 +47,28 @@ def landscape(self):
     inputMask[inputMask > 0] = 1
     inputMask = inputMask.astype(int).reshape((topsize,topsize))
 
-    # Create plit
-    fig, ax = plt.subplots(figsize=(10,10))
+    # Define colors and directions
+    cmap = plt.get_cmap('jet')
+    directions = ['right', 'up-right', 'up', 'up-left', 'left', 'down-left', 'down', 'down-right']
+    cols = [ cmap(i) for i in np.linspace(0,1,len(directions)) ]
+
+    # Create plot
+    #fig, ax = plt.subplots(figsize=(10,10))
+    fig, ax = plt.subplots(figsize=(6,6))
+    # Remove grid for this plot
+    #ax.grid(False)
     # Show landscape, every direction gets a color
-    ax.imshow(self.obj.landscape.reshape(topsize, topsize))
+    ax.imshow(self.obj.landscape.reshape(topsize, topsize), cmap=cmap)
     # Highlights the input area
-    ax.imshow(inputMask, alpha=0.2, cmap = colors.ListedColormap(['black', 'white']))
+    ax.imshow(inputMask, alpha=0.2, cmap=colors.ListedColormap(['black', 'white']))
     # Show vectors
-    ax.quiver(xx, yy, ldx, -ldy, headwidth=2, color="white")  # note: -dy flips quiver to match imshow
+    #ax.quiver(xx, yy, ldx, -ldy, headwidth=2, color="black")  # note: -dy flips quiver to match imshow
     # Define some attributes of the plot and show
-    title = 'Perlin scale: '+ str(self.p.anisoPerlinScale)
+    title = 'Anisotropic landscape'# (perlin scale: '+ str(self.p.anisoPerlinScale) + ')'
     ax.set(aspect=1, title=title)
+    # Add legend
+    patches = [ mpatches.Patch(color=cols[i], label="{}".format(directions[i]) ) for i in range(len(directions)) ]
+    plt.legend(handles=patches, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., title='Shift direction')
     # Save and show
     plt.savefig(self.plotDir + 'landscape.' + self.p.pltFileType)
     p = plt.show()

@@ -182,6 +182,9 @@ def addRepeatedPatchGenerator(self, idc=None):
         for k in range(self.p.trials):
             # Add spike times only when i != k
             apply = np.all([combinations[k, m] != i for m in range(self.p.patchMissingNeurons)])
+            # If patch neuron indices are given, add spikes to all patch neurons
+            if idc is not None:
+                apply = True
 
             if (apply):
                 spks = np.arange(self.p.inputSteps) + self.p.trialSteps*k + self.p.resetOffset*(k+1)
@@ -207,10 +210,10 @@ def addRepeatedPatchGenerator(self, idc=None):
         #patchMask[self.p.patchSize:, :] = 0  # set all mas values behind last neuron of patch input to zero
 
         # Set all values zero which are not part of the patch
-        #shiftX = 0 #self.p.patchNeuronsShiftX
-        #shiftY = 0 #self.p.patchNeuronsShiftY
-        shiftX = 44
-        shiftY = 24
+        shiftX = self.p.patchNeuronsShiftX
+        shiftY = self.p.patchNeuronsShiftY
+        #shiftX = 44
+        #shiftY = 24
         topology = np.zeros((exNeuronsTopSize,exNeuronsTopSize))
         topology[shiftY:shiftY+patchSize,shiftX:shiftX+patchSize] = 1
         #topology[0,0] = 1

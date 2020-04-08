@@ -32,10 +32,10 @@ def reservoirSpikeTrain(self, fr=0, to=None):
     cmap = colors.ListedColormap(['white', 'red', 'blue'])
 
     # Plot spike train
-    plt.figure(figsize=(16, 10))
+    #plt.figure(figsize=(16, 10))
     plt.imshow(chosenSpikes, cmap=cmap, vmin=0, vmax=2, aspect='auto')
-    plt.title('Reservoir spikes')
-    plt.xlabel('Time')
+    #plt.title('Reservoir spikes')
+    plt.xlabel('time')
     plt.ylabel('# neuron')
     plt.savefig(self.plotDir + 'spikes_raster.' + self.p.pltFileType)
     p = plt.show()
@@ -104,6 +104,28 @@ def reservoirRates(self):
     plt.legend()
     plt.savefig(self.plotDir + 'spikes_rates.' + self.p.pltFileType)
     p = plt.show()
+
+"""
+@desc: 
+"""
+def outputRates(self):
+    # If no spike probe is in use and we can stop here
+    if (not self.p.isOutSpikeProbe):
+        warnings.warn("No output spikes were probed, spike trains cannot be shown.")
+        return
+    
+    # Get rate
+    rate = np.mean(self.obj.outSpikeTrains, axis=0)
+
+    # Plot mean rate and show total mean rate in title
+    plt.figure(figsize=(16, 4))
+    plt.ylabel('Mean firing rate')
+    plt.xlabel('Time')
+    plt.plot(np.arange(self.p.totalSteps), rate)
+    plt.legend()
+    plt.savefig(self.plotDir + 'spikes_output_rates.' + self.p.pltFileType)
+    p = plt.show()
+
 
 """
 @desc: Plot spikes of noise neurons

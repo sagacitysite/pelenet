@@ -38,6 +38,8 @@ class Plot():
         rcParams['patch.linewidth'] = self.p.pltPatchLinewidth
         #rcParams['figure.autolayout'] = True
         rcParams['savefig.format'] = self.p.pltFileType
+        #rcParams['axes.spines.top'] = False
+        #rcParams['axes.spines.right'] = False
 
     """
     @note: Import functions from files

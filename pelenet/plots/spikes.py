@@ -29,14 +29,15 @@ def reservoirSpikeTrain(self, fr=0, to=None):
     chosenSpikes = allSpikes[:, fr:to]
 
     # Define colors
-    cmap = colors.ListedColormap(['white', 'red', 'blue'])
+    #cmap = colors.ListedColormap(['#ffffff', '#ec3120', '#00b9d0'])
+    cmap = colors.ListedColormap(['#ffffff', '#41aab7', '#00b9d0'])
 
     # Plot spike train
     #plt.figure(figsize=(16, 10))
     plt.imshow(chosenSpikes, cmap=cmap, vmin=0, vmax=2, aspect='auto')
     #plt.title('Reservoir spikes')
-    plt.xlabel('time')
-    plt.ylabel('# neuron')
+    plt.xlabel('time steps')
+    plt.ylabel('index of neuron')
     plt.savefig(self.plotDir + 'spikes_raster.' + self.p.pltFileType)
     p = plt.show()
 

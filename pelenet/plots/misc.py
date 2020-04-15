@@ -2,6 +2,7 @@ import numpy as np
 from matplotlib import colors
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
+import lib.anisotropic.colormap as cmap
 
 """
 @desc: Plot presynaptic trace
@@ -20,8 +21,6 @@ def landscape(self):
     #  4  3  2
     #  5  x  1
     #  6  7  8
-
-    
 
     # relative directions dx/dy
     #  (-1,1)  (0,1)  (1,1)
@@ -48,9 +47,10 @@ def landscape(self):
     inputMask = inputMask.astype(int).reshape((topsize,topsize))
 
     # Define colors and directions
-    cmap = plt.get_cmap('jet')
+    #colmap = plt.get_cmap('jet')
+    colmap = cmap.virno()
     directions = ['right', 'up-right', 'up', 'up-left', 'left', 'down-left', 'down', 'down-right']
-    cols = [ cmap(i) for i in np.linspace(0,1,len(directions)) ]
+    cols = [ colmap(i) for i in np.linspace(0,1,len(directions)) ]
 
     # Create plot
     #fig, ax = plt.subplots(figsize=(10,10))
@@ -58,9 +58,9 @@ def landscape(self):
     # Remove grid for this plot
     #ax.grid(False)
     # Show landscape, every direction gets a color
-    ax.imshow(self.obj.landscape.reshape(topsize, topsize), cmap=cmap)
+    ax.imshow(self.obj.landscape.reshape(topsize, topsize), cmap=colmap)
     # Highlights the input area
-    ax.imshow(inputMask, alpha=0.2, cmap=colors.ListedColormap(['black', 'white']))
+    #ax.imshow(inputMask, alpha=0.2, cmap=colors.ListedColormap(['black', 'white']))
     # Show vectors
     #ax.quiver(xx, yy, ldx, -ldy, headwidth=2, color="black")  # note: -dy flips quiver to match imshow
     # Define some attributes of the plot and show

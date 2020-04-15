@@ -48,7 +48,7 @@ class ReadoutRandomExperiment():
     def updateParameters(self):
         return {
             # Experiment
-            'trials': 2,
+            'trials': 25,
             'stepsPerTrial': 200,
             # Network
             'reservoirConnProb': 0.035,
@@ -56,7 +56,7 @@ class ReadoutRandomExperiment():
             'weightExCoefficient': 12, #12
             'weightInCoefficient': 48,
             # Output
-            'partitioningClusterSize': 6, #10  # size of clusters connected to an output neuron
+            'partitioningClusterSize': 10, #6/10  # size of clusters connected to an output neuron
             # Neurons
             'refractoryDelay': 2, #5, #2 # Sparse activity (high values) vs. dense activity (low values)
             'compartmentVoltageDecay': 100, #500, #100,#400 #500,  # Slows down / speeds up

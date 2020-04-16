@@ -3,6 +3,7 @@
 
 # All files with ending
 *.pyc
+*.npy
 *.log
 
 # All folders with name

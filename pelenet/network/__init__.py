@@ -72,8 +72,10 @@ class ReservoirNetwork():
 
         # Spikes
         self.exSpikeTrains = []
+        self.exSpikeData = []
         self.inSpikeTrains = []
         self.outSpikeTrains = []
+        self.outSpikeData = []
 
         # Voltages
         self.outVoltageTrains = []
@@ -120,7 +122,7 @@ class ReservoirNetwork():
     from .input import addRepeatedPatchGenerator, addTraceGenerator
     from .noise import addNoiseGenerator, addConstantGenerator
     from .output import drawOutputMaskAndWeights
-    from .probes import addProbes, postProcessing
+    from .probes import addProbes, condenseData, postProcessing
     from .snips import addResetSnips, createAndConnectResetInitChannels
     from .weights import (
         drawAndSetSparseReservoirWeightMatrix, drawSparseWeightMatrix,

@@ -38,10 +38,11 @@ class ReadoutExperiment(AnisotropicExperiment):
 
         # Instantiate utils and plot
         self.utils = Utils.instance()
+        self.utils.setParameters(self.p)
         self.plot = Plot(self)
 
         # Define some further variables
-        self.targetFunction = self.getTargetFunction()
+        self.target = self.utils.loadTarget()
 
     """
     @desc: Overwrite parameters for this experiment
@@ -55,17 +56,23 @@ class ReadoutExperiment(AnisotropicExperiment):
             **p,
             # Experiment
             'trials': 25,
-            'stepsPerTrial': 200, #500,
+            'stepsPerTrial': 210, #500,
             # Network
             'refractoryDelay': 2, # Sparse activity (high values) vs. dense activity (low values)
-            'compartmentVoltageDecay': 500,  # Slows down / speeds up
-            'compartmentCurrentDecay': 500,  # Variability (higher values) vs. Stability (lower values)
-            'thresholdMant': 800,  # Slower spread (high values) va. faster spread (low values)
+            'compartmentVoltageDecay': 400,  # Slows down / speeds up
+            'compartmentCurrentDecay': 380,  # Variability (higher values) vs. Stability (lower values)
+            'thresholdMant': 1000,  # Slower spread (high values) va. faster spread (low values)
+            # Input
+            'patchNeuronsShiftX': 44,
+            'patchNeuronsShiftY': 24,
             # Output
             'partitioningClusterSize': 10, #6/10  # size of clusters connected to an output neuron
             # Probes
             'isExSpikeProbe': True,
-            'isOutSpikeProbe': True
+            'isOutSpikeProbe': True,
+            # Target
+            'targetFilename': 'test1_rec.txt',
+            'targetOffset': 1000
         }
     
     """
@@ -129,36 +136,3 @@ class ReadoutExperiment(AnisotropicExperiment):
 
         # Perform postprocessing
         self.net.postProcessing()
-
-    """
-    @desc: Define function to learn as ouput
-    @params:
-            clusterIndex: index of cluster the function is defined for
-            type: 'sin', 'revsin', 'lin'
-    """
-    def getTargetFunction(self, type = 'sin', steps = None):
-        if steps is None:
-            nTs = self.p.stepsPerTrial
-        else:
-            nTs = steps
-
-        # Define function values
-        if type == 'sin': return 0.5+0.5*np.sin((np.pi/(0.5*nTs))*np.arange(nTs))
-        elif type == 'revsin': return 0.5-0.5*np.sin((np.pi/(0.5*nTs))*np.arange(nTs))
-        elif type == 'lin': return np.concatenate((0.5-(1/nTs)*np.arange(nTs/2), (1/nTs)*np.arange(nTs/2)))
-        else: raise ValueError('Chosen function type is not available')
-    
-    """
-    TODO: Shift to plots/misc.py
-    @desc: Plots either target function or estimated function
-    """
-    def plotActionSequenceFunction(self, y, title="Target function"):
-        # Plot function
-        plt.figure(figsize=(16, 4))
-        plt.title(title)
-        plt.xlabel('Time')
-        for i in range(self.p.traceClusters):
-            fr, to = i*self.p.traceSteps, (i+1)*self.p.traceSteps
-            plt.plot(np.arange(fr, to), y[i], label="Cluster"+str(i))
-        plt.legend()
-        p = plt.show()

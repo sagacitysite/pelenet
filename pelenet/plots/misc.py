@@ -13,7 +13,7 @@ def preSynapticTrace(self):
 """
 @desc: Plot landscape
 """
-def landscape(self):
+def landscape(self, isInput=True, isVectors=False):
     # Define some variables
     topsize = int(np.sqrt(self.p.reservoirExSize))
 
@@ -56,13 +56,13 @@ def landscape(self):
     #fig, ax = plt.subplots(figsize=(10,10))
     fig, ax = plt.subplots(figsize=(6,6))
     # Remove grid for this plot
-    #ax.grid(False)
+    ax.grid(False)
     # Show landscape, every direction gets a color
     ax.imshow(self.obj.landscape.reshape(topsize, topsize), cmap=colmap)
     # Highlights the input area
-    #ax.imshow(inputMask, alpha=0.2, cmap=colors.ListedColormap(['black', 'white']))
+    if isInput: ax.imshow(inputMask, alpha=0.2, cmap=colors.ListedColormap(['black', 'white']))
     # Show vectors
-    #ax.quiver(xx, yy, ldx, -ldy, headwidth=2, color="black")  # note: -dy flips quiver to match imshow
+    if isVectors: ax.quiver(xx, yy, ldx, -ldy, headwidth=2, color="black")  # note: -dy flips quiver to match imshow
     # Define some attributes of the plot and show
     title = 'Anisotropic landscape'# (perlin scale: '+ str(self.p.anisoPerlinScale) + ')'
     ax.set(aspect=1, title=title)

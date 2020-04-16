@@ -15,14 +15,15 @@ def postProcessing(self):
         spks = []
         for i in range(len(self.exSpikeProbes)):
             spks.append(self.exSpikeProbes[i].data)
-        self.exSpikeTrains = np.vstack(spks) #np.reshape(spks, (self.p.reservoirExSize, self.p.totalSteps))
+        self.exSpikeTrains = np.vstack(spks)
+        self.exSpikeData = self.condenseData(np.vstack(spks))
 
     # Combine spike probes from all chunks together for inhibitory neurons
     if self.p.isInSpikeProbe:
         spks = []
         for i in range(len(self.inSpikeProbes)):
             spks.append(self.inSpikeProbes[i].data)
-        self.inSpikeTrains = np.vstack(spks) #np.reshape(spks, (self.p.reservoirInSize, self.p.totalSteps))
+        self.inSpikeTrains = np.vstack(spks)
 
     # Combine spike probes from all chunks together for inhibitory neurons
     if self.p.isOutSpikeProbe:
@@ -30,6 +31,7 @@ def postProcessing(self):
         for i in range(len(self.outSpikeProbes)):
             spks.append(self.outSpikeProbes[i].data)
         self.outSpikeTrains = np.vstack(spks)
+        self.outSpikeData = self.condenseData(np.vstack(spks))
 
     # Combine spike probes from all chunks together for inhibitory neurons
     if self.p.isOutVoltageProbe:
@@ -44,6 +46,24 @@ def postProcessing(self):
 
     # Log that post processing has finished
     logging.info('Post processing succesfully completed')
+
+"""
+@desc: Remove offsets from data
+"""
+def condenseData(self, raw):
+    # Get total offset
+    offset = self.p.resetOffset + self.p.inputOffset
+
+    # Define empty data list and iterate over all trials
+    data = []
+    for i in range(self.p.trials):
+        # Get 'from' and 'to' position of every trial
+        fr, to = (i+1)*offset+i*self.p.stepsPerTrial, (i+1)*offset+(i+1)*self.p.stepsPerTrial
+        # Cut every trial and append it to data
+        data.append(raw[:,fr:to])
+    
+    # Transform list to data array and return
+    return np.array(data)
 
 """
 @desc: Add probing

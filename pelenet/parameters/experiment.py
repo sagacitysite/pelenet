@@ -59,8 +59,13 @@ def includeExperiment(self):
     """
 
     # Readout training
-    self.smoothingWd = 3  # number of neurons to the left and right which are influenced
-    self.smoothingVar = 7  # variance of the Gaussian kernel
+    self.binWindowSize = 10  # number of steps the spikes should be binned backwards for every step
+    #self.smoothingWd = 3  # number of neurons to the left and right which are influenced
+    #self.smoothingVar = 7  # variance of the Gaussian kernel
+
+    # Target
+    self.targetFilename = ''  # file name of the file containing target data
+    self.targetOffset = None  # offset of the target data (if some data in the beginning of  file shall not be used)
 
     # Output layer
     self.partitioningClusterSize = 10 #5  # size of clusters connected to an output neuron

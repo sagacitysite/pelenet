@@ -44,17 +44,21 @@ class Plot():
     """
     @note: Import functions from files
     """
-    # Functions to evaluate spikes
+    # Functions to plot spikes
     from .spikes import (
         reservoirSpikeTrain, outputSpikeTrain, reservoirRates, outputRates, 
         noiseSpikes, pca, autocorrelation, crosscorrelation, spikesMissmatch,
         ffSpikeCounts, meanTopologyActivity
     )
-    # Functions to evaluate weights
+    # Functions to plot weights
     from .weights import (
         initialExWeightDistribution, trainedExWeightDistribution,
         initialExWeightMatrix, trainedExWeightMatrix, weightsSortedBySupport,
         cueWeightMean
+    )
+    # Functions to plot target
+    from .target import (
+        movement1D, movement3D
     )
     # Other functions
     from .misc import (

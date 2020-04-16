@@ -34,6 +34,10 @@ class Utils():
     from .weights import (
         getSpectralRadius, recombineExWeightMatrix, getSupportWeightsMask
     )
+    # Functions to evaluate target
+    from .target import (
+        loadTarget, prepareDataset, estimateMovement
+    )
     # Other functions
     from .misc import (
         trainOLS, pca

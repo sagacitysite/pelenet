@@ -6,7 +6,7 @@ import warnings
 """
 @desc: Plot spike train of neurons in reservoir
 """
-def reservoirSpikeTrain(self, fr=0, to=None):
+def reservoirSpikeTrain(self, fr=0, to=None, figsize=None):
     # Get spikes
     exSpikes = self.obj.exSpikeTrains if self.p.isExSpikeProbe else None
     inSpikes = 2*self.obj.inSpikeTrains if self.p.isInSpikeProbe else None  # multiply by 2 to enable a different color in imshow
@@ -29,11 +29,10 @@ def reservoirSpikeTrain(self, fr=0, to=None):
     chosenSpikes = allSpikes[:, fr:to]
 
     # Define colors
-    #cmap = colors.ListedColormap(['#ffffff', '#ec3120', '#00b9d0'])
-    cmap = colors.ListedColormap(['#ffffff', '#41aab7', '#00b9d0'])
+    cmap = colors.ListedColormap(['#ffffff', self.p.pltColor1, self.p.pltColor2])
 
     # Plot spike train
-    #plt.figure(figsize=(16, 10))
+    if figsize is not None: plt.figure(figsize=figsize)
     plt.imshow(chosenSpikes, cmap=cmap, vmin=0, vmax=2, aspect='auto')
     #plt.title('Reservoir spikes')
     plt.xlabel('time steps')
@@ -44,7 +43,7 @@ def reservoirSpikeTrain(self, fr=0, to=None):
 """
 @desc: Plot spike train of output neurons
 """
-def outputSpikeTrain(self, fr=0, to=None):
+def outputSpikeTrain(self, fr=0, to=None, figsize=None):
     # Get spikes
     outSpikes = self.obj.outSpikeTrains if self.p.isOutSpikeProbe else None
 
@@ -57,21 +56,21 @@ def outputSpikeTrain(self, fr=0, to=None):
     chosenSpikes = outSpikes[:, fr:to]
 
     # Define colors
-    cmap = colors.ListedColormap(['white', 'green'])
+    cmap = colors.ListedColormap(['#ffffff', self.p.pltColor3])
 
     # Plot spike train
-    plt.figure(figsize=(16, 4))
+    if figsize is not None: plt.figure(figsize=figsize)
     plt.imshow(chosenSpikes, cmap=cmap, aspect='auto')
-    plt.title('Output spikes')
-    plt.xlabel('Time')
-    plt.ylabel('# neuron')
+    #plt.title('Output spikes')
+    plt.xlabel('time steps')
+    plt.ylabel('index of neuron')
     plt.savefig(self.plotDir + 'spikes_output_raster.' + self.p.pltFileType)
     p = plt.show()
 
 """
 @desc: Plot average firing rate of reservoir neurons
 """
-def reservoirRates(self):
+def reservoirRates(self, figsize=None):
     # Calculate mean rate for every simulation step
     meanRateEx = np.mean(self.obj.exSpikeTrains, axis=0) if self.p.isExSpikeProbe else None
     meanRateIn = np.mean(self.obj.inSpikeTrains, axis=0) if self.p.isInSpikeProbe else None
@@ -94,14 +93,14 @@ def reservoirRates(self):
     totalMeanRate = np.round(np.mean(meanRate[self.p.inputSteps:])*1000)/1000
 
     # Plot mean rate and show total mean rate in title
-    plt.figure(figsize=(16, 4))
-    plt.ylabel('Mean firing rate')
-    plt.xlabel('Time')
-    plt.title('Mean firing rate: {}'.format(totalMeanRate))
+    if figsize is not None: plt.figure(figsize=figsize)
+    plt.ylabel('mean firing rate')
+    plt.xlabel('time steps')
+    plt.title('mean firing rate: {}'.format(totalMeanRate))
     if meanRateIn is not None:
-        plt.plot(np.arange(self.p.totalSteps), meanRateIn, alpha=0.75, color='b', label='Inhibitory neurons')
+        plt.plot(np.arange(self.p.totalSteps), meanRateIn, alpha=0.75, color=self.p.pltColor2, label='Inhibitory neurons')
     if meanRateEx is not None:
-        plt.plot(np.arange(self.p.totalSteps), meanRateEx, alpha=0.75, color='r', label='Excitatory neurons')
+        plt.plot(np.arange(self.p.totalSteps), meanRateEx, alpha=0.75, color=self.p.pltColor1, label='Excitatory neurons')
     plt.legend()
     plt.savefig(self.plotDir + 'spikes_rates.' + self.p.pltFileType)
     p = plt.show()
@@ -120,9 +119,9 @@ def outputRates(self):
 
     # Plot mean rate and show total mean rate in title
     plt.figure(figsize=(16, 4))
-    plt.ylabel('Mean firing rate')
-    plt.xlabel('Time')
-    plt.plot(np.arange(self.p.totalSteps), rate)
+    plt.ylabel('mean firing rate')
+    plt.xlabel('time steps')
+    plt.plot(np.arange(self.p.totalSteps), rate, color=self.p.pltColor3)
     plt.legend()
     plt.savefig(self.plotDir + 'spikes_output_rates.' + self.p.pltFileType)
     p = plt.show()
@@ -133,7 +132,7 @@ def outputRates(self):
 """
 def noiseSpikes(self):
     plt.figure(figsize=(16, 4))
-    plt.title('Noise spikes')
+    plt.title('noise spikes')
     plt.savefig(self.plotDir + 'spikes_noise.' + self.p.pltFileType)
     p = plt.imshow(self.obj.noiseSpikes, cmap='Greys', aspect='auto')
 

@@ -1,5 +1,6 @@
 import numpy as np
 import statsmodels.api as sm
+from tqdm import tqdm
 
 """
 @desc: Load robotic movement target function
@@ -42,7 +43,7 @@ def prepareDataset(self, data, target, binSize=None, trainTrials=None, testTrial
     trainSpikes = np.moveaxis(train, 0, 2)
 
     # Concatenate train data
-    x = np.hstack(tuple( trainSpikes[i,:,:] for i in range(self.p.trials-1) ))
+    x = np.hstack(tuple( trainSpikes[i,:,:] for i in range(np.sum(trainTrials)) ))
     x = np.insert(x, 0, 1.0, axis=0)  # Add intercept
 
     # Select test data
@@ -51,7 +52,7 @@ def prepareDataset(self, data, target, binSize=None, trainTrials=None, testTrial
     xe = np.insert(testSpikes, 0, 1.0, axis=0)  # Add intercept
     
     # Select target
-    y = np.tile(target[:,:self.p.stepsPerTrial], self.p.trials-1)
+    y = np.tile(target[:,:self.p.stepsPerTrial], np.sum(trainTrials))
 
     # Return dataset
     return (x, xe, y)
@@ -74,3 +75,30 @@ def estimateMovement(self, x, xe, y):
     ye = np.dot(xe.T, params)
     
     return ye
+
+"""
+@desc: Estimates a 3 dimensional function for multiple trajectories
+@pars:
+        Arguments equal arguments from prepareDataset() function
+        Except for 'targets' which has one more dimension compared to 'target'
+@return:
+        yes: estimated target functions
+"""
+def estimateMultipleTrajectories3D(self, data, targets, binSize=None, trainTrials=None, testTrial=None):
+    # Create empty array
+    yes = []
+
+    # Loop over all target functions
+    for i in tqdm(range(targets.shape[0])):
+        # Prepare data
+        (x, xe, y) = self.prepareDataset(data, targets[i], binSize=binSize, trainTrials=trainTrials, testTrial=testTrial)
+
+        # Estimate x, y and z
+        x1 = self.estimateMovement(x, xe, y[0])
+        x2 = self.estimateMovement(x, xe, y[1])
+        x3 = self.estimateMovement(x, xe, y[2])
+        
+        # Append all estimates to array
+        yes.append(np.array([x1, x2, x3]))
+
+    return np.array(yes)

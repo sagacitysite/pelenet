@@ -29,6 +29,7 @@ class Plot():
         rcParams['axes.edgecolor'] = self.p.pltColor
         rcParams['xtick.color'] = self.p.pltColor
         rcParams['ytick.color'] = self.p.pltColor
+        rcParams['axes.axisbelow'] = True
         rcParams['axes.grid'] = True
         rcParams['grid.linestyle'] = ':'
         rcParams['grid.linewidth'] = 0.5

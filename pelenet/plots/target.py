@@ -8,7 +8,7 @@ from scipy.signal import savgol_filter
 """
 @desc: Plot x dimension of movement
 """
-def movement1D(self, est, tgt, dim=None, ylim=None, legend=False, figsize=None):
+def movement1D(self, est, tgt, dim=None, ylim=None, legend=False, figsize=None, precision=20, suffix=None):
     # Set figsize if given
     if figsize is not None: plt.figure(figsize=figsize)
 
@@ -22,11 +22,16 @@ def movement1D(self, est, tgt, dim=None, ylim=None, legend=False, figsize=None):
 
     # Set ylim if given
     if ylim is not None:
-        plt.yticks(getTicks(ylim))
+        plt.yticks(getTicks(ylim, precision))
         plt.ylim(ylim)
 
-    # Prepend underscore to suffix if dim is given
-    suffix = None if dim is None else '_'+dim
+    # Prepare suffix (add given suffix and/or dimension to file name)
+    if dim is not None and suffix is not None:
+        suffix = '_' + dim + '_' + suffix
+    if dim is not None and suffix is None:
+        suffix = '_' + dim
+    if dim is None and suffix is not None:
+        suffix = '_' + suffix
 
     # Set default value for dim if dim is not given
     # NOTE must be after suffix to avoid suffix creation in that case
@@ -41,7 +46,7 @@ def movement1D(self, est, tgt, dim=None, ylim=None, legend=False, figsize=None):
 """
 @desc: Plot all 3 dimensions of movement
 """
-def movement3D(self, est, tgt, view=(30, 120), xlim=None, ylim=None, zlim=None, figsize=None):
+def movement3D(self, est, tgt, view=(20, 120), xlim=None, ylim=None, zlim=None, figsize=None):
     # Set figsize if given
     if figsize is not None: plt.figure(figsize=figsize)
 
@@ -69,11 +74,6 @@ def movement3D(self, est, tgt, view=(30, 120), xlim=None, ylim=None, zlim=None, 
     if zlim is not None:
         ax.set_zticks(getTicks(zlim))
         ax.set_zlim(zlim)
-
-    # Set ticks if limits are given
-    ax.set_xlabel('x [m]')
-    ax.set_ylabel('y [m]')
-    ax.set_zlabel('z [m]')
 
     # Set view perspective
     ax.view_init(*view)

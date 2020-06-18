@@ -37,10 +37,11 @@ class ReadoutRandomExperiment():
 
         # Instantiate utils and plot
         self.utils = Utils.instance()
+        self.utils.setParameters(self.p)
         self.plot = Plot(self)
 
         # Define some further variables
-        #self.targetFunction = self.getTargetFunction()
+        self.target = self.utils.loadTarget()
 
     """
     @desc: Overwrite parameters for this experiment
@@ -49,14 +50,14 @@ class ReadoutRandomExperiment():
         return {
             # Experiment
             'trials': 25,
-            'stepsPerTrial': 200,
+            'stepsPerTrial': 210,
             # Network
             'reservoirConnProb': 0.035,
             #'reservoirConnPerNeuron': 50,
             'weightExCoefficient': 12, #12
             'weightInCoefficient': 48,
             # Output
-            'partitioningClusterSize': 10, #6/10  # size of clusters connected to an output neuron
+            'partitioningClusterSize': 6, #6/10  # size of clusters connected to an output neuron
             # Neurons
             'refractoryDelay': 2, #5, #2 # Sparse activity (high values) vs. dense activity (low values)
             'compartmentVoltageDecay': 100, #500, #100,#400 #500,  # Slows down / speeds up
@@ -65,7 +66,10 @@ class ReadoutRandomExperiment():
             'outputWeightValue': 1,
             # Probes
             'isExSpikeProbe': True,
-            'isOutSpikeProbe': True
+            'isOutSpikeProbe': True,
+            # Target
+            'targetFilename': 'test1_rec.txt',
+            'targetOffset': 1000
         }
 
     # r, vol, cur,  thr 

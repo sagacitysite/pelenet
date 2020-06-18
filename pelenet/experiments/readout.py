@@ -66,7 +66,7 @@ class ReadoutExperiment(AnisotropicExperiment):
             'patchNeuronsShiftX': 44,
             'patchNeuronsShiftY': 24,
             # Output
-            'partitioningClusterSize': 10, #6/10  # size of clusters connected to an output neuron
+            'partitioningClusterSize': 6, #6/10  # size of clusters connected to an output neuron
             # Probes
             'isExSpikeProbe': True,
             'isOutSpikeProbe': True,

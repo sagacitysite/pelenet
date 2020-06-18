@@ -6,10 +6,14 @@ import warnings
 """
 @desc: Plot spike train of neurons in reservoir
 """
-def reservoirSpikeTrain(self, fr=0, to=None, figsize=None):
+def reservoirSpikeTrain(self, fr=0, to=None, figsize=None, colorEx=None, colorIn=None):
     # Get spikes
     exSpikes = self.obj.exSpikeTrains if self.p.isExSpikeProbe else None
     inSpikes = 2*self.obj.inSpikeTrains if self.p.isInSpikeProbe else None  # multiply by 2 to enable a different color in imshow
+
+    # Set colors if not chosen
+    if colorEx is None: colorEx = self.p.pltColor1
+    if colorIn is None: colorIn = self.p.pltColor2
 
     # If no spike probe is in use and we can stop here
     if (not self.p.isExSpikeProbe) and (not self.p.isInSpikeProbe):
@@ -29,7 +33,7 @@ def reservoirSpikeTrain(self, fr=0, to=None, figsize=None):
     chosenSpikes = allSpikes[:, fr:to]
 
     # Define colors
-    cmap = colors.ListedColormap(['#ffffff', self.p.pltColor1, self.p.pltColor2])
+    cmap = colors.ListedColormap(['#ffffff', colorEx, colorIn])
 
     # Plot spike train
     if figsize is not None: plt.figure(figsize=figsize)
@@ -43,7 +47,7 @@ def reservoirSpikeTrain(self, fr=0, to=None, figsize=None):
 """
 @desc: Plot spike train of output neurons
 """
-def outputSpikeTrain(self, fr=0, to=None, figsize=None):
+def outputSpikeTrain(self, fr=0, to=None, color=None, figsize=None):
     # Get spikes
     outSpikes = self.obj.outSpikeTrains if self.p.isOutSpikeProbe else None
 
@@ -51,12 +55,15 @@ def outputSpikeTrain(self, fr=0, to=None, figsize=None):
     if (not self.p.isOutSpikeProbe):
         warnings.warn("No output spikes were probed, spike trains cannot be shown.")
         return
+
+    # Set colors if not chosen
+    if color is None: color = self.p.pltColor1
     
     # Choose spikes ("zoom" in time)
     chosenSpikes = outSpikes[:, fr:to]
 
     # Define colors
-    cmap = colors.ListedColormap(['#ffffff', self.p.pltColor3])
+    cmap = colors.ListedColormap(['#ffffff', color])
 
     # Plot spike train
     if figsize is not None: plt.figure(figsize=figsize)
@@ -70,15 +77,22 @@ def outputSpikeTrain(self, fr=0, to=None, figsize=None):
 """
 @desc: Plot average firing rate of reservoir neurons
 """
-def reservoirRates(self, figsize=None):
+def reservoirRates(self, fr=0, to=None, ylim=None, figsize=None, colorEx=None, colorIn=None):
+    # Set 'to' to total times steps if not defined
+    if to is None: to = self.p.totalSteps
+
     # Calculate mean rate for every simulation step
-    meanRateEx = np.mean(self.obj.exSpikeTrains, axis=0) if self.p.isExSpikeProbe else None
-    meanRateIn = np.mean(self.obj.inSpikeTrains, axis=0) if self.p.isInSpikeProbe else None
+    meanRateEx = np.mean(self.obj.exSpikeTrains, axis=0)[fr:to] if self.p.isExSpikeProbe else None
+    meanRateIn = np.mean(self.obj.inSpikeTrains, axis=0)[fr:to] if self.p.isInSpikeProbe else None
 
     # If no spike probe is in use and we can stop here
     if (not self.p.isExSpikeProbe) and (not self.p.isInSpikeProbe):
         warnings.warn("No spikes were probed, reservoir rates cannot be shown.")
         return
+
+    # Set colors if not chosen
+    if colorEx is None: colorEx = self.p.pltColor1
+    if colorIn is None: colorIn = self.p.pltColor2
 
     # Concatenate ex and in spikes
     meanRate = None
@@ -92,37 +106,59 @@ def reservoirRates(self, figsize=None):
     # Calculate mean rate for whole simulation, except cue steps
     totalMeanRate = np.round(np.mean(meanRate[self.p.inputSteps:])*1000)/1000
 
-    # Plot mean rate and show total mean rate in title
+    # Define alpha level
+    alpha = 0.75 if meanRateEx is not None and meanRateIn is not None else 1.0
+
+    # Set figsize of given
     if figsize is not None: plt.figure(figsize=figsize)
+
+    # Set labels
     plt.ylabel('mean firing rate')
     plt.xlabel('time steps')
-    plt.title('mean firing rate: {}'.format(totalMeanRate))
-    if meanRateIn is not None:
-        plt.plot(np.arange(self.p.totalSteps), meanRateIn, alpha=0.75, color=self.p.pltColor2, label='Inhibitory neurons')
+
+    # Plot mean rates
     if meanRateEx is not None:
-        plt.plot(np.arange(self.p.totalSteps), meanRateEx, alpha=0.75, color=self.p.pltColor1, label='Excitatory neurons')
-    plt.legend()
+        plt.plot(np.arange(fr,to,1), meanRateEx, alpha=alpha, color=colorEx, label='Excitatory neurons')
+    if meanRateIn is not None:
+        plt.plot(np.arange(fr,to,1), meanRateIn, alpha=alpha, color=colorIn, label='Inhibitory neurons')
+
+    # Show legend if both mean rates are plotted
+    if meanRateEx is not None and meanRateIn is not None: plt.legend()
+
+    # Set y limit if given
+    if ylim is not None: plt.ylim(ylim)
+
+    # Save and show plot
     plt.savefig(self.plotDir + 'spikes_rates.' + self.p.pltFileType)
     p = plt.show()
 
 """
 @desc: 
 """
-def outputRates(self):
+def outputRates(self, fr=0, to=None, ylim=None, color=None, figsize=None):
+    # Set 'to' to total times steps if not defined
+    if to is None: to = self.p.totalSteps
+
     # If no spike probe is in use and we can stop here
     if (not self.p.isOutSpikeProbe):
         warnings.warn("No output spikes were probed, spike trains cannot be shown.")
         return
+
+    # Set color if not chosen
+    if color is None: color = self.p.pltColor1
     
     # Get rate
-    rate = np.mean(self.obj.outSpikeTrains, axis=0)
+    rate = np.mean(self.obj.outSpikeTrains, axis=0)[fr:to]
 
-    # Plot mean rate and show total mean rate in title
-    plt.figure(figsize=(16, 4))
+    # Plot mean rate
+    if figsize is not None: plt.figure(figsize=figsize)
     plt.ylabel('mean firing rate')
     plt.xlabel('time steps')
-    plt.plot(np.arange(self.p.totalSteps), rate, color=self.p.pltColor3)
-    plt.legend()
+    plt.plot(np.arange(fr,to,1), rate, color=color)
+
+    # Set y limit if given
+    if ylim is not None: plt.ylim(ylim)
+
     plt.savefig(self.plotDir + 'spikes_output_rates.' + self.p.pltFileType)
     p = plt.show()
 

@@ -36,7 +36,7 @@ class Utils():
     )
     # Functions to evaluate target
     from .target import (
-        loadTarget, prepareDataset, estimateMovement
+        loadTarget, prepareDataset, estimateMovement, estimateMultipleTrajectories3D
     )
     # Other functions
     from .misc import (

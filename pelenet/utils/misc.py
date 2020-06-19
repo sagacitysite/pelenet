@@ -6,6 +6,10 @@ from types import SimpleNamespace
 
 from lib.helper.exceptions import ArgumentNotValid
 
+import copy
+import gc
+
+
 """
 @desc: Trains ordinary least square model, includes filtering and regularization
 @pars: trainSpikes: has dimensions B (number of trials) x N (number of neurons) x T (number of time steps per trial)

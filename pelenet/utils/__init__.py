@@ -40,5 +40,5 @@ class Utils():
     )
     # Other functions
     from .misc import (
-        trainOLS, pca, simLoihi, simAllConfigs
+        trainOLS, pca
     )

@@ -6,7 +6,7 @@ from scipy import sparse
 """
 @desc: Plot weight distribution and show spectral radius
 """
-def weightDistribution(self, weights, yscale):
+def weightDistribution(self, weights, yscale="linear", title=True, figsize=None):
     # Get only data from sparse matrix (equals flattend matrix)
     wsf = weights.data
 
@@ -19,26 +19,27 @@ def weightDistribution(self, weights, yscale):
     meanweight = np.round(np.mean(wnonzero)*1000)/1000.
 
     # Reservoir weights histogram
-    plt.figure(figsize=(16, 4))
+    if figsize is not None: plt.figure(figsize=figsize)
     plt.xlim((0, np.max(wsf)))
-    plt.xlabel('weights')
-    plt.ylabel('#')
-    plt.title('Spectral radius: ' + str(maxeigval_round) + ', Mean weight: ' + str(meanweight))
+    plt.xlabel('size of weight')
+    plt.ylabel('frequency')
+    if title: plt.title('Spectral radius: ' + str(maxeigval_round) + ', Mean weight: ' + str(meanweight))
     plt.yscale(yscale)
+    plt.hist(wsf[np.nonzero(wsf)], bins=np.arange(np.max(wsf)))
     plt.savefig(self.plotDir + 'weights_distribution.' + self.p.pltFileType)
-    p = plt.hist(wsf[np.nonzero(wsf)], bins=np.arange(np.max(wsf)))
+    p = plt.show()
 
 """
 @desc: Plot weight distribution of initial excitatory weights and show spectral radius
 """
-def initialExWeightDistribution(self, yscale="linear"):
-    weightDistribution(self, self.obj.initialWeights.exex, yscale)
+def initialExWeightDistribution(self, *args, **kwargs):
+    weightDistribution(self, self.obj.initialWeights.exex, *args, **kwargs)
 
 """
 @desc: Plot weight distribution of initial excitatory weights and show spectral radius
 """
-def trainedExWeightDistribution(self, yscale="linear"):
-    weightDistribution(self, self.obj.trainedWeightsExex, yscale)
+def trainedExWeightDistribution(self, *args, **kwargs):
+    weightDistribution(self, self.obj.trainedWeightsExex, *args, **kwargs)
 
 """
 @desc: Plot weight matrix

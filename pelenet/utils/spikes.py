@@ -113,3 +113,47 @@ def getHoltDoubleExponentialFilteredSpikes(self, spikes, smoothing_level=0.1, sm
 
     # Transform to numpy array and return
     return np.array(filteredSpikes)
+
+"""
+@desc: Calculate fano factors
+"""
+def fano(self, spikes):
+    # Get shape
+    shp = spikes.shape
+    # Iterate over all trials
+    ff = []
+    for i in range(shp[0]):
+        # Get mean and standard deviation of all spike trains
+        mn = np.mean(spikes[i], axis=1)
+        var = np.var(spikes[i], axis=1)
+
+        # Get indices of zero-values
+        mask = (mn != 0)
+        
+        # Append mean fano factors from all neurons with spiking activity
+        ff.append(np.mean(var[mask]/mn[mask]))
+
+    # Return mean fano factors for every trial
+    return ff
+
+"""
+@desc: Calculate coefficient of variation
+"""
+def cv(self, spikes):
+    # Get shape
+    shp = spikes.shape
+    # Iterate over all trials
+    cv = []
+    for i in range(shp[0]):
+        # Get mean and standard deviation of all spike trains
+        mn = np.mean(spikes[i], axis=1)
+        sd = np.std(spikes[i], axis=1)
+
+        # Get indices of zero-values
+        mask = (mn != 0)
+        
+        # Append mean fano factors from all neurons with spiking activity
+        cv.append(np.mean(sd[mask]/mn[mask]))
+
+    # Return mean fano factors for every trial
+    return cv

@@ -27,7 +27,7 @@ class Utils():
     """
     # Functions to evaluate spikes
     from .spikes import (
-        getSpikesFromActivity, cor, getFilteredSpikes,
+        getSpikesFromActivity, cor, getFilteredSpikes, fano, cv,
         getGaussianFilteredSpikes, getSingleExponentialFilteredSpikes, getHoltDoubleExponentialFilteredSpikes
     )
     # Functions to evaluate weights

@@ -6,7 +6,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from scipy.signal import savgol_filter
 
 """
-@desc: Plot x dimension of movement
+@desc: Plot 1 dimension of movement
 """
 def movement1D(self, est, tgt, dim=None, ylim=None, legend=False, figsize=None, precision=20, suffix=None):
     # Set figsize if given
@@ -19,6 +19,9 @@ def movement1D(self, est, tgt, dim=None, ylim=None, legend=False, figsize=None, 
 
     # Add legend
     if legend: plt.legend()
+
+    # Trim xlim
+    plt.xlim(0, len(tgt)))
 
     # Set ylim if given
     if ylim is not None:

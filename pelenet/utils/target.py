@@ -66,10 +66,10 @@ def prepareDataset(self, data, target, binSize=None, trainTrials=None, testTrial
 @return:
         ye: estimated target function
 """
-def estimateMovement(self, x, xe, y):
+def estimateMovement(self, x, xe, y, alpha=0.0, L1_wt=0.0):
     # Fit
     model = sm.OLS(y, x.T)
-    params = model.fit_regularized(alpha=0.0, L1_wt=0.0).params
+    params = model.fit_regularized(alpha=alpha, L1_wt=L1_wt).params
     
     # Predict
     ye = np.dot(xe.T, params)
@@ -84,7 +84,7 @@ def estimateMovement(self, x, xe, y):
 @return:
         yes: estimated target functions
 """
-def estimateMultipleTrajectories3D(self, data, targets, binSize=None, trainTrials=None, testTrial=None):
+def estimateMultipleTrajectories3D(self, data, targets, binSize=None, trainTrials=None, testTrial=None, alpha=0.0, L1_wt=0.0):
     # Create empty array
     yes = []
 
@@ -94,9 +94,9 @@ def estimateMultipleTrajectories3D(self, data, targets, binSize=None, trainTrial
         (x, xe, y) = self.prepareDataset(data, targets[i], binSize=binSize, trainTrials=trainTrials, testTrial=testTrial)
 
         # Estimate x, y and z
-        x1 = self.estimateMovement(x, xe, y[0])
-        x2 = self.estimateMovement(x, xe, y[1])
-        x3 = self.estimateMovement(x, xe, y[2])
+        x1 = self.estimateMovement(x, xe, y[0], alpha, L1_wt)
+        x2 = self.estimateMovement(x, xe, y[1], alpha, L1_wt)
+        x3 = self.estimateMovement(x, xe, y[2], alpha, L1_wt)
         
         # Append all estimates to array
         yes.append(np.array([x1, x2, x3]))

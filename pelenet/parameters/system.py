@@ -27,7 +27,7 @@ def includeSystem(self):
     # Data log
     self.loihiLoggingLevel = LoggingLevel.INFO
     self.systemLoggingLevel = logging.INFO
-    self.dataLogPath = os.path.join(os.getcwd(), 'datalog/')  # Define datalog path
+    self.dataLogPath = os.path.join(os.getcwd(), 'log/')  # Define datalog path
     self.snipsPath = os.path.join(os.getcwd(), 'pelenet/snips/')  # Path to Loihi snip C files
     self.targetPath = os.path.join(os.getcwd(), 'data/robot/')  # Path to movement trajectory
     self.expLogPath = None  # The explicit path within dataLogPath, which is set when parameter instance is created, it depends on datetime

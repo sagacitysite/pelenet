@@ -21,7 +21,7 @@ def movement1D(self, est, tgt, dim=None, ylim=None, legend=False, figsize=None, 
     if legend: plt.legend()
 
     # Trim xlim
-    plt.xlim(0, len(tgt)))
+    plt.xlim(0, len(tgt))
 
     # Set ylim if given
     if ylim is not None:

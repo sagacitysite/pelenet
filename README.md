@@ -101,9 +101,9 @@ The utils module is a singleton. It is independent from the experiments and can 
 
 ## License
 
-[Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/)
+MIT
 
-Do whatever you want, just mention me ;)
+Do whatever you want and I'm happy if you mention me ;)
 
 ## Questions
 

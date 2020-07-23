@@ -103,8 +103,8 @@ The utils module is a singleton. It is independent from the experiments and can 
 
 MIT
 
-Do whatever you want and I'm happy if you mention me ;)
+Do whatever you want, no warranty and I'm happy if you mention me ;)
 
 ## Questions
 
-If you have any questions, please just contact me via carlo.michaelis@gmail.com
+If you have any questions, please just contact me via carlo.michaelis @ gmail.com

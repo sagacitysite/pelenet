@@ -14,15 +14,14 @@ from ..plots import Plot
 from ..network import ReservoirNetwork
 
 """
-@desc: Class for running an experiment, usually contains performing
-       several networks (e.g. for training and testing)
+@desc: Randomly connected network
 """
-class StaticExperiment():
+class RandomExperiment():
 
     """
     @desc: Initiates the experiment
     """
-    def __init__(self):
+    def __init__(self, name=''):
         self.p = Parameters(update = self.updateParameters())
 
         self.net = None
@@ -30,7 +29,7 @@ class StaticExperiment():
 
         # Instantiate system singleton and add datalog object
         self.system = System.instance()
-        datalog = Datalog(self.p)
+        datalog = Datalog(self.p, name=name)
         self.system.setDatalog(datalog)
 
         # Instantiate utils and plot
@@ -44,18 +43,17 @@ class StaticExperiment():
     def updateParameters(self):
         return {
             # Experiment
-            'trials': 1,
-            'stepsPerTrial': 600,
+            'seed': 1,  # Random seed
+            'trials': 1,  # Number of trials
+            'stepsPerTrial': 600,  # Number of simulation steps for every trial
             # Network
-            #'reservoirConnPerNeuron': 40,
-            'reservoirConnProb': 0.004,
-            #'weightExCoefficient': 12, #12
-            #'weightInCoefficient': 48,
+            #'reservoirConnPerNeuron': 40,  # Number of connections per neuron
+            'reservoirConnProb': 0.005,  # Connection probability
             # Neurons
-            'refractoryDelay': 2, #5, #2 # Sparse activity (high values) vs. dense activity (low values)
-            'compartmentVoltageDecay': 100, #500, #100,#400 #500,  # Slows down / speeds up
-            'compartmentCurrentDecay': 4096, #500, #300, #500,  # Variability (higher values) vs. Stability (lower values)
-            'thresholdMant': 50, #400, #1000, #800,  # Slower spread (high values) va. faster spread (low values)
+            'refractoryDelay': 2, # Refactory period
+            'voltageTau': 40,  # Voltage time constant
+            'currentTau': 1,  # Current time constant
+            'thresholdMant': 70,  # Spiking threshold for membrane potential
             # Input
             'patchSize': 20,
             # Probes
@@ -78,12 +76,6 @@ class StaticExperiment():
 
         # Add patch input
         self.net.addRepeatedPatchGenerator()
-
-        # Plot histogram of weights and calc spectral radius
-        #self.net.plot.initialExWeightDistribution()
-
-        # Plot weight matrix
-        #self.net.plot.initialExWeightMatrix()
 
         # Build the network structure
         self.net.build()

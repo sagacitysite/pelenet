@@ -54,8 +54,7 @@ class Plot():
     # Functions to plot weights
     from .weights import (
         initialExWeightDistribution, trainedExWeightDistribution,
-        initialExWeightMatrix, trainedExWeightMatrix, weightsSortedBySupport,
-        cueWeightMean
+        initialExWeightMatrix, trainedExWeightMatrix, weightsSortedBySupport
     )
     # Functions to plot target
     from .target import (

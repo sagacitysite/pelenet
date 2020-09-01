@@ -16,7 +16,6 @@ def postProcessing(self):
         for i in range(len(self.exSpikeProbes)):
             spks.append(self.exSpikeProbes[i].data)
         self.exSpikeTrains = np.vstack(spks)
-        self.exSpikeData = self.condenseData(np.vstack(spks))
 
     # Combine spike probes from all chunks together for inhibitory neurons
     if self.p.isInSpikeProbe:
@@ -31,7 +30,6 @@ def postProcessing(self):
         for i in range(len(self.outSpikeProbes)):
             spks.append(self.outSpikeProbes[i].data)
         self.outSpikeTrains = np.vstack(spks)
-        self.outSpikeData = self.condenseData(np.vstack(spks))
 
     # Combine spike probes from all chunks together for inhibitory neurons
     if self.p.isOutVoltageProbe:

@@ -11,7 +11,7 @@ def includeExperiment(self):
     self.optimizeParameters = 'reservoirExSize'  # Parameter to optimize (TODO later extend to a list)
 
     # Experiment
-    self.seed = 2  # seed of the simulation, 'None' is random (no seed)
+    self.seed = 1  # seed of the simulation, 'None' is random (no seed)
     self.trials = 5  # number of trials
     self.stepsPerTrial = 200  # number of steps per trial
 
@@ -24,13 +24,12 @@ def includeExperiment(self):
     Neurons and network
     """
 
-    # Neuron
-    self.compartmentVoltageDecay = 100 #100 #200 #20  # voltage decay
-    #self.compartmentVoltageTimeConstant = 1
-    self.compartmentCurrentDecay = 2000
-    #self.compartmentCurrentTimeConstant = 
-    self.thresholdMant = 200
+    # Neuron and synapses
+    self.voltageTau = 40  # voltage time constant (default: inf)
+    self.currentTau = 2  # current time constant (default: 1)
+    self.thresholdMant = 200  # membrane potential threshold for spiking
     self.refractoryDelay = 2  # refractory period for a neuron
+    self.weightExponent = 0  # weight exponent (see NxSDK documentaion)
 
     # Network size and connections
     self.reservoirExSize = 3600 #50 #400 #3600  # size of the excitatory network
@@ -45,7 +44,7 @@ def includeExperiment(self):
     self.learningImpulse = 5  # impulse for learning rule for x1 and y1
     self.learningTimeConstant = 10  # time constant for learning rule for x1 and y1
     self.learningRule = "2^-2*x1*y0 - 2^-2*y1*x0"  # applied learning rule
-    self.learningEpoch = 4  # learning epoch for learnin rule
+    self.learningEpoch = 4  # learning epoch for learning rule
 
     # Noise
     self.noiseNeuronsShare = 0.1 # share of noise neurons in relation to excitatory neurons

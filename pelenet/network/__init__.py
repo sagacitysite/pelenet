@@ -28,10 +28,14 @@ class ReservoirNetwork():
         self.nxNet = nx.NxNet()
 
         # Define prototypes
-        #self.neuronCompProto = nx.CompartmentPrototype(compartmentVoltageDecay=20, refractoryDelay=2)  # compartment prototype (default neuron)
-        self.exConnProto = nx.ConnectionPrototype(signMode=nx.SYNAPSE_SIGN_MODE.EXCITATORY, numTagBits=0, numDelayBits=0, numWeightBits=8)  # excitatory connection prototype
-        self.inConnProto = nx.ConnectionPrototype(signMode=nx.SYNAPSE_SIGN_MODE.INHIBITORY, numTagBits=0, numDelayBits=0, numWeightBits=8)  # inhibitory connection prototype
-        self.mixedConnProto = nx.ConnectionPrototype(signMode=nx.SYNAPSE_SIGN_MODE.MIXED)  # mixed connection prototype
+        self.exConnProto = nx.ConnectionPrototype(signMode=nx.SYNAPSE_SIGN_MODE.EXCITATORY,
+                                                  weightExponent=self.p.weightExponent,
+                                                  numTagBits=0, numDelayBits=0, numWeightBits=8)  # excitatory connection prototype
+        self.inConnProto = nx.ConnectionPrototype(signMode=nx.SYNAPSE_SIGN_MODE.INHIBITORY,
+                                                  weightExponent=self.p.weightExponent,
+                                                  numTagBits=0, numDelayBits=0, numWeightBits=8)  # inhibitory connection prototype
+        self.mixedConnProto = nx.ConnectionPrototype(signMode=nx.SYNAPSE_SIGN_MODE.MIXED,
+                                                     weightExponent=self.p.weightExponent)  # mixed connection prototype
 
         """
         Network objects
@@ -72,10 +76,8 @@ class ReservoirNetwork():
 
         # Spikes
         self.exSpikeTrains = []
-        self.exSpikeData = []
         self.inSpikeTrains = []
         self.outSpikeTrains = []
-        self.outSpikeData = []
 
         # Voltages
         self.outVoltageTrains = []

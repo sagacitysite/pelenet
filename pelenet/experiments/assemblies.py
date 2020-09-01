@@ -1,11 +1,5 @@
-# Loihi modules
-import nxsdk.api.n2a as nx
-
 # Official modules
 import numpy as np
-import logging
-from copy import deepcopy
-import os
 
 # Pelenet modules
 from ..system import System
@@ -13,14 +7,12 @@ from ..system.datalog import Datalog
 from ..parameters import Parameters
 from ..utils import Utils
 from ..plots import Plot
-from .anisotropic import AnisotropicExperiment
 from ..network import ReservoirNetwork
 
 """
-@desc: Class for running an experiment, usually contains performing
-       several networks (e.g. for training and testing)
+@desc: Creating cell assemblies in a reservoir network
 """
-class ReadoutExperiment(AnisotropicExperiment):
+class AssemblyExperiment():
 
     """
     @desc: Initiates the experiment
@@ -38,65 +30,46 @@ class ReadoutExperiment(AnisotropicExperiment):
 
         # Instantiate utils and plot
         self.utils = Utils.instance()
-        self.utils.setParameters(self.p)
         self.plot = Plot(self)
 
         # Define some further variables
-        self.target = self.utils.loadTarget()
 
     """
     @desc: Overwrite parameters for this experiment
     """
     def updateParameters(self):
-        # Update patameters from parent
-        p = super().updateParameters()
-
         return {
-            # Parameters from parent
-            **p,
             # Experiment
-            'trials': 25,
-            'stepsPerTrial': 210, #500,
+            'trials': 5,
+            'stepsPerTrial': 90,
             # Network
-            'refractoryDelay': 2, # Sparse activity (high values) vs. dense activity (low values)
-            'compartmentVoltageDecay': 400,  # Slows down / speeds up
-            'compartmentCurrentDecay': 380,  # Variability (higher values) vs. Stability (lower values)
-            'thresholdMant': 1000,  # Slower spread (high values) va. faster spread (low values)
-            # Input
-            'patchNeuronsShiftX': 44,
-            'patchNeuronsShiftY': 24,
-            # Output
-            'partitioningClusterSize': 10, #6, #6/10  # size of clusters connected to an output neuron
+            'reservoirExSize': 2048,
+            'reservoirConnProb': None,
+            'reservoirConnPerNeuron': 45,
+            'isLearningRule': True,
+            'learningRule': '2^-2*x1*y0 - 2^-2*y1*x0 + 2^-4*x1*y1*y0 - 2^-3*y0*w*w',
             # Probes
-            'isExSpikeProbe': False,
-            'isOutSpikeProbe': True,
-            # Target
-            'targetFilename': 'test1_rec.txt',
-            'targetOffset': 1000
+            'isExSpikeProbe': True
         }
-    
+
     """
     @desc: Build all networks
     """
     def build(self):
         # Instanciate innate network
         self.net = ReservoirNetwork(self.p)
-        self.net.landscape = None
 
-        # Draw anisotropic mask and weights
-        self.drawMaskAndWeights()
-
-        # Draw output weights
-        self.net.drawOutputMaskAndWeights()
+        # Draw mask and log-normal weights
+        self.net.drawMaskAndWeights()
 
         # Connect ex-in reservoir
         self.net.connectReservoir()
 
-        # Connect reservoir to output
-        self.net.connectOutput()
-
         # Add patch input
-        self.net.addRepeatedPatchGenerator()
+        self.net.addAssemlyPatchGenerator()  # TODO
+
+        # Add background noise
+        #self.net.addNoiseGenerator()
 
         # Build the network structure
         self.net.build()

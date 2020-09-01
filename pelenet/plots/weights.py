@@ -99,18 +99,3 @@ def weightsSortedBySupport(self, mask):
     plt.colorbar()
     plt.savefig(self.plotDir + 'weights_support.' + self.p.pltFileType)
     p = plt.show()
-
-"""
-@desc: Shows average input weights for cue input, especially show were input is given in topology
-"""
-def cueWeightMean(self):
-    # Define some variables
-    topsize = int(np.sqrt(self.p.reservoirExSize))
-
-    # Get average over cue input weights 
-    inputWeightMean = np.mean(self.obj.cueWeights, axis=1)
-    # Reshape to topology
-    wgt = inputWeightMean.reshape((topsize,topsize))
-    # Show and save result
-    plt.savefig(self.plotDir + 'weights_cue_mean.' + self.p.pltFileType)
-    p = plt.imshow(wgt)

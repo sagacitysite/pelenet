@@ -1,6 +1,7 @@
 import numpy as np
 import logging
 import itertools
+from scipy import sparse
 
 """
 TODO: Shift to utils/misc.py
@@ -250,7 +251,7 @@ def addRepeatedPatchGenerator(self, idc=None):
         an excitatory connection prototype is used
 """
 def addTraceGenerator(self, clusterIdx):
-    start = self.p.inputOffset + clusterIdx*self.p.traceSteps
+    start = clusterIdx*self.p.traceSteps
     # Create spike generator
     sg = self.nxNet.createSpikeGenProcess(numPorts=self.p.traceGens)
 
@@ -272,16 +273,16 @@ def addTraceGenerator(self, clusterIdx):
     
     self.traceSpikes.append(np.array(traceSpikes))
 
-    # Connect generator to the reservoir network
-    startNeuron = clusterIdx*self.p.traceClusterSize + self.p.constSize
+    # Define start and end neuron
+    startNeuron = clusterIdx*self.p.traceClusterSize
     endNeuron = startNeuron+(self.p.traceClusterSize-1)
 
-    #traceMask = np.zeros((self.p.reservoirExSize, self.p.traceGens)).astype(int)
-    #traceMask[startNeuron:endNeuron, :] = 1
-    #traceMask = sparse.csr_matrix(traceMask)
-    traceMask = self.drawSparseMaskMatrix(self.p.traceDens, self.p.reservoirExSize, self.p.traceGens)
-    traceMask[endNeuron:, :] = 0  # set all mas values behind last neuron of cluster to zero
+    # Define mask matrix
+    traceMask = np.zeros((self.p.reservoirExSize, self.p.traceGens)).astype(int)
+    traceMask[startNeuron:endNeuron, :] = 1
+    traceMask = sparse.csr_matrix(traceMask)
 
+    # Draw weigh matrix based on mask matrix for trace input
     #traceWeights = self.p.traceMaxWeight*np.random.rand(self.p.reservoirExSize, self.p.traceGens)
     traceWeights = self.drawSparseWeightMatrix(traceMask)
 

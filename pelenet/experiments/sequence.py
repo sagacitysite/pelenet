@@ -22,19 +22,20 @@ class SequenceExperiment():
     """
     @desc: Initiates the experiment
     """
-    def __init__(self):
+    def __init__(self, name='', parameters={}):
         # Parameters
-        self.p = Parameters(update = self.updateParameters())
+        self.p = Parameters(update = self.updateParameters(parameters))
 
         self.net = None
 
         # Instantiate system singleton and add datalog object
         self.system = System.instance()
-        datalog = Datalog(self.p)
+        datalog = Datalog(self.p, name=name)
         self.system.setDatalog(datalog)
 
         # Instantiate utils and plot
         self.utils = Utils.instance()
+        self.utils.setParameters(self.p)
         self.plot = Plot(self)
 
         # Define some further variables
@@ -49,20 +50,25 @@ class SequenceExperiment():
     """
     @desc: Overwrite parameters for this experiment
     """
-    def updateParameters(self):
-        return {
+    def updateParameters(self, jupP={}):
+        expP = {
             # Experiment
-            'trials': 5,
-            'stepsPerTrial': 90,
+            'seed': 1,  # Random seed
+            'trials': 5,  # Number of trials
+            'stepsPerTrial': 90,  # Number of simulation steps for every trial
             # Network
-            'reservoirExSize': 2048,
-            'reservoirConnProb': None,
-            'reservoirConnPerNeuron': 45,
-            'isLearningRule': True,
-            'learningRule': '2^-2*x1*y0 - 2^-2*y1*x0 + 2^-4*x1*y1*y0 - 2^-3*y0*w*w',
+            'reservoirExSize': 2000,  # Number of excitatory neurons
+            'reservoirConnProb': None,  # Connection probability (is defined indirectly by number of connections per neuron)
+            'reservoirConnPerNeuron': 45,  # Number of connections per neuron
+            'isLearningRule': True,  # Apply a learning rule
+            'learningRule': '2^-2*x1*y0 - 2^-2*y1*x0 + 2^-4*x1*y1*y0 - 2^-3*y0*w*w',  # Defines the learning rule (see NxSDK documentation for more information)
             # Probes
-            'isExSpikeProbe': True
+            'isExSpikeProbe': True,  # Probe excitatory spikes
+            'isInSpikeProbe': True  # Probe inhibitory spikes
         }
+
+        # Parameters from jupyter notebook overwrite parameters from experiment definition
+        return { **expP, **jupP}
 
     """
     @desc: Build reservoir network with all parts (input, output, noise, etc.)
@@ -89,11 +95,18 @@ class SequenceExperiment():
         self.net.build()
 
     """
+    @desc: Run experiment
+    """
+    def run(self):
+        # Run network
+        self.net.run()
+
+    """
     @desc: Draw mask and weights
     """
     def drawMaskAndWeights(self):
         # Draw and store mask matrix
-        mask = self.net.drawAndSetSparseReservoirMaskMatrix(self.p.reservoirConnProb, self.p.reservoirSize, self.p.reservoirSize, avoidSelf=True)
+        mask = self.net.drawAndSetSparseReservoirMaskMatrix()
 
         # Draw and store weight matrix
         self.net.drawAndSetSparseReservoirWeightMatrix(mask)

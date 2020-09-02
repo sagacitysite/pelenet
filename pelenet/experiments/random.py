@@ -21,8 +21,8 @@ class RandomExperiment():
     """
     @desc: Initiates the experiment
     """
-    def __init__(self, name=''):
-        self.p = Parameters(update = self.updateParameters())
+    def __init__(self, name='', parameters={}):
+        self.p = Parameters(update = self.updateParameters(parameters))
 
         self.net = None
         self.trainSpikes = None
@@ -40,8 +40,8 @@ class RandomExperiment():
     """
     @desc: Overwrite parameters for this experiment
     """
-    def updateParameters(self):
-        return {
+    def updateParameters(self, jupP={}):
+        expP = {
             # Experiment
             'seed': 1,  # Random seed
             'trials': 1,  # Number of trials
@@ -55,11 +55,14 @@ class RandomExperiment():
             'currentTau': 1,  # Current time constant
             'thresholdMant': 70,  # Spiking threshold for membrane potential
             # Input
-            'patchSize': 20,
+            'patchSize': 20,  # Edge size of input patch
             # Probes
-            'isExSpikeProbe': True,
-            'isInSpikeProbe': True
+            'isExSpikeProbe': True,  # Probe excitatory spikes
+            'isInSpikeProbe': True  # Probe inhibitory spikes
         }
+
+        # Parameters from jupyter notebook overwrite parameters from experiment definition
+        return { **expP, **jupP}
     
     """
     @desc: Build network
@@ -79,8 +82,9 @@ class RandomExperiment():
 
         # Build the network structure
         self.net.build()
+    
     """
-    @desc: Run network
+    @desc: Run experiment
     """
     def run(self):
         # Run network

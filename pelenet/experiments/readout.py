@@ -57,12 +57,14 @@ class ReadoutExperiment(AnisotropicExperiment):
             # Experiment
             'trials': 25,
             'stepsPerTrial': 210, #500,
+            'isReset': True,
             # Network
             'refractoryDelay': 2, # Sparse activity (high values) vs. dense activity (low values)
             'compartmentVoltageDecay': 400,  # Slows down / speeds up
             'compartmentCurrentDecay': 380,  # Variability (higher values) vs. Stability (lower values)
             'thresholdMant': 1000,  # Slower spread (high values) va. faster spread (low values)
             # Input
+            'isClusterInput': True,
             'patchNeuronsShiftX': 44,
             'patchNeuronsShiftY': 24,
             # Output

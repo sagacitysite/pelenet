@@ -16,7 +16,7 @@ def includeExperiment(self):
     self.stepsPerTrial = 200  # number of steps per trial
 
     # Reset after trials
-    self.isReset = True  # activate/deactivate network reset
+    self.isReset = False  # activate/deactivate network reset
     self.resetSteps = 30  # number of time steps the stop generator should be active
     self.resetRelaxation = 0  # number time steps to relax after the stop signal
 
@@ -74,21 +74,27 @@ def includeExperiment(self):
     Input
     """
 
-    # General input parameters
-    self.inputSteps = 1 #5 #2 #200 #100  # number of steps the input should drive the network
-    self.inputRelaxation = 4 #23  # time to wait for relaxation of the network activity after input
+    #self.isInputClustered = True  # defines if generators are randomly connected to the network or connected to an index range (clustered)
+    #self.isInputOverlapping = False  # defines if input areas are distinct or not
+    #self.isInputSequence = False  # defines if input is a sequence, consisting out of different input areas
 
-    # Trace input
+    # Clustered input
+    self.isClusterInput = False
+    self.inputSteps = 1  # number of steps the input should drive the network
+    self.inputRelaxation = 4  # time to wait for relaxation of the network activity after input
+
+    # Sequence input
+    self.isSequenceInput = False
     self.traceClusters = 3  # number of trace clusters
     self.traceGens = 10  # number of trace generators per input cluster
     self.traceSteps = 30 #50 #20  # number of steps the trace input should drive the network
-    self.traceDens = 0.1  # percent of connections to reservoir from input
     self.traceSpikeProb = 0.1  # probability of spike for the generator
     #self.traceMaxWeight = 255  # maximum weight a trace connection can have
     self.traceClusterShare = 0.1  # percentage of excitatory neurons a cluster should be connected with
     self.traceClusterSize = None  # the number of neurons a trace cluster has
 
     # Constant input
+    self.isConstantInput = False
     self.constGens = 50 #10  # number of constant signal generators
     self.constDens = 0.1 #0.2  # percent of connections to reservoir from input
     self.constSpikeProb = 0.2  # probability of spike for the generator

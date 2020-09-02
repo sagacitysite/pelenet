@@ -77,20 +77,24 @@ def setSparseReservoirWeightMatrix(self, mask, *args, **kwargs):
 """
 @desc: Create mask that determines the connections to establish
 """
-def drawSparseMaskMatrix(self):
-    pc = self.p.reservoirConnProb
+def drawSparseMaskMatrix(self, p=None, nrows=None, ncols=None, avoidSelf=True):
+    #pc = self.p.reservoirConnProb
     n = self.p.reservoirExSize + self.p.reservoirInSize
+
+    pc = self.p.reservoirConnProb if p is None else p
+    nrows = n if nrows is None else nrows
+    ncols = n if ncols is None else ncols
 
     indices = []  # column indices
     indptr = [0]  # index pointer, start with 0
     prevRowSum = 0
 
     # Iterate over rows
-    for i in range(n):
+    for i in range(nrows):
         # Randomly draw a row
-        row = np.random.choice([0, 1], size=(n-1,), p=[1-pc, pc])
-        # Insert zero value at diagonal
-        row = np.insert(row, i, 0)
+        row = np.random.choice([0, 1], size=(ncols-1,), p=[1-pc, pc])
+        # Insert zero value at diagonal (avoid self connections of neurons)
+        if avoidSelf: row = np.insert(row, i, 0)
         
         # Get indices where row entries are 1
         rowIdx = np.where(row)[0]
@@ -109,7 +113,7 @@ def drawSparseMaskMatrix(self):
     data = np.ones(len(indices)).astype(int)
 
     # Build and return sparse mask matrix
-    return sparse.csr_matrix((data, indices, indptr), shape=(n, n))
+    return sparse.csr_matrix((data, indices, indptr), shape=(nrows, ncols))
 
 """
 @desc: Draw mask matrix for reservoir network

@@ -44,7 +44,7 @@ def trainedExWeightDistribution(self, *args, **kwargs):
 """
 @desc: Plot weight matrix
 """
-def weightMatrix(self, sparseMatrix):
+def weightMatrix(self, sparseMatrix, filename, title):
     # If weight matrix is too large, matrix should not be transformed into dense matrix
     if sparseMatrix.shape[0] > self.p.maxSparseToDenseLimit:
         warnings.warn('excitatoryWeightMatrix was not plotted, since weight matrix is too large')
@@ -55,47 +55,45 @@ def weightMatrix(self, sparseMatrix):
     max_weight = 20
     plt.figure(figsize=(6, 6))
     plt.imshow(denseMatrix, vmin=0, vmax=max_weight, interpolation=None)
-    plt.title('Initial weights')
-    plt.savefig(self.plotDir + 'weights_matrix.' + self.p.pltFileType)
-    p = plt.colorbar()
+    plt.title(title)
+    plt.colorbar()
+    plt.savefig(self.plotDir + 'weights_'+filename+'.' + self.p.pltFileType)
+    p = plt.show()
 
 """
 @desc: Plot initial excitatory weight matrix
 """
 def initialExWeightMatrix(self):
-    weightMatrix(self, self.obj.initialWeights.exex)
+    weightMatrix(self, self.obj.initialWeights.exex, 'initial', 'Initial weights')
 
 """
 @desc: Plot trained excitatory weight matrix
 """
 def trainedExWeightMatrix(self):
-    weightMatrix(self, self.obj.trainedWeightsExex)
+    weightMatrix(self, self.obj.trainedWeightsExex, 'trained', 'Trained weights')
 
 """
 @desc: Plots the whole weight matrix with weights sorted according to support weights
+@params:
+    supportMask: is calculated by getSupportWeightsMask() in utils
 """
-def weightsSortedBySupport(self, mask):
+def weightsSortedBySupport(self, supportMask):
     nCs = self.p.traceClusterSize
     nC = self.p.traceClusters
+    matrix = self.obj.trainedWeightsExex
 
-    matrix = self.obj.initialWeights.exex
-    top = matrix[:nC*nCs,:]  # top
-    bottom = matrix[nC*nCs:,:]  # bottom
+    top = matrix[:nC*nCs,:].toarray()  # top
+    bottom = matrix[nC*nCs:,:].toarray()  # bottom
 
     # Get sorted indices
-    indices = np.lexsort(mask[::-1])[::-1]
+    indices = np.lexsort(supportMask[::-1])[::-1]
 
     # Define sorted matrix
-    sorted_matrix = np.zeros(matrix.shape)
+    sortedMatrix = np.zeros(matrix.shape)
 
     # Fill
-    sorted_matrix[:nC*nCs,:] = top  # fill top
-    sorted_matrix[nC*nCs:,:] = bottom[indices,...] # fill bottom
+    sortedMatrix[:nC*nCs,:] = top  # fill top
+    sortedMatrix[nC*nCs:,:] = bottom[indices,...] # fill bottom
 
     # Plot
-    plt.figure(figsize=(6, 6))
-    plt.imshow(sorted_matrix, interpolation=None, vmin=0, vmax=20)
-    plt.title('Sorted weights')
-    plt.colorbar()
-    plt.savefig(self.plotDir + 'weights_support.' + self.p.pltFileType)
-    p = plt.show()
+    weightMatrix(self, sparse.csr_matrix(sortedMatrix), 'sorted', 'Sorted weights')

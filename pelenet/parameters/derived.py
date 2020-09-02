@@ -14,7 +14,8 @@ def computeDerived(self):
     self.totalSteps = None  # number of simulation steps
     self.reservoirSize = None  # total size of reservoir
     self.totalTrialSteps = None  # number of total steps per trial
-    self.resetOffset = None  # offset due to reset (reset steps + reset relaxation)
+    self.resetOffset = 0  # offset due to reset (reset steps + reset relaxation)
+    self.inputOffset = 0  # offset due to clustered input
 
     """
     Define some derived parameters
@@ -50,8 +51,11 @@ def computeDerived(self):
     if self.isReset:
         self.resetOffset = self.resetSteps + self.resetRelaxation
 
+    # Calculate clustered input offset if it is applied
+    if self.isClusterInput:
+        self.inputOffset = self.inputSteps + self.inputRelaxation
+
     # Calculate steps
-    self.inputOffset = self.inputSteps + self.inputRelaxation
     self.trialSteps = self.inputOffset + self.stepsPerTrial
     self.totalTrialSteps = self.trialSteps + self.resetOffset
     self.totalSteps = self.totalTrialSteps * self.trials

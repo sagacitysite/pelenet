@@ -31,15 +31,15 @@ class AnisotropicExperiment():
     """
     # TODO user decorator for default stuff (like creating instances),
     # maybe some stuff from basicNetwork can be included?
-    def __init__(self, name=''):
+    def __init__(self, name='', parameters={}):
         # Parameters
-        self.p = Parameters(update = self.updateParameters())
+        self.p = Parameters(update = self.updateParameters(parameters))
 
         self.net = None
 
         # Instantiate system singleton and add datalog object
         self.system = System.instance()
-        datalog = Datalog(self.p)
+        datalog = Datalog(self.p, name=name)
         self.system.setDatalog(datalog)
 
         # Instantiate utils and plot
@@ -49,10 +49,10 @@ class AnisotropicExperiment():
     """
     @desc: Overwrite parameters for this experiment
     """
-    def updateParameters(self):
-        return {
+    def updateParameters(self, jupP={}):
+        expP = {
             # Experiment
-            'seed': 1,  # Random seed
+            'seed': 3,  # Random seed
             'trials': 1,  # Number of trials
             'stepsPerTrial': 600,  # Number of simulation steps for every trial
             # Network
@@ -61,19 +61,22 @@ class AnisotropicExperiment():
             'currentTau': 10.78,  # Current time constant
             'thresholdMant': 1000,  # Spiking threshold for membrane potential
             # Anisotropic
-            'anisoStdE': 12, # space constant, std of gaussian for excitatory neurons
-            'anisoStdI': 9, # space constant, std of gaussian for inhibitory neurons (range 9 - 11)
-            'anisoShift': 1, # intensity of the shift of the connectivity distribution for a neuron
-            #'percShift': 1, # percentage of shift (default 1)
-            'anisoPerlinScale': 4, #8 # 4-12  # perlin noise scale, high value => dense valleys, low value => broad valleys
-            'weightExCoefficient': 12, #16 #8 #16 # 8 #8 #16 #8 #4  # coefficient for excitatory anisotropic weight
-            'weightInCoefficient': 48, #64 #32 #64 # 28 #32 #64 #28 sieht gut aus!! #32 #22  # coefficient for inhibitory anisotropic weight, Perlin scale 4: 25-30 ok, 25-28 good
+            'anisoStdE': 12,  # Space constant, std of gaussian for excitatory neurons
+            'anisoStdI': 9,  # Space constant, std of gaussian for inhibitory neurons (range 9 - 11)
+            'anisoShift': 1,  # Intensity of the shift of the connectivity distribution for a neuron
+            #'percShift': 1,  # Percentage of shift (default 1)
+            'anisoPerlinScale': 4,  # Perlin noise scale, high value => dense valleys, low value => broad valleys
+            'weightExCoefficient': 12,  # Coefficient for excitatory anisotropic weight
+            'weightInCoefficient': 48,  # Coefficient for inhibitory anisotropic weight
             # Input
-            'patchSize': 5,
+            'patchSize': 5,  # Edge size of input patch
             # Probes
-            'isExSpikeProbe': True,
-            'isInSpikeProbe': True
+            'isExSpikeProbe': True,  # Probe excitatory spikes
+            'isInSpikeProbe': True   # Probe inhibitory spikes
         }
+
+        # Parameters from jupyter notebook overwrite parameters from experiment definition
+        return { **expP, **jupP}
     
     """
     @desc: Build network
@@ -109,19 +112,11 @@ class AnisotropicExperiment():
         self.net.plot.initialExWeightMatrix()
 
     """
-    @desc: Run network
+    @desc: Run experiment
     """
     def run(self):
         # Run network
         self.net.run()
-
-    """
-    @desc: Saves network in numpy file
-    """
-    # FIXME Does not work
-    #def save(self):
-        # Saves whole experiment
-        #np.save(self.system.datalog.dir+'data/experiment.npy', self)
 
     """
     @desc: Draw mask and weights

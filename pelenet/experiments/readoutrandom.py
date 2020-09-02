@@ -51,11 +51,14 @@ class ReadoutRandomExperiment():
             # Experiment
             'trials': 25,
             'stepsPerTrial': 210,
+            'isReset': True,
             # Network
             'reservoirConnProb': 0.035,
             #'reservoirConnPerNeuron': 50,
             'weightExCoefficient': 12, #12
             'weightInCoefficient': 48,
+            # Input
+            'isClusterInput': True,
             # Output
             'partitioningClusterSize': 10, #6, #6/10  # size of clusters connected to an output neuron
             # Neurons

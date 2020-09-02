@@ -313,3 +313,43 @@ def meanTopologyActivity(self):
     plt.imshow(topoSpikesMean)
     plt.savefig(self.plotDir + 'spikes_topology_activity_mean.' + self.p.pltFileType)
     p = plt.show()
+
+"""
+@desc: Plots binned activity in the topology and visualizes streams
+"""
+def streamActivity(self, binSize=50, ncols=4, nrows=3):
+    # Spikes from loihi
+    spikes = self.obj.exSpikeTrains[:,self.p.resetOffset+self.p.inputOffset:].T
+    topoSpikes = spikes.reshape(-1, 60, 60)
+
+    # Bin spikes
+    bins = np.array([np.mean(topoSpikes[i:i+binSize], axis=0) for i in range(0,spikes.shape[1],binSize)])
+    # Remove zero values to make them white
+    bins[bins == 0.0] = np.nan
+    
+    # Create figure
+    fig, axs = plt.subplots(ncols=ncols, nrows=nrows, figsize=(2*ncols,2*nrows))
+
+    # Start 
+    t = 0
+    for i in range(axs.shape[0]):
+        for j in range(axs.shape[1]):
+            # Get current ax
+            ax = axs[i,j]
+
+            # Define title
+            title = str(t*binSize)+'-'+str((t+1)*binSize)
+
+            # Plot
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+            ax.grid(False)
+            ax.text(2, 9, title, color='#ffffff', bbox=dict(facecolor='#607D8B', alpha=0.8))
+            ax.imshow(bins[t,:,:], cmap=plt.get_cmap('Reds'))
+
+            # Increment counter
+            t += 1
+
+    # Save and show figure
+    plt.savefig(self.plotDir+'streams.svg')
+    p = plt.show()

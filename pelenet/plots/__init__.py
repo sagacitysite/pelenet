@@ -49,7 +49,7 @@ class Plot():
     from .spikes import (
         reservoirSpikeTrain, outputSpikeTrain, reservoirRates, outputRates, 
         noiseSpikes, pca, autocorrelation, crosscorrelation, spikesMissmatch,
-        ffSpikeCounts, meanTopologyActivity
+        ffSpikeCounts, meanTopologyActivity, streamActivity
     )
     # Functions to plot weights
     from .weights import (

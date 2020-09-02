@@ -40,6 +40,8 @@ class NestComparison(ReadoutExperiment):
             # Experiment
             'trials': 1,
             'stepsPerTrial': 500,
+            # Input
+            'isClusterInput': True,
             # Network
             'refractoryDelay': 2, # Sparse activity (high values) vs. dense activity (low values)
             'compartmentVoltageDecay': 400, #400, #500,  # Slows down / speeds up

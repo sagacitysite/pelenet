@@ -13,10 +13,12 @@ def drawWeights(size, distribution):
         s = hyp  # Default: 1.0; according to Teramae, Tsubo & Fukai (2012)
         # Draw weight from lognormal distribution
         weights = (np.random.lognormal(m, s, size)*(255/20.)).astype(int)
-    elif distribution == 'normal':
+    if distribution == 'normal':
         m = 10  # mean
         s = 5  # standard deviation
         weights = np.random.normal(m, s, size).astype(int)
+    if distribution == 'uniform':
+        weights = np.random.uniform(0, 255 ,size).astype(int)
 
     return weights
 
@@ -78,13 +80,13 @@ def setSparseReservoirWeightMatrix(self, mask, *args, **kwargs):
 @desc: Create mask that determines the connections to establish
 """
 def drawSparseMaskMatrix(self, p=None, nrows=None, ncols=None, avoidSelf=True):
-    #pc = self.p.reservoirConnProb
+    # Preprocess some variables
     n = self.p.reservoirExSize + self.p.reservoirInSize
-
     pc = self.p.reservoirConnProb if p is None else p
     nrows = n if nrows is None else nrows
     ncols = n if ncols is None else ncols
 
+    # Prepare sparse matrix
     indices = []  # column indices
     indptr = [0]  # index pointer, start with 0
     prevRowSum = 0
@@ -143,7 +145,6 @@ def getMaskedWeights(self, weights, mask):
     return maskedWeights.filled(0)
 
 """
-TODO: Shift to utils/weights.py
 @desc: Get weight matrix from weight probe
 """
 def getWeightMatrixFromProbe(self, probeIndex=-1):

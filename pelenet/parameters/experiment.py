@@ -29,7 +29,7 @@ def includeExperiment(self):
     self.currentTau = 2  # current time constant (default: 1)
     self.thresholdMant = 200  # membrane potential threshold for spiking
     self.refractoryDelay = 2  # refractory period for a neuron
-    self.weightExponent = 0  # weight exponent (see NxSDK documentaion)
+    self.weightExponent = 0  # weight exponent (between [-8,7])
 
     # Network size and connections
     self.reservoirExSize = 3600 #50 #400 #3600  # size of the excitatory network
@@ -74,11 +74,16 @@ def includeExperiment(self):
     Input
     """
 
-    #self.isInputClustered = True  # defines if generators are randomly connected to the network or connected to an index range (clustered)
-    #self.isInputOverlapping = False  # defines if input areas are distinct or not
-    #self.isInputSequence = False  # defines if input is a sequence, consisting out of different input areas
+    # Simple input: not considering the network topology, good for e.g. randomly connected networks
+    #self.isSimpleInput = False
 
-    # Clustered input
+    # Topological input: considering the network topology, good for 2D networks with local connections (e.g. anisotropic network)
+    #self.isTopoInput = False
+
+    # Simple sequence input: defines multiple simple inputs, activated in a row
+    #self.isSimpleSequence = False
+
+    # Single input
     self.isClusterInput = False
     self.inputSteps = 1  # number of steps the input should drive the network
     self.inputRelaxation = 4  # time to wait for relaxation of the network activity after input
@@ -93,7 +98,7 @@ def includeExperiment(self):
     self.traceClusterShare = 0.1  # percentage of excitatory neurons a cluster should be connected with
     self.traceClusterSize = None  # the number of neurons a trace cluster has
 
-    # Constant input
+    # Background input / constant input
     self.isConstantInput = False
     self.constGens = 50 #10  # number of constant signal generators
     self.constDens = 0.1 #0.2  # percent of connections to reservoir from input
@@ -103,6 +108,8 @@ def includeExperiment(self):
 
     # Cue input
     # TODO
+
+
 
     # Patch input
     #self.patchSteps = 1 #5 #2 #200 #100  # number of steps the cue should drive the network
@@ -114,6 +121,16 @@ def includeExperiment(self):
     self.patchGensPerNeuron = 10  # number of generators per input neuron
     self.patchMissingNeurons = 1 # number of missing neurons (noise level)
 
+    self.inputIsTopology = False
+    self.inputNumTargetNeurons = 40
+    self.inputNumGenerators = 20
+    self.inputType = 'uniform'
+    self.inputSteps = 1
+    self.inputMaskConnProb = 0.5
+    self.inputWeightExponent = 2  # weight exponent (between [-8,7])
+    self.inputGenSpikeProb = 0.2
+    self.inputOffset = 0
+
     """
     Probes
     """
@@ -122,7 +139,7 @@ def includeExperiment(self):
     self.isExSpikeProbe = False  # activate/deactivate spike probes for excitatory neurons
     self.isInSpikeProbe = False  # activate/deactivate spike probes for inhibitory neurons
     self.isOutSpikeProbe = False  # activate/deactivate spike probes for output neurons
-    self.weightProbe = False  # read weights at the end of the simulation
+    self.isWeightProbe = False  # read weights at the end of the simulation
     self.isExVoltageProbe = False  # activate/deactivate voltage probes for excitatory neurons
     self.isInVoltageProbe = False  # activate/deactivate voltage probes for inhibitory neurons
     self.isOutVoltageProbe = False  # activate/deactivate voltage probes for output neurons

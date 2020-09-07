@@ -39,7 +39,7 @@ def postProcessing(self):
         self.outVoltageTrains = np.vstack(spks)
 
     # Recombine all weights from probe chunks together to a matrix again
-    if self.p.weightProbe:
+    if self.p.isWeightProbe:
         self.trainedWeightsExex = self.utils.recombineExWeightMatrix(self.initialWeights.exex, self.weightProbes)
 
     # Log that post processing has finished
@@ -93,7 +93,7 @@ def addProbes(self):
             self.inCurrentProbes.append(net.probe([nx.ProbeParameter.COMPARTMENT_CURRENT ])[0])
     
     # Probe weights
-    if self.p.weightProbe:
+    if self.p.isWeightProbe:
         probeCond = nx.IntervalProbeCondition(tStart=self.p.totalSteps-1, dt=self.p.totalSteps)
         #probeCond = nx.IntervalProbeCondition(tStart=self.p.stepsPerIteration-1, dt=self.p.stepsPerIteration)
         n, m = np.shape(self.connectionChunks)

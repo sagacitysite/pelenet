@@ -54,8 +54,6 @@ class RandomExperiment():
             'voltageTau': 40,  # Voltage time constant
             'currentTau': 1,  # Current time constant
             'thresholdMant': 70,  # Spiking threshold for membrane potential
-            # Input
-            'patchSize': 20,  # Edge size of input patch
             # Probes
             'isExSpikeProbe': True,  # Probe excitatory spikes
             'isInSpikeProbe': True  # Probe inhibitory spikes
@@ -78,10 +76,10 @@ class RandomExperiment():
         self.net.connectReservoir()
 
         # Add patch input
-        self.net.addRepeatedPatchGenerator()
+        self.net.addInput()
 
-        # Build the network structure
-        self.net.build()
+        # Add Probes
+        self.net.addProbes()
     
     """
     @desc: Run experiment

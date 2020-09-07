@@ -80,7 +80,7 @@ def connectReservoir(self):
         self.removeCoreFromList()
 
     # Interconnect excitatory and inhibitory network chunks
-    connectNetworkChunks(self, fromChunks=self.exReservoirChunks, toChunks=self.exReservoirChunks, mask=self.initialMasks.exex, weights=self.initialWeights.exex, prototype=exConnProto, store=self.p.weightProbe)
+    connectNetworkChunks(self, fromChunks=self.exReservoirChunks, toChunks=self.exReservoirChunks, mask=self.initialMasks.exex, weights=self.initialWeights.exex, prototype=exConnProto, store=self.p.isWeightProbe)
     connectNetworkChunks(self, fromChunks=self.inReservoirChunks, toChunks=self.inReservoirChunks, mask=self.initialMasks.inin, weights=self.initialWeights.inin, prototype=self.inConnProto)
     connectNetworkChunks(self, fromChunks=self.exReservoirChunks, toChunks=self.inReservoirChunks, mask=self.initialMasks.exin, weights=self.initialWeights.exin, prototype=self.exConnProto)
     connectNetworkChunks(self, fromChunks=self.inReservoirChunks, toChunks=self.exReservoirChunks, mask=self.initialMasks.inex, weights=self.initialWeights.inex, prototype=self.inConnProto)

@@ -36,6 +36,9 @@ class ReservoirNetwork():
                                                   numTagBits=0, numDelayBits=0, numWeightBits=8)  # inhibitory connection prototype
         self.mixedConnProto = nx.ConnectionPrototype(signMode=nx.SYNAPSE_SIGN_MODE.MIXED,
                                                      weightExponent=self.p.weightExponent)  # mixed connection prototype
+        self.genConnProto = nx.ConnectionPrototype(signMode=nx.SYNAPSE_SIGN_MODE.EXCITATORY,
+                                                  weightExponent=7,
+                                                  numTagBits=0, numDelayBits=0, numWeightBits=8)  # excitatory connection prototype
 
         """
         Network objects
@@ -87,10 +90,15 @@ class ReservoirNetwork():
         self.traceMasks = []
         self.traceWeights = []
 
+        # Input
+        self.inputTargetNeurons = None
+        self.inputSpikes = []
+        self.inputWeights = None
+
         # Cue input
-        self.patchNeurons = None
-        self.patchSpikes = []
-        self.patchWeights = None
+        #self.patchNeurons = None
+        #self.patchSpikes = []
+        #self.patchWeights = None
 
         # Noise input spikes
         self.noiseSpikes = None
@@ -111,17 +119,10 @@ class ReservoirNetwork():
         self.postProcessing()
 
     """
-    @desc: Build default network structure
-    """
-    def build(self):
-        # Add probes
-        self.addProbes()
-
-    """
     @note: Import functions from files
     """
     from .connect import removeCoreFromList, connectReservoir, connectOutput
-    from .input import addRepeatedPatchGenerator, addTraceGenerator
+    from .input import addInput
     from .noise import addNoiseGenerator, addConstantGenerator
     from .output import drawOutputMaskAndWeights
     from .probes import addProbes, condenseSpikeProbes, postProcessing

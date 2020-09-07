@@ -74,7 +74,7 @@ class SequenceExperiment():
             # Probes
             'isExSpikeProbe': True,  # Probe excitatory spikes
             'isInSpikeProbe': True,  # Probe inhibitory spikes
-            'weightProbe': True
+            'isWeightProbe': True
         }
 
         # Parameters from jupyter notebook overwrite parameters from experiment definition

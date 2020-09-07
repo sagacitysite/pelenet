@@ -19,7 +19,7 @@ from ..network import ReservoirNetwork
 @desc: Class for running an experiment, usually contains performing
        several networks (e.g. for training and testing)
 """
-class ReadoutRandomExperiment():
+class RandomReadoutExperiment():
 
     """
     @desc: Initiates the experiment

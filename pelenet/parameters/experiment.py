@@ -119,7 +119,7 @@ def includeExperiment(self):
     """
 
     # Probes
-    self.isExSpikeProbe = True  # activate/deactivate spike probes for excitatory neurons
+    self.isExSpikeProbe = False  # activate/deactivate spike probes for excitatory neurons
     self.isInSpikeProbe = False  # activate/deactivate spike probes for inhibitory neurons
     self.isOutSpikeProbe = False  # activate/deactivate spike probes for output neurons
     self.weightProbe = False  # read weights at the end of the simulation

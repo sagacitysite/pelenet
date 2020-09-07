@@ -20,20 +20,20 @@ from ..network import ReservoirNetwork
 @desc: Class for running an experiment, usually contains performing
        several networks (e.g. for training and testing)
 """
-class ReadoutExperiment(AnisotropicExperiment):
+class AnisotropicReadoutExperiment(AnisotropicExperiment):
 
     """
     @desc: Initiates the experiment
     """
-    def __init__(self):
+    def __init__(self, name='', parameters={}):
         # Parameters
-        self.p = Parameters(update = self.updateParameters())
+        self.p = Parameters(update = self.updateParameters(parameters))
 
         self.net = None
 
         # Instantiate system singleton and add datalog object
         self.system = System.instance()
-        datalog = Datalog(self.p)
+        datalog = Datalog(self.p, name=name)
         self.system.setDatalog(datalog)
 
         # Instantiate utils and plot
@@ -47,35 +47,44 @@ class ReadoutExperiment(AnisotropicExperiment):
     """
     @desc: Overwrite parameters for this experiment
     """
-    def updateParameters(self):
-        # Update patameters from parent
-        p = super().updateParameters()
+    def updateParameters(self, jupP={}):
+        # Parent parameters
+        aniP = super().updateParameters()
 
-        return {
-            # Parameters from parent
-            **p,
+        expP = {
             # Experiment
-            'trials': 25,
-            'stepsPerTrial': 210, #500,
-            'isReset': True,
+            'seed': 3,  # Random seed
+            'trials': 25,  # Number of trials
+            'stepsPerTrial': 110,  # Number of simulation steps for every trial
+            'isReset': True,  # Activate reset after every trial
             # Network
-            'refractoryDelay': 2, # Sparse activity (high values) vs. dense activity (low values)
-            'compartmentVoltageDecay': 400,  # Slows down / speeds up
-            'compartmentCurrentDecay': 380,  # Variability (higher values) vs. Stability (lower values)
-            'thresholdMant': 1000,  # Slower spread (high values) va. faster spread (low values)
+            'refractoryDelay': 2, # Refactory period
+            'voltageTau': 10.24,  # Voltage time constant
+            'currentTau': 10.78,  # Current time constant
+            'thresholdMant': 1000,  # Spiking threshold for membrane potential
+            # Anisotropic
+            'anisoStdE': 12,  # Space constant, std of gaussian for excitatory neurons
+            'anisoStdI': 9,  # Space constant, std of gaussian for inhibitory neurons (range 9 - 11)
+            'anisoShift': 1,  # Intensity of the shift of the connectivity distribution for a neuron
+            #'percShift': 1,  # Percentage of shift (default 1)
+            'anisoPerlinScale': 4,  # Perlin noise scale, high value => dense valleys, low value => broad valleys
+            'weightExCoefficient': 12,  # Coefficient for excitatory anisotropic weight
+            'weightInCoefficient': 48,  # Coefficient for inhibitory anisotropic weight
             # Input
-            'isClusterInput': True,
-            'patchNeuronsShiftX': 44,
-            'patchNeuronsShiftY': 24,
+            'isClusterInput': True,  # Type of input is 'cluster
+            'patchNeuronsShiftX': 44,  # x-position of the input area
+            'patchNeuronsShiftY': 24,  # y-position of the input area
+            'patchSize': 5,  # Edge size of input patch
             # Output
-            'partitioningClusterSize': 10, #6, #6/10  # size of clusters connected to an output neuron
+            'partitioningClusterSize': 10, # size of clusters connected to an output neuron (6|10)
             # Probes
-            'isExSpikeProbe': False,
-            'isOutSpikeProbe': True,
-            # Target
-            'targetFilename': 'test1_rec.txt',
-            'targetOffset': 1000
+            'isExSpikeProbe': True,  # Probe excitatory spikes
+            'isInSpikeProbe': True   # Probe inhibitory spikes
         }
+
+        # Parameters from jupyter notebook overwrite parameters from experiment definition
+        # Experiment parameters overwrite parameters from parent experiment
+        return { **aniP, **expP, **jupP}
     
     """
     @desc: Build all networks

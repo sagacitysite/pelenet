@@ -48,7 +48,7 @@ def postProcessing(self):
 """
 @desc: Remove offsets from data
 """
-def condenseData(self, raw):
+def condenseSpikeProbes(self, raw):
     # Get total offset
     offset = self.p.resetOffset + self.p.inputOffset
 

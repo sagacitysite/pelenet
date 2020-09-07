@@ -54,17 +54,27 @@ class SequenceExperiment():
         expP = {
             # Experiment
             'seed': 1,  # Random seed
-            'trials': 5,  # Number of trials
-            'stepsPerTrial': 90,  # Number of simulation steps for every trial
+            'trials': 30,  # Number of trials
+            'stepsPerTrial': 60,  # Number of simulation steps for every trial
+            # Neurons
+            'refractoryDelay': 2, # Refactory period
+            'voltageTau': 4,  # Voltage time constant
+            'currentTau': 1,  # Current time constant
+            'thresholdMant': 120,  # Spiking threshold for membrane potential
             # Network
-            'reservoirExSize': 2000,  # Number of excitatory neurons
+            'reservoirExSize': 400,  # Number of excitatory neurons
             'reservoirConnProb': None,  # Connection probability (is defined indirectly by number of connections per neuron)
-            'reservoirConnPerNeuron': 45,  # Number of connections per neuron
+            'reservoirConnPerNeuron': 30,  # Number of connections per neuron
             'isLearningRule': True,  # Apply a learning rule
             'learningRule': '2^-2*x1*y0 - 2^-2*y1*x0 + 2^-4*x1*y1*y0 - 2^-3*y0*w*w',  # Defines the learning rule (see NxSDK documentation for more information)
+            # Input
+            'isSequenceInput': True,  # Activates sequence input
+            'traceSteps': 20,  # Number of steps the trace input should drive the network
+            'traceSpikeProb': 1.0,  # Probability of spike for the generator
             # Probes
             'isExSpikeProbe': True,  # Probe excitatory spikes
-            'isInSpikeProbe': True  # Probe inhibitory spikes
+            'isInSpikeProbe': True,  # Probe inhibitory spikes
+            'weightProbe': True
         }
 
         # Parameters from jupyter notebook overwrite parameters from experiment definition

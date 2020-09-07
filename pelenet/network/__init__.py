@@ -124,7 +124,7 @@ class ReservoirNetwork():
     from .input import addRepeatedPatchGenerator, addTraceGenerator
     from .noise import addNoiseGenerator, addConstantGenerator
     from .output import drawOutputMaskAndWeights
-    from .probes import addProbes, condenseData, postProcessing
+    from .probes import addProbes, condenseSpikeProbes, postProcessing
     from .snips import addResetSnips, createAndConnectResetInitChannels
     from .weights import (
         drawAndSetSparseReservoirWeightMatrix, drawSparseWeightMatrix,

@@ -4,10 +4,9 @@ import itertools
 from scipy import sparse
 
 """
-TODO: Shift to utils/misc.py
 @desc: Generates a sinus signal (one 'hill') in given length of time steps
 """
-def generateSinusInput(length, start=0):
+def generateSinusInput(length):
     # Draw from a sin wave from 0 to 3,14 (one 'hill')
     probCoeff = 1 #1.5  # the higher the probability coefficient, the more activity is in the network
     probs = probCoeff * np.abs(np.sin((np.pi / length) * np.arange(length)))
@@ -16,13 +15,13 @@ def generateSinusInput(length, start=0):
     # Get indices of spike
     spikeInd = np.where(randoms < probs)[0]
 
-    # Shift sin signal by 'start' and return spikes
-    return (spikeInd + start)
+    # Return spikes
+    return spikeInd
 
 """
 @desc: Generates a simple input signal
 """
-def generateUniformInput(length, prob=0.1, start=0):
+def generateUniformInput(length, prob=0.1):
     spikes = np.zeros((length, 1))
     randoms = np.random.rand(length)
 
@@ -33,55 +32,139 @@ def generateUniformInput(length, prob=0.1, start=0):
     # Get indices of spike
     spikeTimes = np.where(spikes)[0]
 
-    # Shift sin signal by 'start' and return spikes
-    return (spikeTimes + start)
+    # Return spikes
+    return spikeTimes
 
 """
-@desc:  Create input spiking generator to add a patch signal,
+@desc:  Create a sequence of inputs
+"""
+def addInputSequence(self):
+    # Iterate over number of inputs
+    for i in range(self.p.inputSequenceSize):
+        # Create spike generator
+        sg = self.nxNet.createSpikeGenProcess(numPorts=self.p.inputNumTargetNeurons)
+
+        # Draw spikes for input generators for current input
+        inputSpikes = drawSpikesForAllGenerators(self, offset=i*self.p.inputSteps)
+        self.inputSpikes.append(inputSpikes)
+
+        # Add spikes s to generator i
+        for k, s in enumerate(inputSpikes):
+            sg.addSpikes(spikeInputPortNodeIds=k, spikeTimes=s.tolist())
+
+        # Get inidices of target neurons for current input
+        inputTargetNeurons = np.arange(i*self.p.inputNumTargetNeurons, (i+1)*self.p.inputNumTargetNeurons)
+        self.inputTargetNeurons.append(inputTargetNeurons)
+
+        # Connect spike generators to reservoir
+        self.inputWeights = connectSpikeGenerator(self, sg, inputTargetNeurons)
+
+    # Log that input was added
+    logging.info('Input sequence was added to the network')
+
+"""
+@desc:  Adds input where n target neurons are left out every trial
+        The number of target neurons may differ due to rounding in getTargetNeurons() function
+        Therefore self.p.inputNumTargetNeurons cannot be used here, but instead len(self.inputTargetNeurons) must be used
+        
+"""
+def addLeaveNOutInput(self):
+    # Get inidices of target neurons if not already given
+    self.inputTargetNeurons = getTargetNeurons(self)
+
+    # Create spike generator
+    sg = self.nxNet.createSpikeGenProcess(numPorts=len(self.inputTargetNeurons))
+
+    # Define all possible combinations to leave one out
+    combinations = np.array(list(itertools.combinations(np.arange(len(self.inputTargetNeurons)), self.p.inputNumLeaveOut)))
+
+    # Iterate over target neurons to draw spikes
+    for i in range(len(self.inputTargetNeurons)):
+        
+        spikeTimes = []
+        # Iterate over trials
+        for k in range(self.p.trials):
+            # Add spike times only when i != k
+            apply = np.all([combinations[k, m] != i for m in range(self.p.inputNumLeaveOut)])
+
+            # If spike generator produces input for the current trial, add it to spikeTimes
+            if (apply or not self.p.inputIsLeaveOut):
+                offset = self.p.stepsPerTrial*k + self.p.resetOffset*(k+1)
+                spks = drawSpikes(self, offset=offset)
+                spikeTimes.append(spks)
+
+        # Add spike indices to inputSpikes array and to generator
+        s = list(itertools.chain(*spikeTimes))
+        self.inputSpikes.append(s)
+        sg.addSpikes(spikeInputPortNodeIds=i, spikeTimes=s)
+
+    # Connect spike generators to reservoir
+    self.inputWeights = connectSpikeGenerator(self, sg, self.inputTargetNeurons)
+
+    # Log that input was added
+    logging.info('Leave-one-out input was added to the network')
+
+"""
+@desc:  Create input spiking generator,
         the input is connected to the reservoir network,
-        an excitatory connection prototype is used
+        an excitatory connection type is used
 @params:
+        inputSpikeIndices: indices of input spikes for spike generators
         targetNeuronIndices: indices of reservoir neurons to connect input to, default is None (indices are just taken successively)
 """
 def addInput(self, inputSpikeIndices=[], targetNeuronIndices=[]):
     # Create spike generator
-    sg = self.nxNet.createSpikeGenProcess(numPorts=self.p.inputNumGenerators)
+    sg = self.nxNet.createSpikeGenProcess(numPorts=self.p.inputNumTargetNeurons)
 
     # Draw spikes for input generators if not already given
-    self.inputSpikes = drawSpikes(self) if not inputSpikeIndices else inputSpikeIndices
+    self.inputSpikes = inputSpikeIndices if len(inputSpikeIndices) else drawSpikesForAllGenerators(self)
 
     # Add spikes s to generator i
     for i, s in enumerate(self.inputSpikes):
         sg.addSpikes(spikeInputPortNodeIds=i, spikeTimes=s.tolist())
 
     # Get inidices of target neurons if not already given
-    self.inputTargetNeurons = getTargetNeurons(self) if not targetNeuronIndices else targetNeuronIndices
+    self.inputTargetNeurons = targetNeuronIndices if len(targetNeuronIndices) else getTargetNeurons(self)
 
     # Connect spike generators to reservoir
-    self.inputWeights = connectSpikeGenerator(self, sg)
+    self.inputWeights = connectSpikeGenerator(self, sg, self.inputTargetNeurons)
 
     # Log that input was added
     logging.info('Input was added to the network')
 
 """
-@desc: Draw spikes for spike generators
+@desc: Draw spikes for ALL spike generators
 """
-def drawSpikes(self):
+def drawSpikesForAllGenerators(self, offset=0):
     # Initialize array for spike indices
     inputSpikes = []
 
+    # Number of spike generators
+    numGens = self.p.inputNumTargetNeurons
+
     # Draw spikes for every spike generator
-    for i in range(self.p.inputNumGenerators):
-        s = []
-        # Generate spikes, depending on input type
-        if self.p.inputType == 'uniform':
-            s = generateUniformInput(self.p.inputSteps, prob=self.p.inputGenSpikeProb, start=self.p.inputOffset)
-        if self.p.inputType == 'sinus':
-            s = generateSinusInput(self.p.inputSteps, start=self.p.inputOffset)
+    for i in range(numGens):
+        drawSpikes(self, offset)
+        # Multiply spikes to all trials
+        trialsRange = range(0, self.p.totalSteps, self.p.totalTrialSteps)
+        sAll = np.ndarray.flatten(np.array([s + i for i in trialsRange]))
         # Store input spikes in array
-        inputSpikes.append(s)
+        inputSpikes.append(sAll)
 
     return inputSpikes
+
+"""
+@desc: Draw spikes for ONE spike generator
+"""
+def drawSpikes(self, offset):
+    s = []
+    # Generate spikes, depending on input type
+    if self.p.inputType == 'uniform':
+        s = self.p.inputOffset + offset + generateUniformInput(self.p.inputSteps, prob=self.p.inputGenSpikeProb)
+    if self.p.inputType == 'sinus':
+        s = self.p.inputOffset + offset + generateSinusInput(self.p.inputSteps)
+
+    return s
 
 """
 @desc: Define target neurons in reservoir to connect generators with
@@ -101,8 +184,8 @@ def getTargetNeurons(self):
         exNeuronsEdge = int(np.sqrt(self.p.reservoirExSize))
 
         # Get shifts for the input area of the target neurons
-        sX = self.p.inputTopologyShiftX
-        sY = self.p.inputTopologyShiftY
+        sX = self.p.inputShiftX
+        sY = self.p.inputShiftY
 
         # Define input region in network topology and store their indices
         topology = np.zeros((exNeuronsEdge,exNeuronsEdge))
@@ -112,18 +195,25 @@ def getTargetNeurons(self):
     return targetNeurons
     
 """
-@desc: Connect spike generators with target neurons of reservoir
-       Draws mask and weights
+@desc:  Connect spike generators with target neurons of reservoir
+        Every spike generator is connected to one neuron
+        Finally draws uniformly distributed weights
+@params:
+        spikeGenerators: nxsdk spike generators
+        inputTargetNeurons: indices of reservoir target neurons
 """
-def connectSpikeGenerator(self, spikeGenerators):
-    # Draw mask connections from generators to neurons
-    inputMask = self.drawSparseMaskMatrix(p=self.p.inputMaskConnProb, nrows=self.p.reservoirExSize, ncols=self.p.inputNumGenerators, avoidSelf=False)
+def connectSpikeGenerator(self, spikeGenerators, inputTargetNeurons):
+    # Creates empty mask matrix
+    inputMask = np.zeros((self.p.reservoirExSize, len(inputTargetNeurons)))
 
-    # Set all non-targeted neurons to zero
-    inputMask[np.delete(np.arange(self.p.inputNumGenerators), self.inputTargetNeurons),:] = 0
+    # Every generator is connected to one 
+    for i, idx in enumerate(inputTargetNeurons):
+        inputMask[idx,i:i+1] = 1
+
+    # Transform to sparse matrix
+    inputMask = sparse.csr_matrix(inputMask)
 
     # Draw weights
-    #inputWeights = inputMask*self.p.patchMaxWeight
     inputWeights = self.drawSparseWeightMatrix(inputMask, distribution='uniform')
 
     # Connect generator to the reservoir network
@@ -167,7 +257,7 @@ def addInput2D(self, connectToIndices=None):
                 apply = True
 
             if (apply):
-                spks = np.arange(self.p.inputSteps) + self.p.trialSteps*k + self.p.resetOffset*(k+1)
+                spks = np.arange(self.p.inputSteps) + self.p.stepsPerTrial*k + self.p.resetOffset*(k+1)
                 spikeTimes.append(spks)
     
         spikeTimes = list(itertools.chain(*spikeTimes))
@@ -229,7 +319,7 @@ def addInput2D(self, connectToIndices=None):
         the input is connected to a share of the reservoir network,
         an excitatory connection prototype is used
 """
-def addInputSequence(self, clusterIdx):
+def addTraceGenerator(self, clusterIdx):
     start = clusterIdx*self.p.traceSteps
     # Create spike generator
     sg = self.nxNet.createSpikeGenProcess(numPorts=self.p.traceGens)

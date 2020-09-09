@@ -37,12 +37,11 @@ class AnisotropicReadoutExperiment(AnisotropicExperiment):
         self.system.setDatalog(datalog)
 
         # Instantiate utils and plot
-        self.utils = Utils.instance()
-        self.utils.setParameters(self.p)
+        self.utils = Utils.instance(parameters=self.p)
         self.plot = Plot(self)
 
         # Define some further variables
-        self.target = self.utils.loadTarget()
+        #self.target = self.utils.loadTarget()
 
     """
     @desc: Overwrite parameters for this experiment
@@ -107,10 +106,10 @@ class AnisotropicReadoutExperiment(AnisotropicExperiment):
         self.net.connectOutput()
 
         # Add patch input
-        self.net.addRepeatedPatchGenerator()
+        self.net.addLeaveNOutInput()
 
-        # Build the network structure
-        self.net.build()
+        # Add Probes
+        self.net.addProbes()
     
     """
     @desc: Run whole experiment

@@ -34,8 +34,7 @@ class SequenceExperiment():
         self.system.setDatalog(datalog)
 
         # Instantiate utils and plot
-        self.utils = Utils.instance()
-        self.utils.setParameters(self.p)
+        self.utils = Utils.instance(parameters=self.p)
         self.plot = Plot(self)
 
         # Define some further variables
@@ -94,15 +93,13 @@ class SequenceExperiment():
         self.net.connectReservoir()
 
         # Add cue
-        self.net.addTraceGenerator(0)
-        self.net.addTraceGenerator(1)
-        self.net.addTraceGenerator(2)
+        self.net.addInputSequence()
 
         # Add background noise
         #self.net.addNoiseGenerator()
 
-        # Build the network structure
-        self.net.build()
+        # Add Probes
+        self.net.addProbes()
 
     """
     @desc: Run experiment

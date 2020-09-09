@@ -42,7 +42,7 @@ def landscape(self, isInput=True, isVectors=False):
     xx, yy = np.meshgrid(x,y)
 
     # Get input mask
-    inputMask = np.mean(self.obj.patchWeights, axis=1)
+    inputMask = np.mean(self.obj.inputWeights, axis=1)
     inputMask[inputMask > 0] = 1
     inputMask = inputMask.astype(int).reshape((topsize,topsize))
 

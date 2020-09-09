@@ -33,8 +33,7 @@ class RandomExperiment():
         self.system.setDatalog(datalog)
 
         # Instantiate utils and plot
-        self.utils = Utils.instance()
-        self.utils.setParameters(self.p)
+        self.utils = Utils.instance(parameters=self.p)
         self.plot = Plot(self)
 
     """

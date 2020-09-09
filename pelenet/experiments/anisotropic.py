@@ -43,7 +43,7 @@ class AnisotropicExperiment():
         self.system.setDatalog(datalog)
 
         # Instantiate utils and plot
-        self.utils = Utils.instance()
+        self.utils = Utils.instance(parameters=self.p)
         self.plot = Plot(self)
 
     """
@@ -89,17 +89,14 @@ class AnisotropicExperiment():
         # Draw anisotropic mask and weights
         self.drawMaskAndWeights()
 
-        # Draw output weights
-        self.net.drawOutputMaskAndWeights()
-
         # Connect ex-in reservoir
         self.net.connectReservoir()
 
-        # Add patch input
-        self.net.addRepeatedPatchGenerator()
+        # Add leave-n-out input
+        self.net.addLeaveNOutInput()
 
-        # Build the network structure
-        self.net.build()
+        # Add Probes
+        self.net.addProbes()
 
     """
     @desc: Summary of some plots about the network

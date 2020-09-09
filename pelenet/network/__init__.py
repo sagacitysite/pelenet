@@ -27,18 +27,22 @@ class ReservoirNetwork():
         # Instanciate nx net object
         self.nxNet = nx.NxNet()
 
-        # Define prototypes
+        # Excitatory connection prototype
         self.exConnProto = nx.ConnectionPrototype(signMode=nx.SYNAPSE_SIGN_MODE.EXCITATORY,
-                                                  weightExponent=self.p.weightExponent,
-                                                  numTagBits=0, numDelayBits=0, numWeightBits=8)  # excitatory connection prototype
+                                                  weightExponent=self.p.weightExponent, numTagBits=self.p.numTagBits,
+                                                  numDelayBits=self.p.numDelayBits, numWeightBits=self.p.numWeightBits)
+        # Inhibitory connection prototype
         self.inConnProto = nx.ConnectionPrototype(signMode=nx.SYNAPSE_SIGN_MODE.INHIBITORY,
-                                                  weightExponent=self.p.weightExponent,
-                                                  numTagBits=0, numDelayBits=0, numWeightBits=8)  # inhibitory connection prototype
+                                                  weightExponent=self.p.weightExponent, numTagBits=self.p.numTagBits,
+                                                  numDelayBits=self.p.numDelayBits, numWeightBits=self.p.numWeightBits)
+        # Mixed connection prototype
         self.mixedConnProto = nx.ConnectionPrototype(signMode=nx.SYNAPSE_SIGN_MODE.MIXED,
-                                                     weightExponent=self.p.weightExponent)  # mixed connection prototype
+                                                     weightExponent=self.p.weightExponent, numTagBits=self.p.numTagBits,
+                                                     numDelayBits=self.p.numDelayBits, numWeightBits=self.p.numWeightBits)
+        # Generator connection prototype
         self.genConnProto = nx.ConnectionPrototype(signMode=nx.SYNAPSE_SIGN_MODE.EXCITATORY,
-                                                  weightExponent=7,
-                                                  numTagBits=0, numDelayBits=0, numWeightBits=8)  # excitatory connection prototype
+                                                   weightExponent=self.p.inputWeightExponent, numTagBits=self.p.numTagBits,
+                                                   numDelayBits=self.p.numDelayBits, numWeightBits=self.p.numWeightBits)
 
         """
         Network objects
@@ -91,7 +95,7 @@ class ReservoirNetwork():
         self.traceWeights = []
 
         # Input
-        self.inputTargetNeurons = None
+        self.inputTargetNeurons = []
         self.inputSpikes = []
         self.inputWeights = None
 
@@ -122,7 +126,7 @@ class ReservoirNetwork():
     @note: Import functions from files
     """
     from .connect import removeCoreFromList, connectReservoir, connectOutput
-    from .input import addInput
+    from .input import addInput, addInputSequence, addLeaveNOutInput
     from .noise import addNoiseGenerator, addConstantGenerator
     from .output import drawOutputMaskAndWeights
     from .probes import addProbes, condenseSpikeProbes, postProcessing

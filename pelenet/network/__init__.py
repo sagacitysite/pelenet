@@ -99,11 +99,6 @@ class ReservoirNetwork():
         self.inputSpikes = []
         self.inputWeights = None
 
-        # Cue input
-        #self.patchNeurons = None
-        #self.patchSpikes = []
-        #self.patchWeights = None
-
         # Noise input spikes
         self.noiseSpikes = None
         self.noiseWeights = None
@@ -126,7 +121,7 @@ class ReservoirNetwork():
     @note: Import functions from files
     """
     from .connect import removeCoreFromList, connectReservoir, connectOutput
-    from .input import addInput, addInputSequence, addLeaveNOutInput
+    from .input import addInput
     from .noise import addNoiseGenerator, addConstantGenerator
     from .output import drawOutputMaskAndWeights
     from .probes import addProbes, condenseSpikeProbes, postProcessing

@@ -58,9 +58,9 @@ def recombineExWeightMatrix(self, initialExWeights, exWeightProbes):
 @return: Mask of the bottom-left area of the matrix
 """
 def getSupportWeightsMask(self, exWeightMatrix):
-    nCs = self.p.traceClusterSize
+    nCs = self.p.inputNumTargetNeurons
     nEx = self.p.reservoirExSize
-    nC = self.p.traceClusters
+    nC = self.p.inputSequenceSize
     matrix = exWeightMatrix
 
     # Get areas in matrix

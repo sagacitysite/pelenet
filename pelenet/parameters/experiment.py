@@ -74,57 +74,7 @@ def includeExperiment(self):
     Input
     """
 
-    # Simple input: not considering the network topology, good for e.g. randomly connected networks
-    #self.isSimpleInput = False
-
-    # Topological input: considering the network topology, good for 2D networks with local connections (e.g. anisotropic network)
-    #self.isTopoInput = False
-
-    # Simple sequence input: defines multiple simple inputs, activated in a row
-    #self.isSimpleSequence = False
-
-    # Single input
-    #self.isClusterInput = False
-    #self.inputSteps = 1  # number of steps the input should drive the network
-    #self.inputRelaxation = 4  # time to wait for relaxation of the network activity after input
-
-    # Sequence input
-    #self.isSequenceInput = False
-    #self.traceClusters = 3  # number of trace clusters
-    #self.traceGens = 10  # number of trace generators per input cluster
-    #self.traceSteps = 30 #50 #20  # number of steps the trace input should drive the network
-    #self.traceSpikeProb = 0.1  # probability of spike for the generator
-    #self.traceMaxWeight = 255  # maximum weight a trace connection can have
-    #self.traceClusterShare = 0.1  # percentage of excitatory neurons a cluster should be connected with
-    #self.traceClusterSize = None  # the number of neurons a trace cluster has
-
-    # Background input / constant input
-    #self.isConstantInput = False
-    #self.constGens = 50 #10  # number of constant signal generators
-    #self.constDens = 0.1 #0.2  # percent of connections to reservoir from input
-    #self.constSpikeProb = 0.2  # probability of spike for the generator
-    #self.constSizeShare = 0.1  # share of neurons for the constant input in relation to excitatory network size
-    #self.constSize = None  # number of neurons for the constant input
-
-
-    # Patch input
-    #self.patchSteps = 1 #5 #2 #200 #100  # number of steps the cue should drive the network
-    #self.patchRelaxation = 4 #23  # time to wait for relaxation of the network activity after cue
-    #self.patchMaxWeight = 255 #200 #100  # maximum weight a cue connection can have
-    #self.patchNeuronsShiftX = 0 #20  # shift in x direction of cue input
-    #self.patchNeuronsShiftY = 0 #20  # shift in y direction of cue input
-    #self.patchSize = 5  # size of neuron patch for the cue input
-    #self.patchGensPerNeuron = 10  # number of generators per input neuron
-    #self.patchMissingNeurons = 1 # number of missing neurons (noise level)
-
-    # Input
-    self.inputIsTopology = False  # A 2D input is applied (only important if network has topology)
-    self.inputShiftX = 0  # shift in X direction of input in topology (only applies if inputIsTopology is true)
-    self.inputShiftY = 0  # shift in Y direction of input in topology (only applies if inputIsTopology is true)
-
-    self.inputIsLeaveOut = False  # Leaves one input neuron out in every trial
-    self.inputNumLeaveOut = 1  # Only applied if inputIsLeaveOut is true
-
+    # Basic input parameters
     self.inputNumTargetNeurons = 40  # Number of target neurons which are connected to the spike generators
     self.inputShareTargetNeurons = None  # Share of target neurons in relation to excitatory reservoir size
     self.inputType = 'uniform'  # The form of the input, can be 'uniform' or 'sinus' (TODO: exponential decay, exponential rise)
@@ -133,6 +83,16 @@ def includeExperiment(self):
     self.inputGenSpikeProb = 0.1  # Spiking probability of the spike generators
     self.inputOffset = 0  # Wait some time before input starts in trial
 
+    # Topology
+    self.inputIsTopology = False  # A 2D input is applied (only important if network has topology)
+    self.inputShiftX = 0  # shift in X direction of input in topology (only applies if inputIsTopology is true)
+    self.inputShiftY = 0  # shift in Y direction of input in topology (only applies if inputIsTopology is true)
+
+    # Leave-n-out
+    self.inputIsLeaveOut = False  # Leaves one input neuron out in every trial
+    self.inputNumLeaveOut = 1  # Only applied if inputIsLeaveOut is true
+
+    # Sequence
     self.inputIsSequence = False  # Mulitple inputs are given in a sequence within one trial
     self.inputSequenceSize = 3  # Number of inputs stimulating the network neurons in a row within one trial
 

@@ -60,6 +60,7 @@ class AnisotropicExperiment():
             'voltageTau': 10.24,  # Voltage time constant
             'currentTau': 10.78,  # Current time constant
             'thresholdMant': 1000,  # Spiking threshold for membrane potential
+            'reservoirConnProb': 0.05,  # Connection probability
             # Anisotropic
             'anisoStdE': 12,  # Space constant, std of gaussian for excitatory neurons
             'anisoStdI': 9,  # Space constant, std of gaussian for inhibitory neurons (range 9 - 11)
@@ -69,7 +70,11 @@ class AnisotropicExperiment():
             'weightExCoefficient': 12,  # Coefficient for excitatory anisotropic weight
             'weightInCoefficient': 48,  # Coefficient for inhibitory anisotropic weight
             # Input
-            'patchSize': 5,  # Edge size of input patch
+            'inputIsTopology': True,  # Activate a 2D input area
+            'inputNumTargetNeurons': 36,  # Number of target neurons for the input
+            'inputSteps': 5,  # Number of steps the network is activated by the input
+            'inputWeightExponent': 0,  # The weight exponent of the weights from the generator to the target neurons
+            'inputGenSpikeProb': 1.0,  # Spiking probability of the spike generators
             # Probes
             'isExSpikeProbe': True,  # Probe excitatory spikes
             'isInSpikeProbe': True   # Probe inhibitory spikes
@@ -93,7 +98,7 @@ class AnisotropicExperiment():
         self.net.connectReservoir()
 
         # Add leave-n-out input
-        self.net.addLeaveNOutInput()
+        self.net.addInput()
 
         # Add Probes
         self.net.addProbes()

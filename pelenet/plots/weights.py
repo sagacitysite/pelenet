@@ -78,8 +78,8 @@ def trainedExWeightMatrix(self):
     supportMask: is calculated by getSupportWeightsMask() in utils
 """
 def weightsSortedBySupport(self, supportMask):
-    nCs = self.p.traceClusterSize
-    nC = self.p.traceClusters
+    nCs = self.p.inputNumTargetNeurons
+    nC = self.p.inputSequenceSize
     matrix = self.obj.trainedWeightsExex
 
     top = matrix[:nC*nCs,:].toarray()  # top

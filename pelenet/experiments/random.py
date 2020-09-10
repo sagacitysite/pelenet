@@ -46,13 +46,18 @@ class RandomExperiment():
             'trials': 1,  # Number of trials
             'stepsPerTrial': 600,  # Number of simulation steps for every trial
             # Network
-            #'reservoirConnPerNeuron': 40,  # Number of connections per neuron
-            'reservoirConnProb': 0.005,  # Connection probability
+            'reservoirExSize': 400,  # Number of excitatory neurons
+            'reservoirConnPerNeuron': 40,  # Number of connections per neuron
             # Neurons
-            'refractoryDelay': 2, # Refactory period
-            'voltageTau': 40,  # Voltage time constant
-            'currentTau': 1,  # Current time constant
-            'thresholdMant': 70,  # Spiking threshold for membrane potential
+            'refractoryDelay': 2,  # Refactory period
+            'voltageTau': 20,  # Voltage time constant
+            'currentTau': 5,  # Current time constant
+            'thresholdMant': 800,  # Spiking threshold for membrane potential
+            # Input
+            'inputGenSpikeProb': 0.5,  # Probability of spikes for the spike generators
+            'inputWeightExponent': 2,  # Weight exponent for the connections from the generators to the reservoir neurons
+            'inputNumTargetNeurons': 50,  # Number of neurons targeted by the spike generators
+            'inputSteps': 10,  # Number of steps the input is active
             # Probes
             'isExSpikeProbe': True,  # Probe excitatory spikes
             'isInSpikeProbe': True  # Probe inhibitory spikes

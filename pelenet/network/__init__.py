@@ -107,15 +107,15 @@ class ReservoirNetwork():
         self.utils = Utils.instance()
         self.plot = Plot(self)
     
-    """
-    @desc: Run the network
-    """
-    def run(self):
-        self.nxNet.run(self.p.totalSteps)
-        self.nxNet.disconnect()
+    # """
+    # @desc: Run the network
+    # """
+    # def run(self):
+    #     self.nxNet.run(self.p.totalSteps)
+    #     self.nxNet.disconnect()
 
-        # Post processing of probes
-        self.postProcessing()
+    #     # Post processing of probes
+    #     self.postProcessing()
 
     """
     @note: Import functions from files
@@ -129,5 +129,6 @@ class ReservoirNetwork():
     from .weights import (
         drawAndSetSparseReservoirWeightMatrix, drawSparseWeightMatrix,
         drawAndSetSparseReservoirMaskMatrix, drawSparseMaskMatrix,
-        setSparseReservoirWeightMatrix, getMaskedWeights, getWeightMatrixFromProbe
+        setSparseReservoirWeightMatrix, getMaskedWeights, getWeightMatrixFromProbe,
+        drawMaskAndWeights
     )

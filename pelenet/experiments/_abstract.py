@@ -114,7 +114,7 @@ class Experiment(ABC):
             logging.info('Board successfully started')
 
             # Write initial data to channels
-            for i in range(self.p.numChips):
+            for i in range(self.net.numChipsUsed):
                 resetInitChannels[i].write(3, [
                     self.p.neuronsPerCore,  # number of neurons per core
                     self.p.totalTrialSteps,  # reset interval

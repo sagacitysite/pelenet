@@ -48,7 +48,9 @@ class ReservoirNetwork():
         Network objects
         """
         # Cores
-        self.cores = np.arange(self.p.numChips*self.p.numCoresPerChip)
+        self.coresAvailable = np.arange(self.p.numCores)
+        self.numCoresUsed = 0
+        self.numChipsUsed = 0
 
         # Weights
         self.initialMasks = SimpleNamespace(**{

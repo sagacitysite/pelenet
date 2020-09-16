@@ -97,6 +97,10 @@ def includeExperiment(self):
     self.inputIsSequence = False  # Mulitple inputs are given in a sequence within one trial
     self.inputSequenceSize = 3  # Number of inputs stimulating the network neurons in a row within one trial
 
+    # Vary input positions
+    self.inputIsVary = False
+    self.inputVaryProbs = [0.5, 0.5]
+
     """
     Probes
     """

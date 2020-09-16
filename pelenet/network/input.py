@@ -41,9 +41,62 @@ def generateUniformInput(length, prob=0.1):
 """
 def addInput(self, *args, **kwargs):
     if self.p.inputIsSequence:
-        addInputSequence(self, *args, **kwargs)
-    else:
-        addInputSingle(self, *args, **kwargs)
+        addInputSequence(self)
+        return
+
+    if self.p.inputIsVary:
+        addInputVary(self)
+        return
+    
+    # A single input is the default case
+    addInputSingle(self, *args, **kwargs)
+
+"""
+@desc:  Create a varying input for every trial
+        Different input positions are defined
+        Those positions occur with a given probability
+"""
+def addInputVary(self):
+
+    # Define a list of all trails
+    allTrials = np.arange(self.p.trials)
+    # Define variable to collect used trial indices
+    usedTrials = []
+    # Define variale to collect trials for every input
+    inputsTrials = []
+
+    # Loop over number of inputs and assign trials
+    for i in range(self.p.inputVaryNum):
+        # Get remaning trials, not used by an input
+        remaining = np.delete(allTrials, usedTrials)
+        # Get Number of trials for this input i
+        trialsForInput = int(self.p.inputVaryProbs[i]*self.p.trials)
+        # From remaining trials, choose trials for current input i
+        lastInput = np.random.choice(remaining, trialsForInput, replace=False)
+        # Track used trials
+        usedTrials.extend(lastInput)
+        # Append chosen trials to current input
+        inputsTrials.append(lastInput)
+    
+    # If not all trials were used (due to rounding problems), distribute remaining ones randomly to the inputs
+    remaining = np.delete(allTrials, usedTrials)
+    if len(remaining) > 0:
+        # Get list of inputs
+        inputs = np.arange(self.p.inputVaryNum)
+        # Randomly choose inputs to distribute remaining trials to
+        inds = np.random.choice(inputs, len(remaining), replace=False)
+        # Loop over all chosen inputs
+        for i, ind in enumerate(inds):
+            # Append remainder to chosen input
+            inputsTrials[ind] = np.append(inputsTrials[ind], remaining[i])
+
+    # Loop over number of inputs and add input signals
+    for i in range(self.p.inputVaryNum):
+        targetNeurons = np.arange(i*self.p.inputNumTargetNeurons, (i+1)*self.p.inputNumTargetNeurons)
+        addInputSingle(self, inputTrials=inputsTrials[i], targetNeuronIndices=targetNeurons)
+
+    # Log that input was added
+    logging.info('Varying input was added to the network')
 
 """
 @desc:  Create a sequence of inputs
@@ -92,7 +145,7 @@ def addInputSequence(self):
         targetNeuronIndices:    indices of reservoir neurons to connect input to
                                 if not given, indices are taken successively (default)
 """
-def addInputSingle(self, inputSpikeIndices=[], targetNeuronIndices=[]):
+def addInputSingle(self, inputSpikeIndices=[], targetNeuronIndices=[], inputTrials=[]):
     # Get inidices of target neurons if not already given
     self.inputTargetNeurons = targetNeuronIndices if len(targetNeuronIndices) else getTargetNeurons(self)
 
@@ -103,7 +156,7 @@ def addInputSingle(self, inputSpikeIndices=[], targetNeuronIndices=[]):
     sg = self.nxNet.createSpikeGenProcess(numPorts=numGens)
 
     # Draw spikes for input generators if not already given
-    self.inputSpikes = inputSpikeIndices if len(inputSpikeIndices) else drawSpikesForAllGenerators(self, numGens=numGens)
+    self.inputSpikes = inputSpikeIndices if len(inputSpikeIndices) else drawSpikesForAllGenerators(self, numGens=numGens, inputTrials=inputTrials)
 
     # Add spikes s to generator i
     for i, s in enumerate(self.inputSpikes):
@@ -119,7 +172,7 @@ def addInputSingle(self, inputSpikeIndices=[], targetNeuronIndices=[]):
 """
 @desc: Draw spikes for ALL spike generators
 """
-def drawSpikesForAllGenerators(self, numGens, offset=0):
+def drawSpikesForAllGenerators(self, numGens, offset=0, inputTrials=[]):
     # Initialize array for spike indices
     inputSpikes = []
 
@@ -142,6 +195,11 @@ def drawSpikesForAllGenerators(self, numGens, offset=0):
             if self.p.inputIsLeaveOut:
                 # Add spike times only when i != k
                 apply = np.all([combinations[k, m] != i for m in range(self.p.inputNumLeaveOut)])
+
+            # If varying input should be applied, update apply boolean
+            if self.p.inputIsVary:
+                # Add spikes only when current trial is in trials list
+                apply = k in inputTrials
 
             # If spike generator produces input for the current trial, add it to spikeTimes
             if apply:

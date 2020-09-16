@@ -75,6 +75,10 @@ class Parameters(ParamaterNotValid):
         if self.reservoirConnProb is not None and self.reservoirConnPerNeuron is not None:
             raise ParameterNotValid('Either reservoirConnProb or reservoirConnPerNeuron can be set, not both. Set one of them to None to avoid ambiguity.')
 
+        # Check varying input probabilities
+        if not np.isclose(np.sum(self.inputVaryProbs), 1.0, atol=0.01):
+            raise ParameterNotValid('The probabilities for varying inputs must sum up to 1.0.')
+
     """
     @desc: Check if values make sense AFTER calculating derived parameters and raise error if not
     """

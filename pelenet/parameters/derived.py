@@ -24,6 +24,7 @@ def computeDerived(self):
     self.numOutClusters = int(self.reservoirExSize / np.square(self.partitioningClusterSize))
     self.numOutputNeurons = 2 * self.numOutClusters
     self.numOutDimSize = int(np.sqrt(self.numOutClusters))
+    self.inputVaryNum = len(self.inputVaryProbs)
 
     """
     Define conditional parameters

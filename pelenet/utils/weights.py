@@ -60,7 +60,7 @@ def recombineExWeightMatrix(self, initialExWeights, exWeightProbes):
 def getSupportWeightsMask(self, exWeightMatrix):
     nCs = self.p.inputNumTargetNeurons
     nEx = self.p.reservoirExSize
-    nC = self.p.inputSequenceSize
+    nC = self.p.inputVaryNum
     matrix = exWeightMatrix
 
     # Get areas in matrix

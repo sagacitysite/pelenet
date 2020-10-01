@@ -79,7 +79,7 @@ def trainedExWeightMatrix(self):
 """
 def weightsSortedBySupport(self, supportMask):
     nCs = self.p.inputNumTargetNeurons
-    nC = self.p.inputSequenceSize
+    nC = self.p.inputVaryNum
     matrix = self.obj.trainedWeightsExex
 
     top = matrix[:nC*nCs,:].toarray()  # top

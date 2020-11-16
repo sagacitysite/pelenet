@@ -69,27 +69,35 @@ def initialExWeightMatrix(self):
 """
 @desc: Plot trained excitatory weight matrix
 """
-def trainedExWeightMatrix(self):
-    weightMatrix(self, self.obj.trainedWeightsExex, 'trained', 'Trained weights')
+def trainedExWeightMatrix(self, trainedWeightsExex=None):
+    if trainedWeightsExex is None:
+        # If no trained weight matrix for plotting is given, plot the last one
+        weightMatrix(self, self.obj.trainedWeightsExex[-1], 'trained', 'Trained weights')
+    else:
+        # If a specific matrix is given, plot it
+        weightMatrix(self, trainedWeightsExex, 'trained', 'Trained weights')
 
 """
 @desc: Plots the whole weight matrix with weights sorted according to support weights
 @params:
     supportMask: is calculated by getSupportWeightsMask() in utils
 """
-def weightsSortedBySupport(self, supportMask):
+def weightsSortedBySupport(self, supportMask, trainedWeightsExex):
     nCs = self.p.inputNumTargetNeurons
     nC = self.p.inputVaryNum
-    matrix = self.obj.trainedWeightsExex
 
-    top = matrix[:nC*nCs,:].toarray()  # top
-    bottom = matrix[nC*nCs:,:].toarray()  # bottom
+    # Get parts to sort of weight matrix
+    top = trainedWeightsExex[:nC*nCs,:].toarray()  # top
+    bottom = trainedWeightsExex[nC*nCs:,:].toarray()  # bottom
+
+    # Remove no-support neurons
+    supportMask = supportMask[:-1]
 
     # Get sorted indices
     indices = np.lexsort(supportMask[::-1])[::-1]
 
     # Define sorted matrix
-    sortedMatrix = np.zeros(matrix.shape)
+    sortedMatrix = np.zeros(trainedWeightsExex.shape)
 
     # Fill
     sortedMatrix[:nC*nCs,:] = top  # fill top

@@ -23,35 +23,43 @@ def recombineExWeightMatrix(self, initialExWeights, exWeightProbes):
     # Get shorthand for some variables
     init = initialExWeights
     nPerCore = self.p.neuronsPerCore
-    # Calculate trained weight matrix from weight probes
-    weightMatrix = []
-    # Iterate over number of probes (connection chunks between cores)
-    n, m = np.shape(exWeightProbes)
-    for i in range(n):
-        # Define from/to indices for indexing
-        ifr, ito = i*nPerCore, (i+1)*nPerCore
-        chunks = []
-        for j in range(m):
+    # Array which finally contains all weight matrices
+    weightMatrices = []
+    # Iterate over number of probes over time
+    numProbes = len(exWeightProbes[0][0][0][0].data)
+    for p in range(numProbes):
+        # Calculate trained weight matrix from weight probes
+        weightMatrix = []
+        # Iterate over connection chunks between cores
+        n, m = np.shape(exWeightProbes)
+        for i in range(n):
             # Define from/to indices for indexing
-            jfr, jto = j*nPerCore, (j+1)*nPerCore
-            # Get number of synapses in current probe
-            numSyn = np.shape(exWeightProbes[i][j])[0]
-            # Iterate over number of synapses in current probe (connections from one core to another)
-            data = []
-            for k in range(numSyn):
-                # Get weights data from probe index 0 and append to data array
-                data.append(exWeightProbes[i][j][k][0].data[0])
-            # Get chunk from initial matrix for defining sparse matrix of the current chunk (need indices and index pointer)
-            ic = init[jfr:jto, ifr:ito]
-            # Define sparse matrix, using initial weight matrix indices and index pointerm, as well as shape of chunk
-            chunks.append(sparse.csr_matrix((data, ic.indices, ic.indptr), shape=np.shape(ic)))
-        # Stack list of chunks together to column
-        column = sparse.vstack(chunks)
-        # Append column to weight matrix
-        weightMatrix.append(column)
+            ifr, ito = i*nPerCore, (i+1)*nPerCore
+            chunks = []
+            for j in range(m):
+                # Define from/to indices for indexing
+                jfr, jto = j*nPerCore, (j+1)*nPerCore
+                # Get number of synapses in current probe
+                numSyn = np.shape(exWeightProbes[i][j])[0]
+                # Iterate over number of synapses in current probe (connections from one core to another)
+                data = []
+                for k in range(numSyn):
+                    # Get weights data from probe index p and append to data array
+                    data.append(exWeightProbes[i][j][k][0].data[p])
+                # Get chunk from initial matrix for defining sparse matrix of the current chunk (need indices and index pointer)
+                ic = init[jfr:jto, ifr:ito]
+                # Define sparse matrix, using initial weight matrix indices and index pointerm, as well as shape of chunk
+                chunks.append(sparse.csr_matrix((data, ic.indices, ic.indptr), shape=np.shape(ic)))
+            # Stack list of chunks together to column
+            column = sparse.vstack(chunks)
+            # Append column to weight matrix
+            weightMatrix.append(column)
+        # Stack list of columns together to the whole trained weight matrix
+        wmcsr = sparse.hstack(weightMatrix).tocsr()  # transform to csr, since stacking returns coo format
+        # Add weight matrix of current 
+        weightMatrices.append(wmcsr)
 
-    # Stack list of columns together to the whole trained weight matrix
-    return sparse.hstack(weightMatrix).tocsr()  # transform to csr, since stacking returns coo format
+    return weightMatrices
 
 """
 @desc: Get mask of support weights for every cluster in the assembly
@@ -83,4 +91,10 @@ def getSupportWeightsMask(self, exWeightMatrix):
     maxRowIndices = np.array(col_argmax[:,None] == range(nC)).T
 
     # Get final mask in combining both conditions
-    return np.logical_and(greaterMeanIndices, maxRowIndices)
+    supportMasks = np.logical_and(greaterMeanIndices, maxRowIndices)
+
+    # Get mask for other neurons
+    othersMask = np.logical_not(np.logical_or(*supportMasks))
+
+    # Combine masks for support neurons and other neurons
+    return np.array([*supportMasks, othersMask])

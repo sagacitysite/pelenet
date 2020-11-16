@@ -1,3 +1,7 @@
+import logging
+import numpy as np
+from scipy import sparse
+
 """
 @desc: Adds a generator which produces random spikes and
         connects it to the excitatory reservoir neurons
@@ -7,20 +11,24 @@ def addNoiseGenerator(self):
     sg = self.nxNet.createSpikeGenProcess(numPorts=self.p.noiseNeurons)
 
     # Create random spikes
-    noise = np.random.rand(self.p.noiseNeurons, self.p.totalSteps)
-    noise[noise < (1-self.p.noiseSpikeprob)] = 0
-    noise[noise >= (1-self.p.noiseSpikeprob)] = 1
+    randSpikes = np.random.rand(self.p.noiseNeurons, self.p.stepsPerTrial)
+    randSpikes[randSpikes < (1-self.p.noiseSpikeprob)] = 0
+    randSpikes[randSpikes >= (1-self.p.noiseSpikeprob)] = 1
 
     # Store spikes in object
-    self.noiseSpikes = noise.astype(int)
+    self.noiseSpikes = randSpikes.astype(int)
 
-    # Add spike times to spike generator
+    # Repeat spikes and add spike times to spike generator
     for i in range(self.p.noiseNeurons):
-        spikes = np.where(self.noiseSpikes[i,:])[0].tolist()
-        sg.addSpikes(spikeInputPortNodeIds=i, spikeTimes=spikes)
+        # Get spike times from binary spike array
+        spikesPerTrial = np.where(self.noiseSpikes[i,:])[0]
+        # Apply the same random spike every trial 
+        totalNoiseSpikes = np.array([ spikesPerTrial + self.p.stepsPerTrial*k + self.p.resetOffset*(k+1) for k in range(self.p.trials) ]).flatten()
+        # Add spike times to generator
+        sg.addSpikes(spikeInputPortNodeIds=i, spikeTimes=totalNoiseSpikes.tolist())
 
     # Create mask for noise/reservoir connections
-    noiseMask = self.drawSparseMaskMatrix(self.p.noiseDens, self.p.reservoirExSize, self.p.noiseNeurons)
+    noiseMask = self.drawSparseMaskMatrix(self.p.noiseDens, self.p.reservoirExSize, self.p.noiseNeurons, avoidSelf=False)
 
     # Create weights for noise/reservoir connections between -noiseMaxWeight and +noiseMaxWeight
     randoms = ((np.random.rand(self.p.reservoirExSize, self.p.noiseNeurons)*2*self.p.noiseMaxWeight) - self.p.noiseMaxWeight)

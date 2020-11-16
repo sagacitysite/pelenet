@@ -94,7 +94,7 @@ def addProbes(self):
     
     # Probe weights
     if self.p.isWeightProbe:
-        probeCond = nx.IntervalProbeCondition(tStart=self.p.totalSteps-1, dt=self.p.totalSteps)
+        probeCond = nx.IntervalProbeCondition(tStart=self.p.weightProbeStart, dt=self.p.weightProbeInterval)
         #probeCond = nx.IntervalProbeCondition(tStart=self.p.stepsPerIteration-1, dt=self.p.stepsPerIteration)
         n, m = np.shape(self.connectionChunks)
         for i in range(n):

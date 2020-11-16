@@ -105,7 +105,7 @@ def includeExperiment(self):
     Probes
     """
 
-    # Probes
+    # Probe status
     self.isExSpikeProbe = False  # activate/deactivate spike probes for excitatory neurons
     self.isInSpikeProbe = False  # activate/deactivate spike probes for inhibitory neurons
     self.isOutSpikeProbe = False  # activate/deactivate spike probes for output neurons
@@ -115,3 +115,7 @@ def includeExperiment(self):
     self.isOutVoltageProbe = False  # activate/deactivate voltage probes for output neurons
     self.isExCurrentProbe = False  # activate/deactivate current probes for excitatory neurons
     self.isInCurrentProbe = False  # activate/deactivate current probes for inhibitory neurons
+
+    # Weight probes
+    self.weightProbeStart = None  # time step where the weight probe starts
+    self.weightProbeInterval = None  # probe interval, repeat weight probe after x number of steps

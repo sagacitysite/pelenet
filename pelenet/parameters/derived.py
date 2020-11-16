@@ -44,6 +44,12 @@ def computeDerived(self):
     self.totalTrialSteps = self.stepsPerTrial + self.resetOffset
     self.totalSteps = self.totalTrialSteps * self.trials
 
+    # Define default values for weight probe
+    if self.weightProbeStart is None:
+        self.weightProbeStart = self.totalTrialSteps-1  # first probe after first trial
+    if self.weightProbeInterval is None:
+        self.weightProbeInterval = self.totalTrialSteps  # probe after every trial
+
     # If noiseNeurons is not set (None), calculate it with given share
     if self.noiseNeurons is None:
         self.noiseNeurons = int(self.noiseNeuronsShare * self.reservoirExSize)

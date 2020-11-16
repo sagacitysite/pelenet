@@ -100,6 +100,7 @@ class ReservoirNetwork():
         self.inputTargetNeurons = []
         self.inputSpikes = []
         self.inputWeights = None
+        self.inputTrials = []
 
         # Noise input spikes
         self.noiseSpikes = None

@@ -90,6 +90,9 @@ def addInputVary(self):
             # Append remainder to chosen input
             inputsTrials[ind] = np.append(inputsTrials[ind], remaining[i])
 
+    # Store input trials in network
+    self.inputTrials = inputsTrials
+
     # Loop over number of inputs and add input signals
     for i in range(self.p.inputVaryNum):
         targetNeurons = np.arange(i*self.p.inputNumTargetNeurons, (i+1)*self.p.inputNumTargetNeurons)

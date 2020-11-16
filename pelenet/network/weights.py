@@ -1,4 +1,5 @@
 import numpy as np
+import warnings
 from scipy import sparse
 
 """
@@ -80,6 +81,11 @@ def setSparseReservoirWeightMatrix(self, mask, *args, **kwargs):
 @desc: Create mask that determines the connections to establish
 """
 def drawSparseMaskMatrix(self, p=None, nrows=None, ncols=None, avoidSelf=True):
+    # avoidSelf can only be applied if nrows = ncols, otherwise set to False
+    if avoidSelf and (nrows != ncols):
+        avoidSelf = False
+        warnings.warn("avoidSelf is automatically set to false, since it is not applicable. It is recommended to set avoidSelf=False explicitly.")
+
     # Preprocess some variables
     n = self.p.reservoirExSize + self.p.reservoirInSize
     pc = self.p.reservoirConnProb if p is None else p

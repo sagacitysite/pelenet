@@ -41,7 +41,7 @@ class Utils():
     )
     # Functions to evaluate weights
     from .weights import (
-        getSpectralRadius, recombineExWeightMatrix, getSupportWeightsMask
+        getSpectralRadius, recombineExWeightMatrix, getSupportWeightsMask, getSupportMasksForAllTrials, getSupportNeuronTurnovers
     )
     # Functions to evaluate target
     from .target import (
@@ -49,5 +49,5 @@ class Utils():
     )
     # Other functions
     from .misc import (
-        trainOLS, pca
+        trainOLS, pca, getInputLetterList
     )

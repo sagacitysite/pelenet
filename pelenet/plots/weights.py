@@ -1,4 +1,5 @@
 import warnings
+import string
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import sparse
@@ -105,3 +106,93 @@ def weightsSortedBySupport(self, supportMask, trainedWeightsExex):
 
     # Plot
     weightMatrix(self, sparse.csr_matrix(sortedMatrix), 'sorted', 'Sorted weights')
+
+"""
+@desc:  Share of support neurons
+"""
+def supportShare(self, supportMasks, figsize=(10,4), filename=None):
+    # Calculate share of support neurons
+    supportShare = np.array([ np.sum(supportMasks[i], axis=1) for i in range(self.p.trials+1)]).T
+
+    # Number of background neurons (potential support neurons) 
+    numBackroundNeurons = np.shape(supportMasks)[2]
+
+    # x values for plot
+    xvals = np.arange(1,self.p.trials+1)
+
+    # Letters A to Z
+    alphabet = list(string.ascii_uppercase)
+
+    # Set size of figure
+    plt.figure(figsize=figsize)
+
+    # Plot support share for all clusters
+    for i in range(np.shape(supportShare)[0]-1):
+        plt.plot(supportShare[i]/numBackroundNeurons, label=alphabet[i])
+    # Plot support share for not assigned neurons
+    plt.plot(supportShare[-1]/numBackroundNeurons, label='not assigned')
+    # Add legend
+    plt.legend()
+
+    # Set limits and labels
+    plt.ylim((0,1))
+    plt.xlim((0,self.p.trials))
+    plt.ylabel('support neurons in % of background neurons')
+    plt.xlabel('trials', labelpad=25)
+    plt.xticks(xvals)
+
+    # Add input labels to x-axis indicating stimulated cluster
+    inputs = self.utils.getInputLetterList(self.obj.inputTrials)
+    for i in range(self.p.trials):
+        plt.text(i+0.845, -0.165, inputs[i])
+
+    # Save plot in datalog
+    filename = '_'+filename if filename is not None else ''
+    plt.savefig(self.plotDir + 'weights_support_share' + filename + '.' + self.p.pltFileType)
+
+    # Show plot
+    pl = plt.show()
+
+"""
+@desc:  Turnovers in support neurons
+"""
+def supportTurnover(self, supportMasks, figsize=(10,4), filename=None):
+
+    # Get support turnovers
+    turnover = self.utils.getSupportNeuronTurnovers(supportMasks)
+
+    # x values for plot
+    xvals = np.arange(1,self.p.trials+1)
+
+    # Letters A to Z
+    alphabet = list(string.ascii_uppercase)
+
+    # Set size of figure
+    plt.figure(figsize=figsize)
+
+    # Plot support share for all clusters
+    for i in range(np.shape(turnover)[0]-1):
+        plt.plot(xvals, turnover[i], label=alphabet[i])
+    # Plot support share for not assigned neurons
+    plt.plot(xvals, turnover[-1], label='not assigned')
+    # Add legend
+    plt.legend()
+
+    # Set limits and labels
+    plt.ylim((0,50))
+    plt.xlim((1,self.p.trials+1))
+    plt.ylabel('support neuron turnover')
+    plt.xlabel('trials', labelpad=25)
+    plt.xticks(xvals)
+    
+    # Add input labels to x-axis indicating stimulated cluster
+    inputs = self.utils.getInputLetterList(self.obj.inputTrials)
+    for i in range(self.p.trials):
+        plt.text(i+0.845, -8, inputs[i])
+
+    # Save plot in datalog
+    filename = '_'+filename if filename is not None else ''
+    plt.savefig(self.plotDir + 'weights_support_turnover' + filename + '.' + self.p.pltFileType)
+
+    # Show plot
+    pl = plt.show()

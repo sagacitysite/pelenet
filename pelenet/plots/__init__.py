@@ -1,4 +1,5 @@
 from ..system import System
+from ..utils import Utils
 from matplotlib import rcParams
 
 """
@@ -12,6 +13,9 @@ class Plot():
     def __init__(self, rel):
         # Get system instance
         system = System.instance()
+
+        # Get utils instance
+        self.utils = Utils.instance()
 
         # Store related object
         self.obj = rel
@@ -54,7 +58,8 @@ class Plot():
     # Functions to plot weights
     from .weights import (
         initialExWeightDistribution, trainedExWeightDistribution,
-        initialExWeightMatrix, trainedExWeightMatrix, weightsSortedBySupport
+        initialExWeightMatrix, trainedExWeightMatrix, weightsSortedBySupport,
+        supportShare, supportTurnover
     )
     # Functions to plot target
     from .target import (

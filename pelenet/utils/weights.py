@@ -98,3 +98,36 @@ def getSupportWeightsMask(self, exWeightMatrix):
 
     # Combine masks for support neurons and other neurons
     return np.array([*supportMasks, othersMask])
+
+"""
+@desc: Get support masks for weight matrices of all trials
+"""
+def getSupportMasksForAllTrials(self, initialweightsExex, trainedWeightsExex):
+    supportMasks = []
+
+    # First add initial weights
+    swm = self.getSupportWeightsMask(initialweightsExex)
+    supportMasks.append(swm)
+
+    # Add all trained weights matrices 
+    for i in range(len(trainedWeightsExex)):
+        swm = self.getSupportWeightsMask(trainedWeightsExex[i])
+        supportMasks.append(swm)
+
+    return np.array(supportMasks)
+
+"""
+@desc: Get turnovers of support neurons
+"""
+def getSupportNeuronTurnovers(self, supportMasks):
+    numTrials = np.shape(supportMasks)[0]-1
+    turnover = []
+
+    # Get turonover between all trials
+    for i in range(numTrials):
+        # Get difference between support masks
+        diff = np.subtract(supportMasks[i].astype(int), supportMasks[i+1].astype(int))
+        # Absolute sum of difference
+        turnover.append(np.sum(np.abs(diff), axis=1))
+    
+    return np.array(turnover).T

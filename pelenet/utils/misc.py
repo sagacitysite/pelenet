@@ -8,7 +8,7 @@ from lib.helper.exceptions import ArgumentNotValid
 
 import copy
 import gc
-
+import string
 
 """
 @desc: Trains ordinary least square model, includes filtering and regularization
@@ -114,3 +114,21 @@ def pca(self, data, dims_rescaled_data=2):
     # carry out the transformation on the data using eigenvectors
     # and return the re-scaled data, eigenvalues, and eigenvectors
     return np.dot(evecs.T, data.T).T, evals, evecs
+
+"""
+@desc:  Get a list of the sequence of inputs as alphabetic characters
+        e.g. ['A', 'B', 'B', 'B', 'A', ...]
+"""
+def getInputLetterList(self, inputTrials):
+    # Get number of applied inputs
+    numInputs = len(inputTrials)
+    # Get alphabet letters as list of characters
+    alphabet = list(string.ascii_uppercase)
+
+    # Iterate over inputs and assign alphabetic letters to given inputs
+    numTrials = len(np.concatenate(inputTrials))
+    inputs = np.zeros(numTrials, dtype=str)
+    for i in range(numInputs):
+        inputs[inputTrials[i]] = alphabet[i]
+    
+    return inputs

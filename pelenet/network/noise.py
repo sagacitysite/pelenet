@@ -30,8 +30,15 @@ def addNoiseGenerator(self):
     # Create mask for noise/reservoir connections
     noiseMask = self.drawSparseMaskMatrix(self.p.noiseDens, self.p.reservoirExSize, self.p.noiseNeurons, avoidSelf=False)
 
-    # Create weights for noise/reservoir connections between -noiseMaxWeight and +noiseMaxWeight
-    randoms = ((np.random.rand(self.p.reservoirExSize, self.p.noiseNeurons)*2*self.p.noiseMaxWeight) - self.p.noiseMaxWeight)
+    # Create weights for noise/reservoir connections 
+    randoms = None
+    if self.p.onlyExcitatory:
+        # weights between between 0 and +noiseMaxWeight
+        randoms = np.random.rand(self.p.reservoirExSize, self.p.noiseNeurons)
+    else:
+        # weights between between -noiseMaxWeight and +noiseMaxWeight
+        randoms = ((np.random.rand(self.p.reservoirExSize, self.p.noiseNeurons)*2) - 1)
+    
     self.noiseWeights = sparse.csr_matrix(np.round(self.p.noiseMaxWeight*randoms).astype(int))
     #sign = np.random.rand(self.p.reservoirExSize, self.p.noiseNeurons)
     #sign[sign < 0.5] = -1

@@ -48,6 +48,7 @@ def includeExperiment(self):
 
     # Noise
     self.isNoise = False  # Activates noise
+    self.onlyExcitatory = True  # If False, the noise is randomly excitatory and inhibitory and in average zero
     self.noiseNeuronsShare = 0.1  # Share of noise neurons in relation to excitatory neurons
     self.noiseNeurons = None  # Number of noise neurons (calculated if None)
     self.noiseSpikeprob = 0.05  # In average, every 1/x th time step a noise neuron fires

@@ -70,7 +70,8 @@ class Experiment(ABC):
         self.net.connectReservoir()
 
         # Add cue
-        self.net.addInput()
+        if self.p.isInput:
+            self.net.addInput()
 
         # Add background noise
         if self.p.isNoise:

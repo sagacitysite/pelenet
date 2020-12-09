@@ -7,6 +7,9 @@ import warnings
 @desc: Plot spike train of neurons in reservoir
 """
 def reservoirSpikeTrain(self, fr=0, to=None, figsize=None, colorEx=None, colorIn=None):
+    # Set 'to' to total times steps if not defined
+    if to is None: to = self.p.totalSteps
+    
     # Get spikes
     exSpikes = self.obj.exSpikeTrains if self.p.isExSpikeProbe else None
     inSpikes = 2*self.obj.inSpikeTrains if self.p.isInSpikeProbe else None  # multiply by 2 to enable a different color in imshow
@@ -19,6 +22,11 @@ def reservoirSpikeTrain(self, fr=0, to=None, figsize=None, colorEx=None, colorIn
     if (not self.p.isExSpikeProbe) and (not self.p.isInSpikeProbe):
         warnings.warn("No excitatory or inhibitory spikes were probed, spike trains cannot be shown.")
         return
+    
+    # If to is greater than spike train throw warning and stop here
+    if (to > len(exSpikes[1])):
+        warnings.warn("'to' must be smaller than the available length of spike train")
+        return
 
     # Combine ex and in spikes
     allSpikes = None
@@ -28,16 +36,19 @@ def reservoirSpikeTrain(self, fr=0, to=None, figsize=None, colorEx=None, colorIn
         allSpikes = exSpikes
     elif self.p.isInSpikeProbe:
         allSpikes = inSpikes
-
+    
     # Choose spikes ("zoom" in time)
     chosenSpikes = allSpikes[:, fr:to]
+    
+    # Get number of neurons
+    numNeurons = chosenSpikes.shape[0]
 
     # Define colors
     cmap = colors.ListedColormap(['#ffffff', colorEx, colorIn])
 
     # Plot spike train
     if figsize is not None: plt.figure(figsize=figsize)
-    plt.imshow(chosenSpikes, cmap=cmap, vmin=0, vmax=2, aspect='auto')
+    plt.imshow(chosenSpikes, cmap=cmap, vmin=0, vmax=2, aspect='auto', extent=[fr, to, numNeurons, 0])
     #plt.title('Reservoir spikes')
     plt.xlabel('time steps')
     plt.ylabel('index of neuron')
@@ -77,7 +88,7 @@ def outputSpikeTrain(self, fr=0, to=None, color=None, figsize=None):
 """
 @desc: Plot average firing rate of reservoir neurons
 """
-def reservoirRates(self, fr=0, to=None, ylim=None, figsize=None, colorEx=None, colorIn=None, legend=True):
+def reservoirRates(self, fr=0, to=None, ylim=(0,0.5), figsize=None, colorEx=None, colorIn=None, legend=True):
     # Set 'to' to total times steps if not defined
     if to is None: to = self.p.totalSteps
 
@@ -118,17 +129,17 @@ def reservoirRates(self, fr=0, to=None, ylim=None, figsize=None, colorEx=None, c
 
     # Plot mean rates
     if meanRateIn is not None:
-        plt.plot(np.arange(0,to-fr,1), meanRateIn, alpha=alpha, color=colorIn, label='Inhibitory neurons')
+        plt.plot(np.arange(fr,to,1), meanRateIn, alpha=alpha, color=colorIn, label='Inhibitory neurons')
     if meanRateEx is not None:
-        plt.plot(np.arange(0,to-fr,1), meanRateEx, alpha=alpha, color=colorEx, label='Excitatory neurons')
+        plt.plot(np.arange(fr,to,1), meanRateEx, alpha=alpha, color=colorEx, label='Excitatory neurons')
 
     # Show legend if both mean rates are plotted and legend flag is set
     if meanRateEx is not None and meanRateIn is not None and legend is True: plt.legend()
 
     # Set y limit if given
-    plt.xlim((0, to-fr))
-    if ylim is not None: plt.ylim(ylim)
-
+    plt.xlim((fr, to))
+    plt.ylim(ylim)
+    
     # Save and show plot
     plt.savefig(self.plotDir + 'spikes_rates.' + self.p.pltFileType)
     p = plt.show()

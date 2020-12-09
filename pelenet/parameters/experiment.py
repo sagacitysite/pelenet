@@ -77,6 +77,7 @@ def includeExperiment(self):
     """
 
     # Basic input parameters
+    self.isInput = True  # Enables/Disables input
     self.inputNumTargetNeurons = 40  # Number of target neurons which are connected to the spike generators
     self.inputShareTargetNeurons = None  # Share of target neurons in relation to excitatory reservoir size
     self.inputType = 'uniform'  # The form of the input, can be 'uniform' or 'sinus' (TODO: exponential decay, exponential rise)

@@ -1,5 +1,6 @@
 import logging
 import numpy as np
+from copy import deepcopy
 from scipy import sparse
 
 """
@@ -28,7 +29,7 @@ def addNoiseGenerator(self):
         sg.addSpikes(spikeInputPortNodeIds=i, spikeTimes=totalNoiseSpikes.tolist())
 
     # Create mask for noise/reservoir connections
-    noiseMask = self.drawSparseMaskMatrix(self.p.noiseDens, self.p.reservoirExSize, self.p.noiseNeurons, avoidSelf=False)
+    self.noiseMask = self.drawSparseMaskMatrix(self.p.noiseDens, self.p.reservoirExSize, self.p.noiseNeurons, avoidSelf=False)
 
     # Create weights for noise/reservoir connections 
     randoms = None
@@ -43,14 +44,28 @@ def addNoiseGenerator(self):
     #sign = np.random.rand(self.p.reservoirExSize, self.p.noiseNeurons)
     #sign[sign < 0.5] = -1
     #sign[sign >= 0.5] = 1
-    #self.noiseWeights = self.drawSparseWeightMatrix(noiseMask).multiply(sign).tocsr()
+    #self.noiseWeights = self.drawSparseWeightMatrix(self.noiseMask).multiply(sign).tocsr()
 
+    #import sys
+    
     # Connect noise network to the reservoir network
     for i in range(len(self.exReservoirChunks)):
         fr, to = i*self.p.neuronsPerCore, (i+1)*self.p.neuronsPerCore
-        ma = noiseMask[fr:to, :].toarray()
+        ma = self.noiseMask[fr:to, :].toarray()
         we = self.noiseWeights[fr:to, :].toarray()
-        sg.connect(self.exReservoirChunks[i], prototype=self.mixedConnProto, connectionMask=ma, weight=we)
+        pm = deepcopy(we)
+        pm[pm >= 0] = 0
+        pm[pm < 0] = 1
+        #print(pm)
+        #print(we)
+        #sys.exit()
+        #sg.connect(self.exReservoirChunks[i], prototype=self.mixedConnProto, connectionMask=ma, weight=we)
+        sg.connect(self.exReservoirChunks[i],
+            prototype=[self.exConnProto, self.inConnProto],
+            prototypeMap=pm,
+            connectionMask=ma,
+            weight=we
+        )
     
     # Log that background noise was added
     logging.info('Background noise was added to the network')

@@ -25,6 +25,10 @@ def computeDerived(self):
     self.numOutputNeurons = 2 * self.numOutClusters
     self.numOutDimSize = int(np.sqrt(self.numOutClusters))
     self.inputVaryNum = len(self.inputVaryProbs)
+    
+    # Calculate current and voltage decay
+    self.currentDecay = int(1/self.currentTau*2**12)
+    self.voltageDecay = int(1/self.voltageTau*2**12)
 
     """
     Define conditional parameters

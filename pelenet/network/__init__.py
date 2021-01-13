@@ -104,6 +104,7 @@ class ReservoirNetwork():
 
         # Noise input spikes
         self.noiseSpikes = None
+        self.noiseMask = None
         self.noiseWeights = None
 
         # Instantiate utils and plot

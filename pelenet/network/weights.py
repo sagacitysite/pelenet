@@ -14,6 +14,7 @@ def drawWeights(size, distribution):
         s = hyp  # Default: 1.0; according to Teramae, Tsubo & Fukai (2012)
         # Draw weight from lognormal distribution
         weights = (np.random.lognormal(m, s, size)*(255/20.)).astype(int)
+        #weights = (np.random.lognormal(m, s, size)*(255/5.)).astype(int)
     if distribution == 'normal':
         m = 10  # mean
         s = 5  # standard deviation

@@ -7,7 +7,7 @@ from scipy import sparse
 """
 @desc: Plot weight distribution and show spectral radius
 """
-def weightDistribution(self, weights, yscale="linear", title=True, figsize=None):
+def weightDistribution(self, weights, yscale="linear", title=True, figsize=None, xlim=None):
     # Get only data from sparse matrix (equals flattend matrix)
     wsf = weights.data
 
@@ -21,7 +21,10 @@ def weightDistribution(self, weights, yscale="linear", title=True, figsize=None)
 
     # Reservoir weights histogram
     if figsize is not None: plt.figure(figsize=figsize)
-    plt.xlim((0, np.max(wsf)))
+    if xlim is None:
+        plt.xlim((0, np.max(wsf)))
+    else:
+        plt.xlim(xlim)
     plt.xlabel('size of weight')
     plt.ylabel('frequency')
     if title: plt.title('Spectral radius: ' + str(maxeigval_round) + ', Mean weight: ' + str(meanweight))
@@ -137,7 +140,7 @@ def supportShare(self, supportMasks, figsize=(10,4), filename=None):
     # Set limits and labels
     plt.ylim((0,1))
     plt.xlim((0,self.p.trials))
-    plt.ylabel('support neurons in % of background neurons')
+    plt.ylabel('support neuron share')
     plt.xlabel('trials', labelpad=25)
     plt.xticks(xvals)
 

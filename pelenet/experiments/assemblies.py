@@ -27,23 +27,32 @@ class AssemblyExperiment(Experiment):
             # # Probes
             # 'isExSpikeProbe': True
         }
-
+    
     """
-    @desc: Build reservoir network with given mask and weights
+    @desc: Overwrite build reservoir network with given mask, weights and input
     """
-    def buildWithGivenMaskAndWeights(self, mask, weights):
+    def build(self, mask=None, weights=None, inputSpikes=[]):
         # Instanciate innate network
         self.net = ReservoirNetwork(self.p)
-
-        # Set mask and weights
-        self.net.initialMasks = mask
-        self.net.initialWeights = weights
+        
+        # Define mask and weights
+        if (mask is None and weights is None):
+            # Draw anisotropic mask and weights
+            self.net.drawMaskAndWeights()
+        elif (mask is not None and weights is not None):
+            # Set mask and weights
+            self.net.initialMasks = mask
+            self.net.initialWeights = weights
+        else:
+            # Throw an error if only one of mask/weights is defiend
+            raise Exception("It is not possible to define only one of mask and weights, both must be defined or not defined.")
 
         # Connect ex-in reservoir
         self.net.connectReservoir()
 
-        # Add cue
-        self.net.addInput()
+        # Add input
+        if self.p.isInput:
+            self.net.addInput(inputSpikes)
 
         # Add background noise
         if self.p.isNoise:

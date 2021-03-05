@@ -70,7 +70,7 @@ void reset(runState *RunState) {
         if ((RunState->time_step - resetSteps) % resetInterval == 0) {
             // Print what we are doing
             if (i==0) {
-                //printf("Reset current/voltage from time step %d to %d\n", RunState->time_step-resetSteps+1, RunState->time_step);
+                printf("Reset current/voltage from time step %d to %d\n", RunState->time_step-resetSteps+1, RunState->time_step);
                 printf("Reset functional state at %d\n", RunState->time_step);
                 //printf("Enable learning at %d\n", RunState->time_step);
             }

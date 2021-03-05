@@ -4,10 +4,17 @@ import itertools
 import warnings
 from scipy import sparse
 
-"""
-@desc: Generates a sinus signal (one 'hill') in given length of time steps
-"""
 def generateSinusInput(length):
+    '''
+    Generates half of a sinus signal (one 'hill') in given length of time steps
+    
+    :param length: Length of the sine-wave to generate
+    :type length: int
+    
+    :returns: Indices of spikes
+    :rtype: 1-dimensional array of indices for spike positions as int
+    '''
+    
     # Draw from a sin wave from 0 to 3,14 (one 'hill')
     probCoeff = 1 #1.5  # the higher the probability coefficient, the more activity is in the network
     probs = probCoeff * np.abs(np.sin((np.pi / length) * np.arange(length)))
@@ -45,7 +52,7 @@ def addInput(self, *args, **kwargs):
         return
 
     if self.p.inputIsVary:
-        addInputVary(self)
+        addInputVary(self, *args, **kwargs)
         return
     
     # A single input is the default case
@@ -56,13 +63,13 @@ def addInput(self, *args, **kwargs):
         Different input positions are defined
         Those positions occur with a given probability
 """
-def addInputVary(self):
-
+def addInputVary(self, inputSpikes=[]):
+    
     # Define a list of all trails
     allTrials = np.arange(self.p.trials)
     # Define variable to collect used trial indices
     usedTrials = []
-    # Define variale to collect trials for every input
+    # Define variable to collect trials for every input
     inputsTrials = []
 
     # Loop over number of inputs and assign trials
@@ -77,7 +84,7 @@ def addInputVary(self):
         usedTrials.extend(lastInput)
         # Append chosen trials to current input
         inputsTrials.append(lastInput)
-    
+
     # If not all trials were used (due to rounding problems), distribute remaining ones randomly to the inputs
     remaining = np.delete(allTrials, usedTrials)
     if len(remaining) > 0:
@@ -96,7 +103,12 @@ def addInputVary(self):
     # Loop over number of inputs and add input signals
     for i in range(self.p.inputVaryNum):
         targetNeurons = np.arange(i*self.p.inputNumTargetNeurons, (i+1)*self.p.inputNumTargetNeurons)
-        addInputSingle(self, inputTrials=inputsTrials[i], targetNeuronIndices=targetNeurons)
+        addInputSingle(
+            self,
+            inputSpikeIndices=inputSpikes,
+            inputTrials=inputsTrials[i],
+            targetNeuronIndices=targetNeurons
+        )
 
     # Log that input was added
     logging.info('Varying input was added to the network')

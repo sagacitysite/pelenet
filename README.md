@@ -11,6 +11,10 @@ The PeleNet is a framework for reservoir computing. It has the following feature
 * Logging of experiments
 * Object-oriented code design
 
+Details of the framework are described on Arxiv:
+
+[PeleNet: A Reservoir Computing Framework for Loihi (Michaelis, 2020)](https://arxiv.org/abs/2011.12338)
+
 ## Warning
 
 The framework is still under development. Some functionality may not work as described. For questions please contact me (see below).

@@ -288,7 +288,7 @@ def connectSpikeGenerator(self, spikeGenerators, inputTargetNeurons):
     inputMask = sparse.csr_matrix(inputMask)
 
     # Draw weights
-    inputWeights = self.drawSparseWeightMatrix(inputMask, distribution='uniform')
+    inputWeights = self.drawSparseWeightMatrix(inputMask, distribution=self.p.inputWeightDistribution)
 
     # Connect generator to the reservoir network
     for i in range(len(self.exReservoirChunks)):

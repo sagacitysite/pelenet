@@ -82,8 +82,9 @@ def includeExperiment(self):
     self.inputShareTargetNeurons = None  # Share of target neurons in relation to excitatory reservoir size
     self.inputType = 'uniform'  # The form of the input, can be 'uniform' or 'sinus' (TODO: exponential decay, exponential rise)
     self.inputSteps = 10  # Number of steps the input is presented
-    self.inputWeightExponent = 0  # weight exponent (between [-8,7])
     self.inputGenSpikeProb = 0.1  # Spiking probability of the spike generators
+    self.inputWeightExponent = 0  # weight exponent (between [-8,7])
+    self.inputWeightDistribution = 'uniform'  # Defines how generators and ex-neurons are connected: 'max', 'uniform', 'lognormal' or 'normal'
     self.inputOffset = 0  # Wait some time before input starts in trial
 
     # Topology

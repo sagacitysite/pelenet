@@ -21,6 +21,8 @@ def drawWeights(size, distribution):
         weights = np.random.normal(m, s, size).astype(int)
     if distribution == 'uniform':
         weights = np.random.uniform(0, 255 ,size).astype(int)
+    if distribution == 'max':
+        weights = 255*np.ones(size).astype(int)
 
     return weights
 

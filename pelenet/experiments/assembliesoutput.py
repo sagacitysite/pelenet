@@ -128,11 +128,11 @@ class AssemblyOutputExperiment(Experiment):
         # Concatenate datasets
         inputs = np.concatenate((
             yin_train[:nTrain],
-            #yang_train[:nTrain],
-            dots_train[:nTrain],
+            yang_train[:nTrain],
+            #dots_train[:nTrain],
             yin_test[:nTest],
-            #yang_test[:nTest],
-            dots_test[:nTest]
+            yang_test[:nTest],
+            #dots_test[:nTest]
         ), axis=0)
         
         # Transform to input for reservoir and return

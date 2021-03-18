@@ -1,5 +1,6 @@
 # Official modules
 import numpy as np
+from mnist import MNIST
 from sklearn.linear_model import RidgeClassifier
 
 # Pelenet modules
@@ -92,12 +93,80 @@ class AssemblyOutputExperiment(Experiment):
             spikeIdcs.append(spikeTimes)
         return spikeIdcs
 
+    def getImagesOfClass(self, images, labels, label=0, threshold=64, size=1000):
+        """
+        Get MNIST images of a specific class
+        
+        Images are postprocesses. The image is reshaped to a squared form from 784 to 28x28.
+        Further, the grey values are thresholded to get binary values (black/white only).
+        
+        Parameters
+        ----------
+        images :
+            Images to be used from the MNIST dataset (train or test)
+        labels :
+            Labels to be used from the MNIST dataset (train or test)
+        label :
+            The class to filter images for.
+        threshold:
+            The threshold to tranform grey values to black/white (binary) values (0-255).
+        """
+        # Transform images and labels to numpy arrays
+        images = np.array(images)
+        labels = np.array(labels)
+        # Get indices where images match label
+        idc = np.where(labels == label)[0]
+        # Filter out 'size' images with specific label
+        img = images[idc[:size]]
+        # Reshape images from 1D to 2D
+        s = img.shape
+        xy = int(np.sqrt(s[1]))
+        img = img.reshape((s[0], xy, xy))
+        # Threshold images to remove grey values and tranform to black/white (binary) values
+        img[img <= threshold] = 0
+        img[img > threshold] = 1
+        
+        # Return images of requested class
+        return img
+
+    def loadMnistAsInputs(self, nAssemblies=2, nTrain=500, nTest=100):
+        # Define variables
+        self.nAssemblies = nAssemblies
+        self.nTrain = nTrain
+        self.nTest = nTest
+
+        # Load mnist data
+        mndata = MNIST('data/mnist')
+        train, trainLabels = mndata.load_training()
+        test, testLabels = mndata.load_testing()
+
+        # Throw error if number of classes exceeds limit
+        if (nAssemblies != 2):
+            raise Exception('Curently only two classes are supported')
+
+        # Get training set
+        train0 = self.getImagesOfClass(train, trainLabels, 0)
+        train1 = self.getImagesOfClass(train, trainLabels, 1)
+
+        # Get test set
+        test0 = self.getImagesOfClass(test, testLabels, 0)
+        test1 = self.getImagesOfClass(test, testLabels, 1)
+
+        # Concatenate datasets
+        inputs = np.concatenate((
+            train0,
+            train1,
+            test0,
+            test1
+        ), axis=0)
+
+        return self.getInputIdcs(inputs)
+
+
     def loadYinYangAsInputs(self, nAssemblies=2, nTrain=500, nTest=100):
         """
         Loads the Yin Yang dataset and transforms it to an input for the reservoir network
         """
-
-        # TODO add dot class
 
         # Define variables
         self.nAssemblies = nAssemblies
@@ -105,17 +174,17 @@ class AssemblyOutputExperiment(Experiment):
         self.nTest = nTest
 
         # Load raw data
-        yin_train = np.load('data/yinyang/inputs_yin_train.npy')  # 1000
-        yang_train = np.load('data/yinyang/inputs_yang_train.npy')  # 1000
-        dots_train = np.load('data/yinyang/inputs_dots_train.npy')  # 1000
-        yin_test = np.load('data/yinyang/inputs_yin_test.npy')  # 200
-        yang_test = np.load('data/yinyang/inputs_yang_test.npy')  # 200
-        dots_test = np.load('data/yinyang/inputs_dots_test.npy')  # 200
+        yinTrain = np.load('data/yinyang/inputs_yin_train.npy')  # 1000
+        yangTrain = np.load('data/yinyang/inputs_yang_train.npy')  # 1000
+        dotsTrain = np.load('data/yinyang/inputs_dots_train.npy')  # 1000
+        yinTest = np.load('data/yinyang/inputs_yin_test.npy')  # 200
+        yangTest = np.load('data/yinyang/inputs_yang_test.npy')  # 200
+        dotsTest = np.load('data/yinyang/inputs_dots_test.npy')  # 200
 
         # Check if requested data is avialable
-        if (nTrain > yin_train.shape[0]) or (nTrain > yang_train.shape[0]):
+        if (nTrain > yinTrain.shape[0]) or (nTrain > yangTrain.shape[0]):
             raise Exception('The training dataset has fewer samples than requested.')
-        if (nTest > yin_test.shape[0]) or (nTest > yang_test.shape[0]):
+        if (nTest > yinTest.shape[0]) or (nTest > yangTest.shape[0]):
             raise Exception('The test dataset has fewer samples than requested.')
 
         # Check if number of classes is available
@@ -127,12 +196,12 @@ class AssemblyOutputExperiment(Experiment):
 
         # Concatenate datasets
         inputs = np.concatenate((
-            yin_train[:nTrain],
-            yang_train[:nTrain],
-            #dots_train[:nTrain],
-            yin_test[:nTest],
-            yang_test[:nTest],
-            #dots_test[:nTest]
+            yinTrain[:nTrain],
+            yangTrain[:nTrain],
+            #dotsTrain[:nTrain],
+            yinTest[:nTest],
+            yangTest[:nTest],
+            #dotsTest[:nTest]
         ), axis=0)
         
         # Transform to input for reservoir and return

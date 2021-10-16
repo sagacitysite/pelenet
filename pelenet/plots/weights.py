@@ -88,7 +88,7 @@ def trainedExWeightMatrix(self, trainedWeightsExex=None):
 """
 def weightsSortedBySupport(self, supportMask, trainedWeightsExex):
     nCs = self.p.inputNumTargetNeurons
-    nC = self.p.inputVaryNum
+    nC = self.p.inputAlternatingNum
 
     # Get parts to sort of weight matrix
     top = trainedWeightsExex[:nC*nCs,:].toarray()  # top

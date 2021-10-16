@@ -24,7 +24,6 @@ def computeDerived(self):
     self.numOutClusters = int(self.reservoirExSize / np.square(self.partitioningClusterSize))
     self.numOutputNeurons = 2 * self.numOutClusters
     self.numOutDimSize = int(np.sqrt(self.numOutClusters))
-    self.inputVaryNum = len(self.inputVaryProbs)
     
     # Calculate current and voltage decay
     self.currentDecay = int(1/self.currentTau*2**12)
@@ -33,6 +32,10 @@ def computeDerived(self):
     """
     Define conditional parameters
     """
+
+    # Set number of alternating inputs to the siize of the probability list
+    if self.inputAlternatingProbs is not None:
+        self.inputAlternatingNum = len(self.inputAlternatingProbs)
 
     # Size of inhibitory/excitatory network
     if self.reservoirInSize is None:

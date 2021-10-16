@@ -68,7 +68,7 @@ def recombineExWeightMatrix(self, initialExWeights, exWeightProbes):
 def getSupportWeightsMask(self, exWeightMatrix):
     nCs = self.p.inputNumTargetNeurons
     nEx = self.p.reservoirExSize
-    nC = self.p.inputVaryNum
+    nC = self.p.inputAlternatingNum
     matrix = exWeightMatrix
 
     # Get areas in matrix
@@ -92,9 +92,12 @@ def getSupportWeightsMask(self, exWeightMatrix):
 
     # Get final mask in combining both conditions
     supportMasks = np.logical_and(greaterMeanIndices, maxRowIndices)
+    
+    # Create a "false" column, which is necessary if only one column (one input) exists
+    falseCol = np.zeros((supportMasks.shape[1])).astype(bool)
 
     # Get mask for other neurons
-    othersMask = np.logical_not(np.logical_or(*supportMasks))
+    othersMask = np.logical_not(np.logical_or(falseCol, *supportMasks))
 
     # Combine masks for support neurons and other neurons
     return np.array([*supportMasks, othersMask])
@@ -109,7 +112,7 @@ def getSupportMasksForAllTrials(self, initialweightsExex, trainedWeightsExex):
     swm = self.getSupportWeightsMask(initialweightsExex)
     supportMasks.append(swm)
 
-    # Add all trained weights matrices 
+    # Add all trained weight matrices 
     for i in range(len(trainedWeightsExex)):
         swm = self.getSupportWeightsMask(trainedWeightsExex[i])
         supportMasks.append(swm)

@@ -100,9 +100,10 @@ def includeExperiment(self):
     self.inputIsSequence = False  # Mulitple inputs are given in a sequence within one trial
     self.inputSequenceSize = 3  # Number of inputs stimulating the network neurons in a row within one trial
 
-    # Vary input positions
-    self.inputIsVary = False
-    self.inputVaryProbs = [0.5, 0.5]
+    # Alternate input positions
+    self.inputIsAlternating = False  # Inputs alternate their position
+    self.inputAlternatingNum = 2  # Number of inputs to alternate
+    self.inputAlternatingProbs = None  # If probabilities are given (e.g. [0.5, 0.5]), the alternation is not regular, but random
 
     """
     Probes

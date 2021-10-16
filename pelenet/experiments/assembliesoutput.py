@@ -1,6 +1,6 @@
 # Official modules
 import numpy as np
-from mnist import MNIST
+#from mnist import MNIST
 from sklearn.linear_model import RidgeClassifier
 
 # Pelenet modules
@@ -44,6 +44,10 @@ class AssemblyOutputExperiment(Experiment):
         # Define variables for the experiment
         self.assemblyIndex = assemblyIndex
         self.supportMask = supportMask
+        
+        # Data
+        self.dataTrain = None
+        self.dataTest = None
 
         # Instanciate innate network
         self.net = ReservoirNetwork(self.p)
@@ -145,12 +149,12 @@ class AssemblyOutputExperiment(Experiment):
             raise Exception('Curently only two classes are supported')
 
         # Get training set
-        train0 = self.getImagesOfClass(train, trainLabels, 0)
-        train1 = self.getImagesOfClass(train, trainLabels, 1)
+        train0 = self.getImagesOfClass(train, trainLabels, 0, size=nTrain)
+        train1 = self.getImagesOfClass(train, trainLabels, 1, size=nTrain)
 
         # Get test set
-        test0 = self.getImagesOfClass(test, testLabels, 0)
-        test1 = self.getImagesOfClass(test, testLabels, 1)
+        test0 = self.getImagesOfClass(test, testLabels, 0, size=nTest)
+        test1 = self.getImagesOfClass(test, testLabels, 1, size=nTest)
 
         # Concatenate datasets
         inputs = np.concatenate((

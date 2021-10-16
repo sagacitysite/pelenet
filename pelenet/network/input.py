@@ -42,6 +42,7 @@ def generateUniformInput(length, prob=0.1):
 
     # Return spikes
     return spikeTimes
+
 """
 @desc:  Adds an input to the network for every trial,
         either a sequence or a single input
@@ -51,33 +52,75 @@ def addInput(self, *args, **kwargs):
         addInputSequence(self)
         return
 
-    if self.p.inputIsVary:
-        addInputVary(self, *args, **kwargs)
+    if self.p.inputIsAlternating and self.p.inputAlternatingProbs is not None:
+        addInputAlternatingRandom(self, *args, **kwargs)
+        return
+    
+    if self.p.inputIsAlternating and self.p.inputAlternatingProbs is None:
+        addInputAlternatingFixed(self, *args, **kwargs)
         return
     
     # A single input is the default case
     addInputSingle(self, *args, **kwargs)
 
 """
-@desc:  Create a varying input for every trial
-        Different input positions are defined
-        Those positions occur with a given probability
+@desc:  Create an alternating input for the trials
+        Different input positions are defined in a fixed order
 """
-def addInputVary(self, inputSpikes=[]):
+def addInputAlternatingFixed(self, inputSpikes=[]):
+
+    # Define a list of all trails
+    allTrials = np.arange(self.p.trials)
+    # Define variable to collect trial indices for every input
+    inputsTrials = []
+
+    for i in range(self.p.inputAlternatingNum):
+        # Get trial indices for current input
+        inputTrials = allTrials[::self.p.inputAlternatingNum]+i
+        
+        # Check if last value exeeds number of total trials and remove if necessary
+        if np.max(inputTrials) >= self.p.trials:
+            inputTrials = inputTrials[:-1]
+            
+        # Append trial indices for current input to array
+        inputsTrials.append(inputTrials)
+
+    # Store input trials in network
+    self.inputTrials = inputsTrials
+
+    # Loop over number of inputs and add input signals
+    for i in range(self.p.inputAlternatingNum):
+        targetNeurons = np.arange(i*self.p.inputNumTargetNeurons, (i+1)*self.p.inputNumTargetNeurons)
+        addInputSingle(
+            self,
+            inputSpikeIndices=inputSpikes,
+            inputTrials=inputsTrials[i],
+            targetNeuronIndices=targetNeurons
+        )
+
+    # Log that input was added
+    logging.info('Alternating input was added to the network')
+
+"""
+@desc:  Create an alternating input for the trials
+        Different input positions are defined in a random order
+        The occurencies depend on a distribution
+"""
+def addInputAlternatingRandom(self, inputSpikes=[]):
     
     # Define a list of all trails
     allTrials = np.arange(self.p.trials)
     # Define variable to collect used trial indices
     usedTrials = []
-    # Define variable to collect trials for every input
+    # Define variable to collect trial indices for every input
     inputsTrials = []
 
     # Loop over number of inputs and assign trials
-    for i in range(self.p.inputVaryNum):
+    for i in range(self.p.inputAlternatingNum):
         # Get remaning trials, not used by an input
         remaining = np.delete(allTrials, usedTrials)
         # Get Number of trials for this input i
-        trialsForInput = int(self.p.inputVaryProbs[i]*self.p.trials)
+        trialsForInput = int(self.p.inputAlternatingProbs[i]*self.p.trials)
         # From remaining trials, choose trials for current input i
         lastInput = np.random.choice(remaining, trialsForInput, replace=False)
         # Track used trials
@@ -89,7 +132,7 @@ def addInputVary(self, inputSpikes=[]):
     remaining = np.delete(allTrials, usedTrials)
     if len(remaining) > 0:
         # Get list of inputs
-        inputs = np.arange(self.p.inputVaryNum)
+        inputs = np.arange(self.p.inputAlternatingNum)
         # Randomly choose inputs to distribute remaining trials to
         inds = np.random.choice(inputs, len(remaining), replace=False)
         # Loop over all chosen inputs
@@ -101,7 +144,7 @@ def addInputVary(self, inputSpikes=[]):
     self.inputTrials = inputsTrials
 
     # Loop over number of inputs and add input signals
-    for i in range(self.p.inputVaryNum):
+    for i in range(self.p.inputAlternatingNum):
         targetNeurons = np.arange(i*self.p.inputNumTargetNeurons, (i+1)*self.p.inputNumTargetNeurons)
         addInputSingle(
             self,
@@ -212,7 +255,7 @@ def drawSpikesForAllGenerators(self, numGens, offset=0, inputTrials=[]):
                 apply = np.all([combinations[k, m] != i for m in range(self.p.inputNumLeaveOut)])
 
             # If varying input should be applied, update apply boolean
-            if self.p.inputIsVary:
+            if self.p.inputIsAlternating:
                 # Add spikes only when current trial is in trials list
                 apply = k in inputTrials
 

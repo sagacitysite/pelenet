@@ -59,7 +59,7 @@ class Plot():
     from .weights import (
         initialExWeightDistribution, trainedExWeightDistribution,
         initialExWeightMatrix, trainedExWeightMatrix, weightsSortedBySupport,
-        supportShare, supportTurnover
+        weightDistribution, supportShare, supportTurnover
     )
     # Functions to plot target
     from .target import (

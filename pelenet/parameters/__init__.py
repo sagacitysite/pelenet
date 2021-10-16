@@ -76,8 +76,13 @@ class Parameters(ParamaterNotValid):
             raise ParameterNotValid('Either reservoirConnProb or reservoirConnPerNeuron can be set, not both. Set one of them to None to avoid ambiguity.')
 
         # Check varying input probabilities
-        if not np.isclose(np.sum(self.inputVaryProbs), 1.0, atol=0.01):
+        if self.inputAlternatingProbs is not None and not np.isclose(np.sum(self.inputAlternatingProbs), 1.0, atol=0.01):
             raise ParameterNotValid('The probabilities for varying inputs must sum up to 1.0.')
+
+        # TODO remove in later versions
+        # Check if inputIsVary was used, if so: raise error
+        if hasattr(self, 'inputIsVary'):
+            raise ParameterNotValid('Pleae update your parameter name: inputIsVary is now inputIsAlternating')
 
     """
     @desc: Check if values make sense AFTER calculating derived parameters and raise error if not

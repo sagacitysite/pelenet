@@ -88,7 +88,7 @@ def outputSpikeTrain(self, fr=0, to=None, color=None, figsize=None):
 """
 @desc: Plot average firing rate of reservoir neurons
 """
-def reservoirRates(self, fr=0, to=None, ylim=(0,0.5), figsize=None, colorEx=None, colorIn=None, legend=True):
+def reservoirRates(self, fr=0, to=None, ylim=(0,0.5), figsize=None, colorEx=None, colorIn=None, legend=True, legend_loc='best'):
     # Set 'to' to total times steps if not defined
     if to is None: to = self.p.totalSteps
 
@@ -134,7 +134,7 @@ def reservoirRates(self, fr=0, to=None, ylim=(0,0.5), figsize=None, colorEx=None
         plt.plot(np.arange(fr,to,1), meanRateEx, alpha=alpha, color=colorEx, label='Excitatory neurons')
 
     # Show legend if both mean rates are plotted and legend flag is set
-    if meanRateEx is not None and meanRateIn is not None and legend is True: plt.legend()
+    if meanRateEx is not None and meanRateIn is not None and legend is True: plt.legend(loc=legend_loc)
 
     # Set y limit if given
     plt.xlim((fr, to))

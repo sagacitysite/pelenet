@@ -14,7 +14,7 @@ def getSpectralRadius(self, weights):
 
     # Calculate and return rounded spectral radius
     maxeigval = np.absolute(sparse.linalg.eigs(wgs.asfptype() / 255., k=1, which='LM', return_eigenvectors=False)[0])
-    return np.round(maxeigval*1000)/1000.
+    return maxeigval
 
 """
 Recombine weight matrix from excitatory probe chunks

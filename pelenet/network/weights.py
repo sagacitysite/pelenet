@@ -10,7 +10,7 @@ def drawWeights(size, distribution):
 
     if distribution == 'lognormal':
         hyp = 1.0
-        m = np.log(0.2) + hyp #np.log(0.12) + hyp  # Default: np.log(0.2)+1.0; according to Teramae, Tsubo & Fukai (2012)
+        m = np.log(0.2) + np.square(hyp) #np.log(0.12) + hyp  # Default: np.log(0.2)+1.0**2; according to Teramae, Tsubo & Fukai (2012)
         s = hyp  # Default: 1.0; according to Teramae, Tsubo & Fukai (2012)
         # Draw weight from lognormal distribution
         weights = (np.random.lognormal(m, s, size)*(255/20.)).astype(int)

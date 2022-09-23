@@ -54,6 +54,7 @@ def includeExperiment(self):
     self.noiseSpikeprob = 0.05  # In average, every 1/x th time step a noise neuron fires
     self.noiseDens = 0.05 # 0.005 # Connectivity between noise neurons and reservoir
     self.noiseMaxWeight = 10 #2  # Maximum weight a noise connection can have
+    self.noiseOffset = 0  # Time steps before background noise starts
 
     """
     Output

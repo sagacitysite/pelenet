@@ -12,12 +12,12 @@ def addNoiseGenerator(self):
     sg = self.nxNet.createSpikeGenProcess(numPorts=self.p.noiseNeurons)
 
     # Create random spikes
-    randSpikes = np.random.rand(self.p.noiseNeurons, self.p.stepsPerTrial)
+    randSpikes = np.random.rand(self.p.noiseNeurons, self.p.stepsPerTrial - self.p.noiseOffset)
     randSpikes[randSpikes < (1-self.p.noiseSpikeprob)] = 0
     randSpikes[randSpikes >= (1-self.p.noiseSpikeprob)] = 1
 
-    # Store spikes in object
-    self.noiseSpikes = randSpikes.astype(int)
+    # Append offset zeros in the beginning and store spikes in global object
+    self.noiseSpikes = np.insert(randSpikes.astype(int), 0, np.zeros((self.p.noiseOffset, self.p.noiseNeurons)), axis=1)
 
     # Repeat spikes and add spike times to spike generator
     for i in range(self.p.noiseNeurons):
